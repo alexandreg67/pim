@@ -1,0 +1,18 @@
+{
+  "name": "pim",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky",
+    "lint": "npm run lint --prefix client && npm run lint --prefix services/graphql-service && npm run lint --prefix services/mail-service && npm run lint --prefix services/upload-service"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10"
+  }
+}
