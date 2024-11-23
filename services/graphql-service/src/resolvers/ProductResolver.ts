@@ -1,24 +1,29 @@
-import { Resolver, Query, Mutation, Arg } from 'type-graphql';
+import { Resolver, Query, Arg, FieldResolver, Root } from 'type-graphql';
 import { Product } from '../entities/Product';
+import { Image } from '../entities/Image';
 
 @Resolver(Product)
 export class ProductResolver {
   @Query(() => [Product])
   async products(): Promise<Product[]> {
-    return Product.find();
+    return await Product.find({
+      relations: ['brand', 'categories', 'characteristics', 'images'],
+    });
   }
 
   @Query(() => Product, { nullable: true })
   async product(@Arg('id') id: string): Promise<Product | null> {
-    return Product.findOneBy({ id });
+    return await Product.findOne({
+      where: { id },
+      relations: ['brand', 'categories', 'characteristics', 'images'],
+    });
   }
 
-  @Mutation(() => Product)
-  async createProduct(
-    @Arg('name') name: string,
-    @Arg('description', { nullable: true }) description?: string
-  ): Promise<Product> {
-    // Création et sauvegarde en une seule étape avec BaseEntity
-    return Product.create({ name, description }).save();
+  @FieldResolver(() => [Image])
+  async images(@Root() product: Product): Promise<Image[]> {
+    return Image.find({
+      where: { product: { id: product.id } },
+      order: { isPrimary: 'DESC' },
+    });
   }
 }
