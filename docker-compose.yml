@@ -1,4 +1,24 @@
 services:
+  api:
+    build:
+      context: ./services/graphql-service # Le dossier où se trouve le Dockerfile
+      dockerfile: Dockerfile
+    container_name: pim_api
+    ports:
+      - "4000:4000" # Port local:Port conteneur
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres # Important : on utilise le nom du service comme host
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=pim_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pim_network
+
   postgres:
     image: postgres:15-alpine
     container_name: pim_postgres
@@ -6,11 +26,11 @@ services:
       POSTGRES_DB: pim_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+        # Point important : montage du fichier d'initialisation
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - pim_network

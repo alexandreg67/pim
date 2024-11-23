@@ -1,0 +1,24 @@
+# On utilise Node.js 18 avec Alpine
+FROM node:18-alpine
+
+# On crée et définit le dossier de travail
+WORKDIR /app
+
+# On copie les fichiers de configuration
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# On installe les dépendances
+RUN npm install
+
+# On copie le code source
+COPY src/ src/
+
+# On compile le TypeScript
+RUN npm run build
+
+# On expose le port 4000
+EXPOSE 4000
+
+# On démarre l'application
+CMD ["node", "dist/index.js"]
