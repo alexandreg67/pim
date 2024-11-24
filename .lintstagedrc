@@ -1,0 +1,18 @@
+{
+  "client/src/**/*.{ts,tsx}": [
+    "cd client && npm run lint",
+    "cd client && npm run format"
+  ],
+  "services/graphql-service/src/**/*.ts": [
+    "cd services/graphql-service && npm run lint",
+    "cd services/graphql-service && npm run format"
+  ],
+  "services/mail-service/src/**/*.ts": [
+    "cd services/mail-service && npm run lint",
+    "cd services/mail-service && npm run format"
+  ],
+  "services/upload-service/src/**/*.ts": [
+    "cd services/upload-service && npm run lint",
+    "cd services/upload-service && npm run format"
+  ]
+}
