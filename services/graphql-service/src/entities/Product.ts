@@ -6,16 +6,13 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
-  CreateDateColumn,
-  UpdateDateColumn,
   BaseEntity,
-  JoinColumn,
 } from 'typeorm';
 import { Brand } from './Brand';
 import { Category } from './Category';
 import { Tag } from './Tag';
-import { Characteristic } from './Characteristic';
 import { Image } from './Image';
+import { ProductCharacteristic } from './ProductCharacteristic';
 import { Field, Float, ID, ObjectType } from 'type-graphql';
 
 @ObjectType()
@@ -43,10 +40,10 @@ export class Product extends BaseEntity {
 
   @Field(() => Brand)
   @ManyToOne(() => Brand, (brand) => brand.products)
-  @JoinColumn({ name: 'brandId' }) // Explicitement nommer la colonne
   brand!: Brand;
 
-  @ManyToMany(() => Category)
+  @Field(() => [Category], { nullable: 'itemsAndList' })
+  @ManyToMany(() => Category, (category) => category.products)
   @JoinTable({
     name: 'productsCategories',
     joinColumn: {
@@ -62,22 +59,36 @@ export class Product extends BaseEntity {
 
   @Field(() => [Tag], { nullable: 'itemsAndList' })
   @ManyToMany(() => Tag, (tag) => tag.products)
-  @JoinTable()
+  @JoinTable({
+    name: 'productsTags',
+    joinColumn: {
+      name: 'productId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'tagId',
+      referencedColumnName: 'id',
+    },
+  })
   tags!: Tag[];
 
-  @Field(() => [Characteristic], { nullable: 'itemsAndList' })
-  @OneToMany(() => Characteristic, (characteristic) => characteristic.product)
-  characteristics?: Characteristic[];
+  @Field(() => [ProductCharacteristic], { nullable: 'itemsAndList' })
+  @OneToMany(() => ProductCharacteristic, (pc) => pc.product)
+  characteristics?: ProductCharacteristic[];
 
   @Field(() => [Image], { nullable: 'itemsAndList' })
   @OneToMany(() => Image, (image) => image.product)
   images?: Image[];
 
   @Field(() => Date)
-  @CreateDateColumn()
+  @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;
 
   @Field(() => Date)
-  @UpdateDateColumn()
+  @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
   updatedAt!: Date;
+
+  @Field(() => Date, { nullable: true })
+  @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
+  deletedAt!: Date;
 }

@@ -27,7 +27,6 @@ export class Image extends BaseEntity {
   @Column({ default: false })
   isPrimary!: boolean;
 
-  @Field(() => Product)
   @ManyToOne(() => Product, (product) => product.images)
   product!: Product;
 }

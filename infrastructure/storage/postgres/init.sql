@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 CREATE EXTENSION IF NOT EXISTS "unaccent";
 
--- Création de la table des marques
+-- Tables principales
 CREATE TABLE IF NOT EXISTS "brands" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "name" VARCHAR(255) NOT NULL UNIQUE,
@@ -11,10 +11,12 @@ CREATE TABLE IF NOT EXISTS "brands" (
     "logo" VARCHAR(255),
     "contactEmail" VARCHAR(255),
     "phone" VARCHAR(20),
-    "description" TEXT
+    "description" TEXT,
+    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "deletedAt" TIMESTAMP DEFAULT NULL
 );
 
--- Création de la table des produits
 CREATE TABLE IF NOT EXISTS "products" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "name" VARCHAR(255) NOT NULL,
@@ -23,10 +25,10 @@ CREATE TABLE IF NOT EXISTS "products" (
     "price" DECIMAL(10, 2) NOT NULL CHECK (price >= 0),
     "brandId" UUID REFERENCES "brands"("id") ON DELETE SET NULL,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "deletedAt" TIMESTAMP DEFAULT NULL
 );
 
--- Création de la table des images
 CREATE TABLE IF NOT EXISTS "images" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "url" VARCHAR(255) NOT NULL,
@@ -35,22 +37,26 @@ CREATE TABLE IF NOT EXISTS "images" (
     "productId" UUID REFERENCES "products"("id") ON DELETE CASCADE
 );
 
--- Création de la table des caractéristiques
-CREATE TABLE IF NOT EXISTS "characteristics" (
+-- Nouvelle structure pour les caractéristiques
+CREATE TABLE IF NOT EXISTS "characteristicDefinitions" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "name" VARCHAR(255) NOT NULL,
-    "value" TEXT NOT NULL,
-    "productId" UUID REFERENCES "products"("id") ON DELETE CASCADE
+    "name" VARCHAR(255) NOT NULL UNIQUE
 );
 
--- Création de la table des catégories
+CREATE TABLE IF NOT EXISTS "productCharacteristics" (
+    "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "productId" UUID NOT NULL REFERENCES "products"("id") ON DELETE CASCADE,
+    "characteristicId" UUID NOT NULL REFERENCES "characteristicDefinitions"("id") ON DELETE CASCADE,
+    "value" TEXT NOT NULL,
+    UNIQUE("productId", "characteristicId")
+);
+
 CREATE TABLE IF NOT EXISTS "categories" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "name" VARCHAR(255) NOT NULL UNIQUE,
     "description" TEXT
 );
 
--- Création de la table des tags
 CREATE TABLE IF NOT EXISTS "tags" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "name" VARCHAR(255) NOT NULL UNIQUE,
@@ -68,7 +74,6 @@ CREATE TABLE IF NOT EXISTS "productsTags" (
     "tagId" UUID REFERENCES "tags"("id") ON DELETE CASCADE,
     PRIMARY KEY ("productId", "tagId")
 );
-
 
 -- Table temporaire pour l'import
 CREATE TEMPORARY TABLE temp_import (
@@ -153,23 +158,55 @@ CROSS JOIN LATERAL (
 ) AS i(url, alt_text, is_primary)
 WHERE i.url IS NOT NULL AND i.url != '';
 
--- Insertion des caractéristiques
-INSERT INTO "characteristics" ("name", "value", "productId")
-SELECT c.name, c.value, p.id
-FROM "products" p
-JOIN temp_import ti ON p.name = ti.name 
-    AND p."shortDescription" = ti.short_description 
-    AND p.description = ti.description
-    AND p.price = ti.price
-CROSS JOIN LATERAL (
-    VALUES 
-        (ti.property_1_label, ti.property_1_text),
-        (ti.property_2_label, ti.property_2_text),
-        (ti.property_3_label, ti.property_3_text),
-        (ti.property_4_label, ti.property_4_text),
-        (ti.property_5_label, ti.property_5_text)
-) AS c(name, value)
-WHERE c.name IS NOT NULL AND c.value IS NOT NULL;
+-- Insertion des définitions de caractéristiques
+INSERT INTO "characteristicDefinitions" ("name")
+SELECT DISTINCT label
+FROM (
+    SELECT property_1_label as label FROM temp_import WHERE property_1_label IS NOT NULL
+    UNION
+    SELECT property_2_label FROM temp_import WHERE property_2_label IS NOT NULL
+    UNION
+    SELECT property_3_label FROM temp_import WHERE property_3_label IS NOT NULL
+    UNION
+    SELECT property_4_label FROM temp_import WHERE property_4_label IS NOT NULL
+    UNION
+    SELECT property_5_label FROM temp_import WHERE property_5_label IS NOT NULL
+) unique_labels
+ON CONFLICT ("name") DO NOTHING;
+
+-- Insertion des valeurs des caractéristiques
+INSERT INTO "productCharacteristics" ("productId", "characteristicId", "value")
+WITH unique_characteristics AS (
+    SELECT DISTINCT ON (p.id, cd.id)
+        p.id as product_id,
+        cd.id as characteristic_id,
+        FIRST_VALUE(c.value) OVER (
+            PARTITION BY p.id, cd.id 
+            ORDER BY c.value
+        ) as value
+    FROM "products" p
+    JOIN temp_import ti ON p.name = ti.name 
+        AND p."shortDescription" = ti.short_description 
+        AND p.description = ti.description
+        AND p.price = ti.price
+    CROSS JOIN LATERAL (
+        VALUES 
+            (ti.property_1_label, ti.property_1_text),
+            (ti.property_2_label, ti.property_2_text),
+            (ti.property_3_label, ti.property_3_text),
+            (ti.property_4_label, ti.property_4_text),
+            (ti.property_5_label, ti.property_5_text)
+    ) AS c(label, value)
+    JOIN "characteristicDefinitions" cd ON cd.name = c.label
+    WHERE c.label IS NOT NULL AND c.value IS NOT NULL
+)
+SELECT 
+    product_id,
+    characteristic_id,
+    value
+FROM unique_characteristics
+ON CONFLICT ("productId", "characteristicId") 
+DO UPDATE SET value = EXCLUDED.value;
 
 -- Insertion des catégories de base
 INSERT INTO "categories" ("name", "description")
@@ -202,6 +239,16 @@ SELECT p.id, t.id
 FROM "products" p
 CROSS JOIN "tags" t
 WHERE t.name IN ('New', 'Featured');
+
+-- Index pour optimiser les performances
+CREATE INDEX idx_products_brand ON "products"("brandId");
+CREATE INDEX idx_images_product ON "images"("productId");
+CREATE INDEX idx_product_characteristics_product ON "productCharacteristics"("productId");
+CREATE INDEX idx_product_characteristics_characteristic ON "productCharacteristics"("characteristicId");
+CREATE INDEX idx_products_categories_product ON "productsCategories"("productId");
+CREATE INDEX idx_products_categories_category ON "productsCategories"("categoryId");
+CREATE INDEX idx_products_tags_product ON "productsTags"("productId");
+CREATE INDEX idx_products_tags_tag ON "productsTags"("tagId");
 
 -- Nettoyage
 DROP TABLE temp_import;

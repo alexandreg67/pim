@@ -39,7 +39,6 @@ export class Brand extends BaseEntity {
   @Column('text', { nullable: true })
   description?: string;
 
-  @Field(() => [Product], { nullable: 'itemsAndList' })
   @OneToMany(() => Product, (product) => product.brand)
   products!: Product[];
 }

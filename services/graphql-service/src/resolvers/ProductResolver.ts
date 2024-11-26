@@ -1,13 +1,23 @@
-import { Resolver, Query, Arg, FieldResolver, Root } from 'type-graphql';
+import { Resolver, Query, Arg } from 'type-graphql';
 import { Product } from '../entities/Product';
-import { Image } from '../entities/Image';
 
 @Resolver(Product)
 export class ProductResolver {
   @Query(() => [Product])
   async products(): Promise<Product[]> {
     return await Product.find({
-      relations: ['brand', 'categories', 'characteristics', 'images'],
+      relations: {
+        brand: true,
+        categories: true,
+        characteristics: {
+          definition: true,
+        },
+        images: true,
+        tags: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
     });
   }
 
@@ -15,15 +25,15 @@ export class ProductResolver {
   async product(@Arg('id') id: string): Promise<Product | null> {
     return await Product.findOne({
       where: { id },
-      relations: ['brand', 'categories', 'characteristics', 'images'],
-    });
-  }
-
-  @FieldResolver(() => [Image])
-  async images(@Root() product: Product): Promise<Image[]> {
-    return Image.find({
-      where: { product: { id: product.id } },
-      order: { isPrimary: 'DESC' },
+      relations: {
+        brand: true,
+        categories: true,
+        characteristics: {
+          definition: true,
+        },
+        images: true,
+        tags: true,
+      },
     });
   }
 }
