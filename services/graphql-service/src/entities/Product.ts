@@ -9,6 +9,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
+  JoinColumn,
 } from 'typeorm';
 import { Brand } from './Brand';
 import { Category } from './Category';
@@ -42,11 +43,21 @@ export class Product extends BaseEntity {
 
   @Field(() => Brand)
   @ManyToOne(() => Brand, (brand) => brand.products)
+  @JoinColumn({ name: 'brandId' }) // Explicitement nommer la colonne
   brand!: Brand;
 
-  @Field(() => [Category], { nullable: 'itemsAndList' })
-  @ManyToMany(() => Category, (category) => category.products)
-  @JoinTable()
+  @ManyToMany(() => Category)
+  @JoinTable({
+    name: 'productsCategories',
+    joinColumn: {
+      name: 'productId',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'categoryId',
+      referencedColumnName: 'id',
+    },
+  })
   categories!: Category[];
 
   @Field(() => [Tag], { nullable: 'itemsAndList' })

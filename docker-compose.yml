@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: pim_api
     ports:
-      - "4000:4000"
+      - '4000:4000'
     environment:
       - NODE_ENV=development
       - DB_HOST=postgres
@@ -27,14 +27,15 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./infrastructure/storage/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./infrastructure/storage/postgres/products.csv:/docker-entrypoint-initdb.d/products.csv
     networks:
       - pim_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
       timeout: 5s
       retries: 5

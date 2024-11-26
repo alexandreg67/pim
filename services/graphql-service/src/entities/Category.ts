@@ -23,6 +23,7 @@ export class Category extends BaseEntity {
   @Column('text', { nullable: true })
   description?: string;
 
+  @Field(() => [Product], { nullable: 'itemsAndList' })
   @ManyToMany(() => Product, (product) => product.categories)
   products!: Product[];
 }

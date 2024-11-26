@@ -3,8 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
   BaseEntity,
 } from 'typeorm';
 import { Product } from './Product';
@@ -44,12 +42,4 @@ export class Brand extends BaseEntity {
   @Field(() => [Product], { nullable: 'itemsAndList' })
   @OneToMany(() => Product, (product) => product.brand)
   products!: Product[];
-
-  @Field(() => Date)
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  @Field(() => Date)
-  @UpdateDateColumn()
-  updatedAt!: Date;
 }
