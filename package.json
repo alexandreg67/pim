@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "docker-compose up",
-    "dev:build": "docker-compose up --build",
-    "down": "docker-compose down",
+    "dev": "docker-compose -f deploy/dev/docker-compose.yml up",
+    "dev:build": "docker-compose -f deploy/dev/docker-compose.yml up --build",
+    "dev:down": "docker-compose -f deploy/dev/docker-compose.yml down",
+    "dev:down:volumes": "docker-compose -f deploy/dev/docker-compose.yml down -v",
     "lint": "npm run lint --prefix services/graphql-service",
     "format": "npm run format --prefix services/graphql-service"
   },

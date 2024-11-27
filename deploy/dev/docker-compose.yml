@@ -1,7 +1,7 @@
 services:
   api:
     build:
-      context: ./services/graphql-service
+      context: ../../services/graphql-service
       dockerfile: Dockerfile
     container_name: pim_api
     ports:
@@ -27,11 +27,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - '5433:5432'
+      - '5435:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./infrastructure/storage/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./infrastructure/storage/postgres/products.csv:/docker-entrypoint-initdb.d/products.csv
+      - ../../storage/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../../storage/postgres/products.csv:/docker-entrypoint-initdb.d/products.csv
     networks:
       - pim_network
     healthcheck:
