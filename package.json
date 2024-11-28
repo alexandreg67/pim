@@ -7,8 +7,10 @@
     "dev:build": "docker-compose -f deploy/dev/docker-compose.yml up --build",
     "dev:down": "docker-compose -f deploy/dev/docker-compose.yml down",
     "dev:down:volumes": "docker-compose -f deploy/dev/docker-compose.yml down -v",
-    "lint": "npm run lint --prefix services/graphql-service",
-    "format": "npm run format --prefix services/graphql-service"
+    "lint": "npm run lint:client && npm run lint:services",
+    "lint:client": "cd client && npm run lint",
+    "lint:services": "cd services/graphql-service && npm run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "keywords": [],
   "author": "",
@@ -16,6 +18,7 @@
   "description": "",
   "devDependencies": {
     "husky": "^8.0.0",
-    "lint-staged": "^15.2.0"
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.4.1"
   }
 }

@@ -1,6 +1,11 @@
 {
+  "*.{json,css,md}": ["prettier --write"],
+  "client/src/**/*.{ts,tsx}": [
+    "prettier --write",
+    "npm --prefix client run lint:fix"
+  ],
   "services/graphql-service/src/**/*.ts": [
-    "npm run lint",
-    "npm run format"
+    "prettier --write",
+    "npm --prefix services/graphql-service run lint:fix"
   ]
 }
