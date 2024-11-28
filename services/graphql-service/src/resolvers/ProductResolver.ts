@@ -22,9 +22,18 @@ export class ProductResolver {
   }
 
   @Query(() => Product, { nullable: true })
-  async product(@Arg('id') id: string): Promise<Product | null> {
+  async product(
+    @Arg('id', { nullable: true }) id?: string,
+    @Arg('reference', { nullable: true }) reference?: string
+  ): Promise<Product | null> {
+    if (!id && !reference) {
+      return null;
+    }
+
+    const whereCondition = id ? { id } : { reference };
+
     return await Product.findOne({
-      where: { id },
+      where: whereCondition,
       relations: {
         brand: true,
         categories: true,

@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS "brands" (
 
 CREATE TABLE IF NOT EXISTS "products" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "reference" VARCHAR(255) NOT NULL UNIQUE,
     "name" VARCHAR(255) NOT NULL,
     "shortDescription" TEXT,
     "description" TEXT,
@@ -77,32 +78,33 @@ CREATE TABLE IF NOT EXISTS "productsTags" (
 
 -- Table temporaire pour l'import
 CREATE TEMPORARY TABLE temp_import (
-    name VARCHAR(255),
+    ref VARCHAR(255),
     short_description TEXT,
     description TEXT,
-    price DECIMAL(10, 2),
     image_1_src VARCHAR(255),
     image_1_alt VARCHAR(255),
     image_2_src VARCHAR(255),
     image_2_alt VARCHAR(255),
     image_3_src VARCHAR(255),
     image_3_alt VARCHAR(255),
+    price DECIMAL(10, 2),
     brand_name VARCHAR(255),
-    brand_country VARCHAR(255),
     brand_logo VARCHAR(255),
-    brand_email VARCHAR(255),
+    name VARCHAR(255),
+    supplier_country VARCHAR(255),
+    supplier_phone TEXT,
+    supplier_email VARCHAR(255),
     brand_description TEXT,
-    brand_phone VARCHAR(20),
     property_1_label VARCHAR(255),
-    property_1_text VARCHAR(255),
+    property_1_text TEXT,
     property_2_label VARCHAR(255),
-    property_2_text VARCHAR(255),
+    property_2_text TEXT,
     property_3_label VARCHAR(255),
-    property_3_text VARCHAR(255),
+    property_3_text TEXT,
     property_4_label VARCHAR(255),
-    property_4_text VARCHAR(255),
+    property_4_text TEXT,
     property_5_label VARCHAR(255),
-    property_5_text VARCHAR(255)
+    property_5_text TEXT
 );
 
 -- Import des données du CSV
@@ -112,44 +114,49 @@ COPY temp_import FROM '/docker-entrypoint-initdb.d/products.csv' WITH (FORMAT cs
 WITH unique_brands AS (
     SELECT DISTINCT ON (brand_name)
         brand_name,
-        brand_country,
+        supplier_country,
         brand_logo,
-        brand_email,
+        supplier_email,
         brand_description,
-        brand_phone
+        supplier_phone
     FROM temp_import
-    ORDER BY brand_name, brand_email NULLS LAST
+    ORDER BY brand_name, supplier_email NULLS LAST
 )
 INSERT INTO "brands" ("name", "country", "logo", "contactEmail", "description", "phone")
 SELECT 
     brand_name,
-    brand_country,
+    supplier_country,
     brand_logo,
-    brand_email,
+    supplier_email,
     brand_description,
-    brand_phone
+    supplier_phone
 FROM unique_brands
 ON CONFLICT ("name") DO NOTHING;
 
 -- Insertion des produits
-INSERT INTO "products" ("name", "shortDescription", "description", "price", "brandId")
+INSERT INTO "products" ("reference", "name", "shortDescription", "description", "price", "brandId")
 SELECT 
+    ti.ref,
     ti.name,
-    ti.short_description,
+    ti.short_description as "shortDescription",
     ti.description,
     ti.price,
     b.id as "brandId"
 FROM temp_import ti
-JOIN "brands" b ON ti.brand_name = b.name;
+JOIN "brands" b ON ti.brand_name = b.name
+ON CONFLICT ("reference") DO UPDATE SET
+    "name" = EXCLUDED."name",
+    "shortDescription" = EXCLUDED."shortDescription",
+    "description" = EXCLUDED."description",
+    "price" = EXCLUDED."price",
+    "brandId" = EXCLUDED."brandId",
+    "updatedAt" = CURRENT_TIMESTAMP;
 
 -- Insertion des images
 INSERT INTO "images" ("url", "altText", "isPrimary", "productId")
 SELECT i.url, i.alt_text, i.is_primary, p.id
 FROM "products" p
-JOIN temp_import ti ON p.name = ti.name 
-    AND p."shortDescription" = ti.short_description 
-    AND p.description = ti.description
-    AND p.price = ti.price
+JOIN temp_import ti ON p.reference = ti.ref
 CROSS JOIN LATERAL (
     VALUES 
         (ti.image_1_src, ti.image_1_alt, true),
@@ -185,10 +192,7 @@ WITH unique_characteristics AS (
             ORDER BY c.value
         ) as value
     FROM "products" p
-    JOIN temp_import ti ON p.name = ti.name 
-        AND p."shortDescription" = ti.short_description 
-        AND p.description = ti.description
-        AND p.price = ti.price
+    JOIN temp_import ti ON p.reference = ti.ref
     CROSS JOIN LATERAL (
         VALUES 
             (ti.property_1_label, ti.property_1_text),
@@ -208,39 +212,8 @@ FROM unique_characteristics
 ON CONFLICT ("productId", "characteristicId") 
 DO UPDATE SET value = EXCLUDED.value;
 
--- Insertion des catégories de base
-INSERT INTO "categories" ("name", "description")
-VALUES 
-    ('Electronics', 'Electronic devices and gadgets'),
-    ('Computers', 'Desktop and laptop computers'),
-    ('Storage', 'Storage solutions'),
-    ('Accessories', 'Computer and electronic accessories')
-ON CONFLICT ("name") DO NOTHING;
-
--- Insertion des tags de base
-INSERT INTO "tags" ("name", "description")
-VALUES 
-    ('New', 'Newly added products'),
-    ('Popular', 'Popular items'),
-    ('Sale', 'Items on sale'),
-    ('Featured', 'Featured products')
-ON CONFLICT ("name") DO NOTHING;
-
--- Association des produits avec les catégories
-INSERT INTO "productsCategories" ("productId", "categoryId")
-SELECT p.id, c.id
-FROM "products" p
-CROSS JOIN "categories" c
-WHERE c.name IN ('Electronics', 'Computers');
-
--- Association des produits avec les tags
-INSERT INTO "productsTags" ("productId", "tagId")
-SELECT p.id, t.id
-FROM "products" p
-CROSS JOIN "tags" t
-WHERE t.name IN ('New', 'Featured');
-
--- Index pour optimiser les performances
+-- Création des index
+CREATE INDEX idx_products_reference ON "products"("reference");
 CREATE INDEX idx_products_brand ON "products"("brandId");
 CREATE INDEX idx_images_product ON "images"("productId");
 CREATE INDEX idx_product_characteristics_product ON "productCharacteristics"("productId");

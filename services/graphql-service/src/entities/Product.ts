@@ -23,6 +23,10 @@ export class Product extends BaseEntity {
   id!: string;
 
   @Field()
+  @Column({ unique: true })
+  reference!: string;
+
+  @Field()
   @Column()
   name!: string;
 
@@ -89,6 +93,6 @@ export class Product extends BaseEntity {
   updatedAt!: Date;
 
   @Field(() => Date, { nullable: true })
-  @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
-  deletedAt!: Date;
+  @Column('timestamp with time zone', { nullable: true })
+  deletedAt?: Date;
 }
