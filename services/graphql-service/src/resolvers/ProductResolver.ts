@@ -1,48 +1,57 @@
-import { Resolver, Query, Arg } from 'type-graphql';
-import { Product } from '../entities/Product';
+import { Resolver, Query, Arg, ID } from 'type-graphql';
+import { Products } from '../entities/Products';
 
-@Resolver(Product)
+@Resolver(Products)
 export class ProductResolver {
-  @Query(() => [Product])
-  async products(): Promise<Product[]> {
-    return await Product.find({
-      relations: {
-        brand: true,
-        categories: true,
-        characteristics: {
-          definition: true,
-        },
-        images: true,
-        tags: true,
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-    });
-  }
+  @Query(() => [Products])
+  async products(
+    @Arg('search', { nullable: true }) search?: string,
+    @Arg('brandId', () => ID, { nullable: true }) brandId?: string,
+    @Arg('categoryId', () => ID, { nullable: true }) categoryId?: string
+  ): Promise<Products[]> {
+    const queryBuilder = Products.createQueryBuilder('product')
+      .leftJoinAndSelect('product.brand', 'brand')
+      .leftJoinAndSelect('product.categories', 'categories')
+      .leftJoinAndSelect('product.tags', 'tags')
+      .leftJoinAndSelect('product.images', 'images')
+      .leftJoinAndSelect('product.productCharacteristics', 'characteristics')
+      .leftJoinAndSelect('characteristics.characteristic', 'characteristicDef');
 
-  @Query(() => Product, { nullable: true })
-  async product(
-    @Arg('id', { nullable: true }) id?: string,
-    @Arg('reference', { nullable: true }) reference?: string
-  ): Promise<Product | null> {
-    if (!id && !reference) {
-      return null;
+    if (search) {
+      queryBuilder.andWhere(
+        '(product.name ILIKE :search OR product.reference ILIKE :search OR product.description ILIKE :search)',
+        { search: `%${search}%` }
+      );
     }
 
-    const whereCondition = id ? { id } : { reference };
+    if (brandId) {
+      queryBuilder.andWhere('brand.id = :brandId', { brandId });
+    }
 
-    return await Product.findOne({
-      where: whereCondition,
-      relations: {
-        brand: true,
-        categories: true,
-        characteristics: {
-          definition: true,
-        },
-        images: true,
-        tags: true,
-      },
+    if (categoryId) {
+      queryBuilder.andWhere('categories.id = :categoryId', { categoryId });
+    }
+
+    return await queryBuilder.getMany();
+  }
+
+  @Query(() => Products, { nullable: true })
+  async product(
+    @Arg('id', () => ID, { nullable: true }) id?: string,
+    @Arg('reference', { nullable: true }) reference?: string
+  ): Promise<Products | null> {
+    if (!id && !reference) return null;
+
+    return await Products.findOne({
+      where: id ? { id } : { reference },
+      relations: [
+        'brand',
+        'categories',
+        'tags',
+        'images',
+        'productCharacteristics',
+        'productCharacteristics.characteristic',
+      ],
     });
   }
 }
