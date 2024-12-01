@@ -1,18 +1,18 @@
-import { Resolver, Query, Arg } from 'type-graphql';
-import { Brand } from '../entities/Brand';
+import { Resolver, Query, Arg, ID } from 'type-graphql';
+import { Brands } from '../entities/Brand';
 
-@Resolver(Brand)
+@Resolver(Brands)
 export class BrandResolver {
-  @Query(() => [Brand])
-  async brands(): Promise<Brand[]> {
-    return await Brand.find({
+  @Query(() => [Brands])
+  async brands(): Promise<Brands[]> {
+    return await Brands.find({
       relations: ['products'],
     });
   }
 
-  @Query(() => Brand, { nullable: true })
-  async brand(@Arg('id') id: string): Promise<Brand | null> {
-    return await Brand.findOne({
+  @Query(() => Brands, { nullable: true })
+  async brand(@Arg('id', () => ID) id: string): Promise<Brands | null> {
+    return await Brands.findOne({
       where: { id },
       relations: ['products'],
     });
