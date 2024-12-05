@@ -1,10 +1,20 @@
-import { Column, Entity, Index, JoinTable, ManyToMany } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  JoinTable,
+  ManyToMany,
+} from 'typeorm';
 import { Products } from './Products';
+import { Field, ObjectType } from 'type-graphql';
 
+@ObjectType()
 @Index('images_pkey', ['id'], { unique: true })
 @Index('images_url_key', ['url'], { unique: true })
 @Entity('images', { schema: 'public' })
-export class Images {
+export class Images extends BaseEntity {
+  @Field()
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -12,9 +22,11 @@ export class Images {
   })
   id: string;
 
+  @Field()
   @Column('character varying', { name: 'url', unique: true, length: 500 })
   url: string;
 
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'alt_text',
     nullable: true,
@@ -22,6 +34,7 @@ export class Images {
   })
   altText: string | null;
 
+  @Field()
   @Column('boolean', { name: 'is_primary', default: () => 'false' })
   isPrimary: boolean;
 

@@ -1,4 +1,5 @@
 import {
+  BaseEntity,
   Column,
   Entity,
   Index,
@@ -15,14 +16,17 @@ import { Images } from './Images';
 import { Brands } from './Brands';
 import { Categories } from './Categories';
 import { Tags } from './Tags';
+import { Field, ObjectType } from 'type-graphql';
 
+@ObjectType()
 @Index('idx_products_brand', ['brandId'], {})
 @Index('products_pkey', ['id'], { unique: true })
 @Index('idx_products_name_trgm', ['name'], {})
 @Index('products_reference_key', ['reference'], { unique: true })
 @Index('idx_products_reference_trgm', ['reference'], {})
 @Entity('products', { schema: 'public' })
-export class Products {
+export class Products extends BaseEntity {
+  @Field()
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -30,12 +34,15 @@ export class Products {
   })
   id: string;
 
+  @Field()
   @Column('character varying', { name: 'reference', unique: true, length: 50 })
   reference: string;
 
+  @Field()
   @Column('character varying', { name: 'name', length: 150 })
   name: string;
 
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'short_description',
     nullable: true,
@@ -43,12 +50,15 @@ export class Products {
   })
   shortDescription: string | null;
 
+  @Field({ nullable: true })
   @Column('text', { name: 'description', nullable: true })
   description: string | null;
 
+  @Field()
   @Column('numeric', { name: 'price', precision: 10, scale: 2 })
   price: string;
 
+  @Field()
   @Column('character varying', {
     name: 'status',
     length: 20,
@@ -56,12 +66,15 @@ export class Products {
   })
   status: string;
 
+  @Field({ nullable: true })
   @Column('character varying', { name: 'label', nullable: true, length: 50 })
   label: string | null;
 
+  @Field()
   @Column('uuid', { name: 'brand_id' })
   brandId: string;
 
+  @Field({ nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,
@@ -69,6 +82,7 @@ export class Products {
   })
   createdAt: Date | null;
 
+  @Field({ nullable: true })
   @Column('timestamp with time zone', {
     name: 'updated_at',
     nullable: true,
@@ -76,6 +90,7 @@ export class Products {
   })
   updatedAt: Date | null;
 
+  @Field({ nullable: true })
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 

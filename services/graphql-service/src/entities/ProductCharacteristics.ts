@@ -1,7 +1,16 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
 import { CharacteristicDefinitions } from './CharacteristicDefinitions';
 import { Products } from './Products';
+import { Field, ObjectType } from 'type-graphql';
 
+@ObjectType()
 @Index('idx_product_characteristics_characteristic', ['characteristicId'], {})
 @Index(
   'product_characteristics_product_id_characteristic_id_key',
@@ -11,7 +20,8 @@ import { Products } from './Products';
 @Index('product_characteristics_pkey', ['id'], { unique: true })
 @Index('idx_product_characteristics_product', ['productId'], {})
 @Entity('product_characteristics', { schema: 'public' })
-export class ProductCharacteristics {
+export class ProductCharacteristics extends BaseEntity {
+  @Field()
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -19,12 +29,15 @@ export class ProductCharacteristics {
   })
   id: string;
 
+  @Field()
   @Column('uuid', { name: 'product_id', nullable: true, unique: true })
   productId: string | null;
 
+  @Field()
   @Column('uuid', { name: 'characteristic_id', nullable: true, unique: true })
   characteristicId: string | null;
 
+  @Field()
   @Column('text', { name: 'value' })
   value: string;
 
