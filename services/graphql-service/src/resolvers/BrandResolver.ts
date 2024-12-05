@@ -1,5 +1,5 @@
 import { Resolver, Query, Arg, ID } from 'type-graphql';
-import { Brands } from '../entities/Brand';
+import { Brands } from '../entities/Brands';
 
 @Resolver(Brands)
 export class BrandResolver {

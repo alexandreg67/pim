@@ -1,17 +1,10 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  Index,
-  JoinTable,
-  ManyToMany,
-} from 'typeorm';
+import { Column, Entity, Index, JoinTable, ManyToMany } from 'typeorm';
 import { Products } from './Products';
 
 @Index('categories_pkey', ['id'], { unique: true })
 @Index('categories_name_key', ['name'], { unique: true })
 @Entity('categories', { schema: 'public' })
-export class Categories extends BaseEntity {
+export class Categories {
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -19,7 +12,7 @@ export class Categories extends BaseEntity {
   })
   id: string;
 
-  @Column('character varying', { name: 'name', unique: true, length: 255 })
+  @Column('character varying', { name: 'name', unique: true, length: 100 })
   name: string;
 
   @Column('text', { name: 'description', nullable: true })
@@ -27,9 +20,9 @@ export class Categories extends BaseEntity {
 
   @ManyToMany(() => Products, (products) => products.categories)
   @JoinTable({
-    name: 'productsCategories',
-    joinColumns: [{ name: 'categoryId', referencedColumnName: 'id' }],
-    inverseJoinColumns: [{ name: 'productId', referencedColumnName: 'id' }],
+    name: 'products_categories',
+    joinColumns: [{ name: 'category_id', referencedColumnName: 'id' }],
+    inverseJoinColumns: [{ name: 'product_id', referencedColumnName: 'id' }],
     schema: 'public',
   })
   products: Products[];

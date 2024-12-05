@@ -1,24 +1,33 @@
-# On utilise Node.js 18 avec Alpine
 FROM node:18-alpine
 
-# On crée et définit le dossier de travail
 WORKDIR /app
 
-# On copie les fichiers de configuration
+# Installation des dépendances globales
+RUN npm install -g typescript ts-node
+
+# Copie des fichiers de configuration
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# On installe les dépendances
+# Installation des dépendances du projet
 RUN npm install
 
-# On copie le code source
-COPY src/ src/
+# Installer PostgreSQL client pour utiliser pg_isready
+RUN apk add --no-cache bash postgresql-client
 
-# On compile le TypeScript
-RUN npm run build
+# Script d'attente
+COPY scripts/wait-for-seed.sh /app/wait-for-seed.sh
 
-# On expose le port 4000
+# Copie du code source
+COPY . .
+
+# Création du dossier dist
+RUN mkdir -p dist
+
+# Ajouter les permissions pour le script
+RUN chmod +x /app/wait-for-seed.sh
+
 EXPOSE 4000
 
-# On démarre l'application
-CMD ["node", "dist/index.js"]
+ENTRYPOINT ["/app/wait-for-seed.sh"]
+CMD ["npm", "start"]

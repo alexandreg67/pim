@@ -18,6 +18,14 @@ services:
         condition: service_healthy
     networks:
       - pim_network
+    volumes:
+      - ../../services/graphql-service/src:/app/src
+      - ../../services/graphql-service/dist:/app/dist
+    command: >
+      sh -c "
+        echo 'Waiting for postgres...' &&
+        npm run generate:entities
+      "
 
   postgres:
     image: postgres:15-alpine
@@ -30,8 +38,9 @@ services:
       - '5435:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ../../storage/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ../../storage/postgres/products.csv:/docker-entrypoint-initdb.d/products.csv
+      - ../../storage/postgres/init/01_init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ../../storage/postgres/init/02_import.sql:/docker-entrypoint-initdb.d/02_import.sql
+      - ../../storage/postgres/data/products.csv:/docker-entrypoint-initdb.d/products.csv
     networks:
       - pim_network
     healthcheck:
@@ -42,7 +51,9 @@ services:
 
 volumes:
   postgres_data:
+    name: pim_postgres_data
 
 networks:
   pim_network:
+    name: pim_network
     driver: bridge
