@@ -30,7 +30,7 @@ CREATE TEMPORARY TABLE temp_import (
 );
 
 -- Étape 2 : Copier les données du CSV dans la table temporaire
-COPY temp_import FROM '/docker-entrypoint-initdb.d/products.csv' WITH (FORMAT csv, HEADER true, LIMIT 50);
+COPY temp_import FROM '/docker-entrypoint-initdb.d/products.csv' WITH (FORMAT csv, HEADER true);
 
 -- Étape 3 : Supprimer les lignes inutiles
 DELETE FROM temp_import 
