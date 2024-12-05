@@ -10,7 +10,10 @@
     "lint": "npm run lint:client && npm run lint:services",
     "lint:client": "cd client && npm run lint",
     "lint:services": "cd services/graphql-service && npm run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js",
+    "generate:entities": "ts-node scripts/generate-entities.ts"
   },
   "keywords": [],
   "author": "",
