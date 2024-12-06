@@ -15,10 +15,11 @@ export class Actions extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'name', unique: true, length: 50 })
   name: string;
 
+  @Field(() => History, { nullable: true })
   @OneToMany(() => History, (history) => history.action)
   histories: History[];
 }

@@ -30,4 +30,4 @@ RUN chmod +x /app/wait-for-seed.sh
 EXPOSE 4000
 
 ENTRYPOINT ["/app/wait-for-seed.sh"]
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]

@@ -17,7 +17,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('idx_exchanges_user_id', ['userId'], {})
 @Entity('exchanges', { schema: 'public' })
 export class Exchanges extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -25,23 +25,23 @@ export class Exchanges extends BaseEntity {
   })
   id: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('uuid', { name: 'user_id', nullable: true })
   userId: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('uuid', { name: 'brand_id', nullable: true })
   brandId: string | null;
 
-  @Field()
+  @Field(() => String)
   @Column('text', { name: 'message' })
   message: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'status', length: 20 })
   status: string;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,
@@ -49,14 +49,16 @@ export class Exchanges extends BaseEntity {
   })
   createdAt: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', { name: 'closed_at', nullable: true })
   closedAt: Date | null;
 
+  @Field(() => Brands, { nullable: true })
   @ManyToOne(() => Brands, (brands) => brands.exchanges)
   @JoinColumn([{ name: 'brand_id', referencedColumnName: 'id' }])
   brand: Brands;
 
+  @Field(() => Users, { nullable: true })
   @ManyToOne(() => Users, (users) => users.exchanges)
   @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
   user: Users;

@@ -14,7 +14,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('images_url_key', ['url'], { unique: true })
 @Entity('images', { schema: 'public' })
 export class Images extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -22,11 +22,11 @@ export class Images extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'url', unique: true, length: 500 })
   url: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('character varying', {
     name: 'alt_text',
     nullable: true,
@@ -34,10 +34,11 @@ export class Images extends BaseEntity {
   })
   altText: string | null;
 
-  @Field()
+  @Field(() => Boolean)
   @Column('boolean', { name: 'is_primary', default: () => 'false' })
   isPrimary: boolean;
 
+  @Field(() => Products)
   @ManyToMany(() => Products, (products) => products.images)
   @JoinTable({
     name: 'product_images',

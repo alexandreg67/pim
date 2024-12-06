@@ -21,7 +21,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('idx_product_characteristics_product', ['productId'], {})
 @Entity('product_characteristics', { schema: 'public' })
 export class ProductCharacteristics extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -29,15 +29,15 @@ export class ProductCharacteristics extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String)
   @Column('uuid', { name: 'product_id', nullable: true, unique: true })
   productId: string | null;
 
-  @Field()
+  @Field(() => String)
   @Column('uuid', { name: 'characteristic_id', nullable: true, unique: true })
   characteristicId: string | null;
 
-  @Field()
+  @Field(() => String)
   @Column('text', { name: 'value' })
   value: string;
 

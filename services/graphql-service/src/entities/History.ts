@@ -18,7 +18,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('idx_history_user_id', ['userId'], {})
 @Entity('history', { schema: 'public' })
 export class History extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -26,15 +26,15 @@ export class History extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String)
   @Column('uuid', { name: 'user_id' })
   userId: string;
 
-  @Field()
+  @Field(() => String)
   @Column('uuid', { name: 'product_id' })
   productId: string;
 
-  @Field()
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,
@@ -42,14 +42,17 @@ export class History extends BaseEntity {
   })
   createdAt: Date | null;
 
+  @Field(() => Actions)
   @ManyToOne(() => Actions, (actions) => actions.histories)
   @JoinColumn([{ name: 'action_id', referencedColumnName: 'id' }])
   action: Actions;
 
+  @Field(() => Products)
   @ManyToOne(() => Products, (products) => products.histories)
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   product: Products;
 
+  @Field(() => Users)
   @ManyToOne(() => Users, (users) => users.histories)
   @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
   user: Users;

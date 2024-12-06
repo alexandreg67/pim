@@ -7,7 +7,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('tags_name_key', ['name'], { unique: true })
 @Entity('tags', { schema: 'public' })
 export class Tags extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -15,11 +15,11 @@ export class Tags extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'name', unique: true, length: 50 })
   name: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('text', { name: 'description', nullable: true })
   description: string | null;
 

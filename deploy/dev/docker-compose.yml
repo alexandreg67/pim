@@ -21,11 +21,6 @@ services:
     volumes:
       - ../../services/graphql-service/src:/app/src
       - ../../services/graphql-service/dist:/app/dist
-    command: >
-      sh -c "
-        echo 'Waiting for postgres...' &&
-        npm run generate:entities
-      "
 
   postgres:
     image: postgres:15-alpine

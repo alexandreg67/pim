@@ -9,7 +9,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('brands_name_key', ['name'], { unique: true })
 @Entity('brands', { schema: 'public' })
 export class Brands extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -17,19 +17,19 @@ export class Brands extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'name', unique: true, length: 100 })
   name: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('text', { name: 'description', nullable: true })
   description: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('character varying', { name: 'logo', nullable: true, length: 500 })
   logo: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,
@@ -37,7 +37,7 @@ export class Brands extends BaseEntity {
   })
   createdAt: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'updated_at',
     nullable: true,
@@ -45,16 +45,19 @@ export class Brands extends BaseEntity {
   })
   updatedAt: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
+  @Field(() => [Contacts], { nullable: true })
   @OneToMany(() => Contacts, (contacts) => contacts.brand)
   contacts: Contacts[];
 
+  @Field(() => [Exchanges], { nullable: true })
   @OneToMany(() => Exchanges, (exchanges) => exchanges.brand)
   exchanges: Exchanges[];
 
+  @Field(() => [Products], { nullable: true })
   @OneToMany(() => Products, (products) => products.brand)
   products: Products[];
 }

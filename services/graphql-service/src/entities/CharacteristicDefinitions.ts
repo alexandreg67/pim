@@ -7,7 +7,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('characteristic_definitions_name_key', ['name'], { unique: true })
 @Entity('characteristic_definitions', { schema: 'public' })
 export class CharacteristicDefinitions extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -15,10 +15,11 @@ export class CharacteristicDefinitions extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'name', unique: true, length: 100 })
   name: string;
 
+  @Field(() => ProductCharacteristics, { nullable: true })
   @OneToMany(
     () => ProductCharacteristics,
     (productCharacteristics) => productCharacteristics.characteristic

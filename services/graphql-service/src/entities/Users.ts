@@ -8,7 +8,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('users_pkey', ['id'], { unique: true })
 @Entity('users', { schema: 'public' })
 export class Users extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -16,39 +16,39 @@ export class Users extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'last_name', length: 50 })
   lastName: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'first_name', length: 50 })
   firstName: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'email', unique: true, length: 100 })
   email: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'password', length: 100 })
   password: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('character varying', { name: 'phone', nullable: true, length: 20 })
   phone: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', { name: 'start_date' })
   startDate: Date;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', { name: 'end_date', nullable: true })
   endDate: Date | null;
 
-  @Field()
+  @Field(() => Boolean)
   @Column('boolean', { name: 'is_admin', default: () => 'false' })
   isAdmin: boolean;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,
@@ -56,7 +56,7 @@ export class Users extends BaseEntity {
   })
   createdAt: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'updated_at',
     nullable: true,
@@ -64,13 +64,15 @@ export class Users extends BaseEntity {
   })
   updatedAt: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
+  @Field(() => [Exchanges], { nullable: true })
   @OneToMany(() => Exchanges, (exchanges) => exchanges.user)
   exchanges: Exchanges[];
 
+  @Field(() => [History], { nullable: true })
   @OneToMany(() => History, (history) => history.user)
   histories: History[];
 }

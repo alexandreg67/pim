@@ -14,7 +14,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('categories_name_key', ['name'], { unique: true })
 @Entity('categories', { schema: 'public' })
 export class Categories extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -22,14 +22,15 @@ export class Categories extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String)
   @Column('character varying', { name: 'name', unique: true, length: 100 })
   name: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('text', { name: 'description', nullable: true })
   description: string | null;
 
+  @Field(() => Products, { nullable: true })
   @ManyToMany(() => Products, (products) => products.categories)
   @JoinTable({
     name: 'products_categories',

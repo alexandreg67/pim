@@ -5,7 +5,6 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  RelationId,
 } from 'typeorm';
 import { Brands } from './Brands';
 import { Products } from './Products';
@@ -15,7 +14,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('contacts_pkey', ['id'], { unique: true })
 @Entity('contacts', { schema: 'public' })
 export class Contacts extends BaseEntity {
-  @Field()
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -23,15 +22,15 @@ export class Contacts extends BaseEntity {
   })
   id: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   @Column('character varying', { name: 'email', nullable: true, length: 100 })
   email: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('character varying', { name: 'phone', nullable: true, length: 20 })
   phone: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column('character varying', { name: 'country', nullable: true, length: 100 })
   country: string | null;
 
@@ -42,10 +41,4 @@ export class Contacts extends BaseEntity {
   @ManyToOne(() => Products, (products) => products.contacts)
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   product: Products;
-
-  @RelationId((contacts: Contacts) => contacts.brand)
-  brandId: string | null;
-
-  @RelationId((contacts: Contacts) => contacts.product)
-  productId: string | null;
 }

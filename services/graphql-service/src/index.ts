@@ -2,8 +2,7 @@ import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import { buildSchema } from 'type-graphql';
 import { AppDataSource } from './config/database';
-import { Brands } from './entities/Brands';
-import { Categories } from './entities/Categories';
+import ProductResolver from './resolvers/ProductResolver';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -12,7 +11,7 @@ async function bootstrap() {
 
   // Construction du schéma GraphQL
   const schema = await buildSchema({
-    resolvers: [Brands, Categories],
+    resolvers: [ProductResolver],
     validate: false,
   });
 
