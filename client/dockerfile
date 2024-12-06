@@ -1,0 +1,17 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Installation des dépendances
+COPY *.json ./
+
+RUN npm install
+
+# Copie du code source
+COPY . .
+
+# Expose le port de développement de Vite
+EXPOSE 5173
+
+# Commande pour le développement
+CMD ["npm", "run", "dev"]
