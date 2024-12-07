@@ -12,8 +12,6 @@
     "format": "prettier --write '*/**/*.{js,jsx,ts,tsx}'"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.0",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.13.0",
@@ -23,6 +21,7 @@
     "react-router-dom": "^7.0.2"
   },
   "devDependencies": {
+    "@emotion/babel-plugin": "^11.13.5",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
     "@eslint/eslintrc": "^3.2.0",
