@@ -5,7 +5,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <MainLayout>
+      <MainLayout isAdmin={true}>
         <div>Dashboard</div>
       </MainLayout>
     ),
