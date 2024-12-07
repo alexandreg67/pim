@@ -1,4 +1,5 @@
 import { ObjectType, Field, Int } from 'type-graphql';
+import { GraphQLDateTime } from 'graphql-scalars';
 
 @ObjectType()
 export class ProductStat {
@@ -14,7 +15,7 @@ export class HistoryEntry {
   @Field(() => String)
   action!: string;
 
-  @Field(() => Date)
+  @Field(() => GraphQLDateTime)
   createdAt!: Date;
 }
 
