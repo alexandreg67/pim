@@ -16,7 +16,7 @@ import { Images } from './Images';
 import { Brands } from './Brands';
 import { Categories } from './Categories';
 import { Tags } from './Tags';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, Float, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Index('idx_products_brand', ['brandId'], {})
@@ -54,9 +54,17 @@ export class Products extends BaseEntity {
   @Column('text', { name: 'description', nullable: true })
   description: string | null;
 
-  @Field(() => String)
   @Column('numeric', { name: 'price', precision: 10, scale: 2 })
-  price: string;
+  private _price: string;
+
+  @Field(() => Float)
+  get price(): number {
+    return parseFloat(this._price);
+  }
+
+  set price(value: number) {
+    this._price = value.toFixed(2);
+  }
 
   @Field(() => String)
   @Column('character varying', {
@@ -109,6 +117,7 @@ export class Products extends BaseEntity {
   @ManyToMany(() => Images, (images) => images.products)
   images: Images[];
 
+  @Field(() => Brands)
   @ManyToOne(() => Brands, (brands) => brands.products)
   @JoinColumn([{ name: 'brand_id', referencedColumnName: 'id' }])
   brand: Brands;

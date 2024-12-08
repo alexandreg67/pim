@@ -8,9 +8,9 @@ import {
 
 export const menuItemsAdmin = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'Catégories', icon: <CategoryIcon />, path: '/categories' },
   { text: 'Produits', icon: <InventoryIcon />, path: '/products' },
   { text: 'Marques', icon: <BusinessIcon />, path: '/brands' },
+  { text: 'Catégories', icon: <CategoryIcon />, path: '/categories' },
   { text: 'Tags', icon: <CategoryIcon />, path: '/tags' },
   {
     text: 'Caractéristiques',

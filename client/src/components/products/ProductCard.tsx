@@ -5,14 +5,14 @@ interface ProductCardProps {
   name: string;
   brand: string;
   price: number;
-  stock: number;
+  status: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   name,
   brand,
   price,
-  stock,
+  status,
 }) => {
   return (
     <Card sx={{ minWidth: 275, maxWidth: 300, margin: 2 }}>
@@ -26,8 +26,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <Typography variant="body1" sx={{ marginTop: 1 }}>
           Prix: {price} €
         </Typography>
-        <Typography variant="body2" color={stock > 0 ? 'green' : 'red'}>
-          Stock: {stock > 0 ? 'En stock' : 'Rupture de stock'}
+        <Typography variant="body2" color="textSecondary">
+          Status: {status}
         </Typography>
       </CardContent>
     </Card>
