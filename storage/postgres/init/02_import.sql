@@ -126,52 +126,74 @@ WHERE ti.supplier_email IS NOT NULL
   AND ti.supplier_country IS NOT NULL;
 
 -- Gestion des caractéristiques
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1
-        FROM pg_type
-        WHERE typname = 'characteristic_pair'
-    ) THEN
-        CREATE TYPE characteristic_pair AS (
-            label VARCHAR(255),
-            value TEXT
-        );
-    END IF;
-END
-$$;
+-- D'abord, on insère les définitions de caractéristiques
+INSERT INTO characteristic_definitions (name)
+SELECT DISTINCT property_1_label FROM temp_import WHERE property_1_label IS NOT NULL
+UNION
+SELECT DISTINCT property_2_label FROM temp_import WHERE property_2_label IS NOT NULL
+UNION
+SELECT DISTINCT property_3_label FROM temp_import WHERE property_3_label IS NOT NULL
+UNION
+SELECT DISTINCT property_4_label FROM temp_import WHERE property_4_label IS NOT NULL
+UNION
+SELECT DISTINCT property_5_label FROM temp_import WHERE property_5_label IS NOT NULL
+ON CONFLICT (name) DO NOTHING;
 
--- Étape unique : Insérer définitions et associer caractéristiques aux produits
-WITH characteristic_data AS (
-    SELECT 
-        ti.ref AS product_reference,
-        unnest(ARRAY[
-            ROW(property_1_label, property_1_text)::characteristic_pair,
-            ROW(property_2_label, property_2_text)::characteristic_pair,
-            ROW(property_3_label, property_3_text)::characteristic_pair,
-            ROW(property_4_label, property_4_text)::characteristic_pair,
-            ROW(property_5_label, property_5_text)::characteristic_pair
-        ]) AS char_data
-    FROM temp_import ti
-),
-inserted_definitions AS (
-    INSERT INTO characteristic_definitions (name)
-    SELECT DISTINCT 
-        (char_data).label
-    FROM characteristic_data
-    WHERE (char_data).label IS NOT NULL
-    ON CONFLICT (name) DO NOTHING
-    RETURNING id, name
-)
+-- Ensuite, on insère les associations avec les valeurs
+-- Caractéristique 1
 INSERT INTO product_characteristics (product_id, characteristic_id, value)
 SELECT 
-    p.id AS product_id,
-    cd.id AS characteristic_id,
-    (char_data).value
-FROM characteristic_data
-JOIN products p ON p.reference = characteristic_data.product_reference
-JOIN characteristic_definitions cd ON cd.name = (char_data).label
-WHERE (char_data).value IS NOT NULL;
+    p.id,
+    cd.id,
+    ti.property_1_text
+FROM temp_import ti
+JOIN products p ON p.reference = ti.ref
+JOIN characteristic_definitions cd ON cd.name = ti.property_1_label
+WHERE ti.property_1_label IS NOT NULL AND ti.property_1_text IS NOT NULL;
+
+-- Caractéristique 2
+INSERT INTO product_characteristics (product_id, characteristic_id, value)
+SELECT 
+    p.id,
+    cd.id,
+    ti.property_2_text
+FROM temp_import ti
+JOIN products p ON p.reference = ti.ref
+JOIN characteristic_definitions cd ON cd.name = ti.property_2_label
+WHERE ti.property_2_label IS NOT NULL AND ti.property_2_text IS NOT NULL;
+
+-- Caractéristique 3
+INSERT INTO product_characteristics (product_id, characteristic_id, value)
+SELECT 
+    p.id,
+    cd.id,
+    ti.property_3_text
+FROM temp_import ti
+JOIN products p ON p.reference = ti.ref
+JOIN characteristic_definitions cd ON cd.name = ti.property_3_label
+WHERE ti.property_3_label IS NOT NULL AND ti.property_3_text IS NOT NULL;
+
+-- Caractéristique 4
+INSERT INTO product_characteristics (product_id, characteristic_id, value)
+SELECT 
+    p.id,
+    cd.id,
+    ti.property_4_text
+FROM temp_import ti
+JOIN products p ON p.reference = ti.ref
+JOIN characteristic_definitions cd ON cd.name = ti.property_4_label
+WHERE ti.property_4_label IS NOT NULL AND ti.property_4_text IS NOT NULL;
+
+-- Caractéristique 5
+INSERT INTO product_characteristics (product_id, characteristic_id, value)
+SELECT 
+    p.id,
+    cd.id,
+    ti.property_5_text
+FROM temp_import ti
+JOIN products p ON p.reference = ti.ref
+JOIN characteristic_definitions cd ON cd.name = ti.property_5_label
+WHERE ti.property_5_label IS NOT NULL AND ti.property_5_text IS NOT NULL;
 
 -- Étape 9 : Suppression de la table temporaire
 DROP TABLE temp_import;
