@@ -34,10 +34,12 @@ export class Contacts extends BaseEntity {
   @Column('character varying', { name: 'country', nullable: true, length: 100 })
   country: string | null;
 
+  @Field(() => Brands, { nullable: true })
   @ManyToOne(() => Brands, (brands) => brands.contacts)
   @JoinColumn([{ name: 'brand_id', referencedColumnName: 'id' }])
   brand: Brands;
 
+  @Field(() => Products, { nullable: true })
   @ManyToOne(() => Products, (products) => products.contacts)
   @JoinColumn([{ name: 'product_id', referencedColumnName: 'id' }])
   product: Products;
