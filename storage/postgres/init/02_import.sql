@@ -114,16 +114,18 @@ JOIN (
 ON CONFLICT (product_id, image_id) DO NOTHING;
 
 -- Gestion des contacts
-INSERT INTO contacts (product_id, email, phone, country)
+INSERT INTO contacts (brand_id, product_id, email, phone, country)
 SELECT DISTINCT
-    p.id AS product_id,
-    ti.supplier_email,
-    ti.supplier_phone,
-    ti.supplier_country
+   b.id AS brand_id,
+   p.id AS product_id,
+   ti.supplier_email,
+   ti.supplier_phone,
+   ti.supplier_country
 FROM temp_import ti
 JOIN products p ON p.reference = ti.ref
+JOIN brands b ON b.name = ti.brand_name
 WHERE ti.supplier_email IS NOT NULL
-  AND ti.supplier_country IS NOT NULL;
+ AND ti.supplier_country IS NOT NULL;
 
 -- Gestion des caractéristiques
 -- D'abord, on insère les définitions de caractéristiques

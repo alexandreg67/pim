@@ -64,9 +64,8 @@ CREATE TABLE IF NOT EXISTS "contacts" (
     "email" VARCHAR(100) NULL,
     "phone" VARCHAR(20) NULL,
     "country" VARCHAR(100) NULL,
-    CONSTRAINT "contact_association" CHECK (
-        (brand_id IS NOT NULL AND product_id IS NULL) OR
-        (brand_id IS NULL AND product_id IS NOT NULL)
+     CONSTRAINT "contact_association" CHECK (
+        brand_id IS NOT NULL AND product_id IS NOT NULL
     )
 );
 
