@@ -1,13 +1,13 @@
 import { BaseEntity, Column, Entity, Index, OneToMany } from 'typeorm';
 import { History } from './History';
-import { Field, ID, ObjectType } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Index('actions_pkey', ['id'], { unique: true })
 @Index('actions_name_key', ['name'], { unique: true })
 @Entity('actions', { schema: 'public' })
 export class Actions extends BaseEntity {
-  @Field(() => ID)
+  @Field(() => String)
   @Column('uuid', {
     primary: true,
     name: 'id',
@@ -19,7 +19,7 @@ export class Actions extends BaseEntity {
   @Column('character varying', { name: 'name', unique: true, length: 50 })
   name: string;
 
-  @Field(() => History, { nullable: true })
+  @Field(() => History)
   @OneToMany(() => History, (history) => history.action)
   histories: History[];
 }

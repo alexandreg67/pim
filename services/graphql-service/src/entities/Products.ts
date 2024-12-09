@@ -9,14 +9,14 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Contacts } from './Contacts';
 import { History } from './History';
 import { ProductCharacteristics } from './ProductCharacteristics';
 import { Images } from './Images';
+import { BrandContacts } from './BrandContacts';
 import { Brands } from './Brands';
 import { Categories } from './Categories';
 import { Tags } from './Tags';
-import { Field, Float, ObjectType } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Index('idx_products_brand', ['brandId'], {})
@@ -54,17 +54,9 @@ export class Products extends BaseEntity {
   @Column('text', { name: 'description', nullable: true })
   description: string | null;
 
+  @Field(() => String)
   @Column('numeric', { name: 'price', precision: 10, scale: 2 })
-  private _price: string;
-
-  @Field(() => Float)
-  get price(): number {
-    return parseFloat(this._price);
-  }
-
-  set price(value: number) {
-    this._price = value.toFixed(2);
-  }
+  price: string;
 
   @Field(() => String)
   @Column('character varying', {
@@ -78,7 +70,7 @@ export class Products extends BaseEntity {
   @Column('character varying', { name: 'label', nullable: true, length: 50 })
   label: string | null;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @Column('uuid', { name: 'brand_id' })
   brandId: string;
 
@@ -102,21 +94,25 @@ export class Products extends BaseEntity {
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
-  @OneToMany(() => Contacts, (contacts) => contacts.product)
-  contacts: Contacts[];
-
+  @Field(() => [History])
   @OneToMany(() => History, (history) => history.product)
   histories: History[];
 
-  @Field(() => [ProductCharacteristics], { nullable: true })
+  @Field(() => [ProductCharacteristics])
   @OneToMany(
     () => ProductCharacteristics,
     (productCharacteristics) => productCharacteristics.product
   )
   productCharacteristics: ProductCharacteristics[];
 
+  @Field(() => [Images])
   @ManyToMany(() => Images, (images) => images.products)
   images: Images[];
+
+  @Field(() => BrandContacts)
+  @ManyToOne(() => BrandContacts, (brandContacts) => brandContacts.products)
+  @JoinColumn([{ name: 'brand_contact_id', referencedColumnName: 'id' }])
+  brandContact: BrandContacts;
 
   @Field(() => Brands)
   @ManyToOne(() => Brands, (brands) => brands.products)
@@ -127,6 +123,7 @@ export class Products extends BaseEntity {
   @ManyToMany(() => Categories, (categories) => categories.products)
   categories: Categories[];
 
+  @Field(() => [Tags])
   @ManyToMany(() => Tags, (tags) => tags.products)
   @JoinTable({
     name: 'products_tags',

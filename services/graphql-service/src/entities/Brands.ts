@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, Index, OneToMany } from 'typeorm';
-import { Contacts } from './Contacts';
+import { BrandContacts } from './BrandContacts';
 import { Exchanges } from './Exchanges';
 import { Products } from './Products';
 import { Field, ObjectType } from 'type-graphql';
@@ -49,15 +49,12 @@ export class Brands extends BaseEntity {
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
-  @Field(() => [Contacts], { nullable: true })
-  @OneToMany(() => Contacts, (contacts) => contacts.brand)
-  contacts: Contacts[];
+  @OneToMany(() => BrandContacts, (brandContacts) => brandContacts.brand)
+  brandContacts: BrandContacts[];
 
-  @Field(() => [Exchanges], { nullable: true })
   @OneToMany(() => Exchanges, (exchanges) => exchanges.brand)
   exchanges: Exchanges[];
 
-  @Field(() => [Products], { nullable: true })
   @OneToMany(() => Products, (products) => products.brand)
   products: Products[];
 }

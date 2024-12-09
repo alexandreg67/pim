@@ -38,7 +38,6 @@ export class Images extends BaseEntity {
   @Column('boolean', { name: 'is_primary', default: () => 'false' })
   isPrimary: boolean;
 
-  @Field(() => Products)
   @ManyToMany(() => Products, (products) => products.images)
   @JoinTable({
     name: 'product_images',

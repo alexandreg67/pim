@@ -36,7 +36,7 @@ export class Users extends BaseEntity {
   @Column('character varying', { name: 'phone', nullable: true, length: 20 })
   phone: string | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => Date)
   @Column('timestamp with time zone', { name: 'start_date' })
   startDate: Date;
 
@@ -68,11 +68,11 @@ export class Users extends BaseEntity {
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
-  @Field(() => [Exchanges], { nullable: true })
+  @Field(() => [Exchanges])
   @OneToMany(() => Exchanges, (exchanges) => exchanges.user)
   exchanges: Exchanges[];
 
-  @Field(() => [History], { nullable: true })
+  @Field(() => [History])
   @OneToMany(() => History, (history) => history.user)
   histories: History[];
 }
