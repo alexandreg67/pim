@@ -70,7 +70,7 @@ export class Products extends BaseEntity {
   @Column('character varying', { name: 'label', nullable: true, length: 50 })
   label: string | null;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   @Column('uuid', { name: 'brand_id' })
   brandId: string;
 
@@ -109,7 +109,7 @@ export class Products extends BaseEntity {
   @ManyToMany(() => Images, (images) => images.products)
   images: Images[];
 
-  @Field(() => BrandContacts)
+  @Field(() => BrandContacts, { nullable: true })
   @ManyToOne(() => BrandContacts, (brandContacts) => brandContacts.products)
   @JoinColumn([{ name: 'brand_contact_id', referencedColumnName: 'id' }])
   brandContact: BrandContacts;

@@ -58,10 +58,13 @@ export class BrandContacts extends BaseEntity {
   })
   updatedAt: Date | null;
 
-  @ManyToOne(() => Brands, (brands) => brands.brandContacts)
+  @Field(() => Brands)
+  @Field(() => Brands)
+  @ManyToOne(() => Brands, (brands) => brands.contacts)
   @JoinColumn([{ name: 'brand_id', referencedColumnName: 'id' }])
   brand: Brands;
 
+  @Field(() => [Products])
   @OneToMany(() => Products, (products) => products.brandContact)
   products: Products[];
 }

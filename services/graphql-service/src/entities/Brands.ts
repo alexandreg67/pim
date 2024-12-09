@@ -49,8 +49,9 @@ export class Brands extends BaseEntity {
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
+  @Field(() => [BrandContacts])
   @OneToMany(() => BrandContacts, (brandContacts) => brandContacts.brand)
-  brandContacts: BrandContacts[];
+  contacts: BrandContacts[];
 
   @OneToMany(() => Exchanges, (exchanges) => exchanges.brand)
   exchanges: Exchanges[];
