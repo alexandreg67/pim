@@ -37,40 +37,39 @@ DELETE FROM temp_import
 WHERE ref IS NULL;
 
 -- Étape 4 : Gestion des marques (brands)
-INSERT INTO brands (name, logo, description, created_at, updated_at)
+INSERT INTO brands (name, logo, description)
 SELECT DISTINCT ON (brand_name) 
     brand_name, 
     brand_logo, 
-    brand_description,
-    CURRENT_TIMESTAMP,
-    CURRENT_TIMESTAMP
+    brand_description
 FROM temp_import
-WHERE brand_name IS NOT NULL
-ON CONFLICT (name) DO UPDATE SET 
-    logo = EXCLUDED.logo,
-    description = EXCLUDED.description,
-    updated_at = CURRENT_TIMESTAMP;
+WHERE brand_name IS NOT NULL;
+
+-- Contacts de marques par pays
+INSERT INTO brand_contacts (brand_id, country, email, phone)
+SELECT DISTINCT ON (b.id, ti.supplier_country) 
+    b.id,
+    ti.supplier_country,
+    ti.supplier_email,
+    ti.supplier_phone
+FROM temp_import ti
+JOIN brands b ON b.name = ti.brand_name
+WHERE ti.supplier_country IS NOT NULL
+ORDER BY b.id, ti.supplier_country, ti.supplier_email;
 
 -- Étape 5 : Gestion des produits (products)
-INSERT INTO products (reference, name, short_description, description, price, brand_id, created_at, updated_at)
+INSERT INTO products (reference, name, short_description, description, price, brand_id, brand_contact_id)
 SELECT 
     ti.ref, 
     ti.name, 
     ti.short_description, 
     ti.description, 
     ti.price, 
-    b.id AS brand_id, 
-    CURRENT_TIMESTAMP, 
-    CURRENT_TIMESTAMP
+    b.id AS brand_id,
+    bc.id AS brand_contact_id
 FROM temp_import ti
 JOIN brands b ON b.name = ti.brand_name
-WHERE ti.ref IS NOT NULL
-ON CONFLICT (reference) DO UPDATE SET 
-    name = EXCLUDED.name,
-    short_description = EXCLUDED.short_description,
-    description = EXCLUDED.description,
-    price = EXCLUDED.price,
-    updated_at = CURRENT_TIMESTAMP;
+JOIN brand_contacts bc ON bc.brand_id = b.id AND bc.country = ti.supplier_country;
 
 -- Étape 6 : Gestion des images
 WITH image_data AS (
@@ -112,20 +111,6 @@ JOIN (
     JOIN products p ON p.reference = ti.ref
 ) i ON im.url = i.url
 ON CONFLICT (product_id, image_id) DO NOTHING;
-
--- Gestion des contacts
-INSERT INTO contacts (brand_id, product_id, email, phone, country)
-SELECT DISTINCT
-   b.id AS brand_id,
-   p.id AS product_id,
-   ti.supplier_email,
-   ti.supplier_phone,
-   ti.supplier_country
-FROM temp_import ti
-JOIN products p ON p.reference = ti.ref
-JOIN brands b ON b.name = ti.brand_name
-WHERE ti.supplier_email IS NOT NULL
- AND ti.supplier_country IS NOT NULL;
 
 -- Gestion des caractéristiques
 -- D'abord, on insère les définitions de caractéristiques
