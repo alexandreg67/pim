@@ -41,6 +41,7 @@ export class ProductCharacteristics extends BaseEntity {
   @Column('text', { name: 'value' })
   value: string;
 
+  @Field(() => CharacteristicDefinitions)
   @ManyToOne(
     () => CharacteristicDefinitions,
     (characteristicDefinitions) =>

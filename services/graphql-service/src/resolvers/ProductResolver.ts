@@ -14,7 +14,12 @@ export default class ProductsResolver {
         skip: offset,
         take: limit,
         order: { createdAt: 'DESC' },
-        relations: ['brand'],
+        relations: {
+          brand: true,
+          productCharacteristics: {
+            characteristic: true,
+          },
+        },
       });
     } catch (error) {
       console.error('Error fetching products:', error);

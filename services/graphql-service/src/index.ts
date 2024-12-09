@@ -4,6 +4,7 @@ import { buildSchema } from 'type-graphql';
 import { AppDataSource } from './config/database';
 import ProductResolver from './resolvers/ProductResolver';
 import { DashboardResolver } from './resolvers/DashboardResolver';
+import { BrandResolver } from './resolvers/BrandResolver';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -12,7 +13,7 @@ async function bootstrap() {
 
   // Construction du schéma GraphQL
   const schema = await buildSchema({
-    resolvers: [ProductResolver, DashboardResolver],
+    resolvers: [ProductResolver, DashboardResolver, BrandResolver],
     validate: false,
   });
 

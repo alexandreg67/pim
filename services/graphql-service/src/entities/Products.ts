@@ -108,6 +108,7 @@ export class Products extends BaseEntity {
   @OneToMany(() => History, (history) => history.product)
   histories: History[];
 
+  @Field(() => [ProductCharacteristics], { nullable: true })
   @OneToMany(
     () => ProductCharacteristics,
     (productCharacteristics) => productCharacteristics.product
@@ -122,6 +123,7 @@ export class Products extends BaseEntity {
   @JoinColumn([{ name: 'brand_id', referencedColumnName: 'id' }])
   brand: Brands;
 
+  @Field(() => [Categories])
   @ManyToMany(() => Categories, (categories) => categories.products)
   categories: Categories[];
 

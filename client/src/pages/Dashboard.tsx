@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
-import StatCard from '../components/StatCard';
-import ProductsByBrandChart from '../components/ProductsByBrandChart';
-import ProductsByCategoryChart from '../components/ProductsByCategoryChart';
-import RecentHistory from '../components/RecentHistory';
+import StatCard from '../components/dashboard/StatCard';
+import ProductsByBrandChart from '../components/dashboard/ProductsByBrandChart';
+import ProductsByCategoryChart from '../components/dashboard/ProductsByCategoryChart';
+import RecentHistory from '../components/dashboard/RecentHistory';
 import { useDashboardStatsQuery } from '../generated/graphql-types';
 
 const drawerWidth = 240;
