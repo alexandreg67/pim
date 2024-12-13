@@ -1,7 +1,7 @@
 import { BaseEntity, Column, Entity, Index, OneToMany } from 'typeorm';
 import { Exchanges } from './Exchanges';
 import { History } from './History';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, GraphQLISODateTime, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Index('users_email_key', ['email'], { unique: true })
@@ -36,11 +36,11 @@ export class Users extends BaseEntity {
   @Column('character varying', { name: 'phone', nullable: true, length: 20 })
   phone: string | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime)
   @Column('timestamp with time zone', { name: 'start_date' })
   startDate: Date;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', { name: 'end_date', nullable: true })
   endDate: Date | null;
 
@@ -48,7 +48,7 @@ export class Users extends BaseEntity {
   @Column('boolean', { name: 'is_admin', default: () => 'false' })
   isAdmin: boolean;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,
@@ -56,7 +56,7 @@ export class Users extends BaseEntity {
   })
   createdAt: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'updated_at',
     nullable: true,
@@ -64,15 +64,15 @@ export class Users extends BaseEntity {
   })
   updatedAt: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
-  @Field(() => [Exchanges], { nullable: true })
+  @Field(() => Exchanges)
   @OneToMany(() => Exchanges, (exchanges) => exchanges.user)
   exchanges: Exchanges[];
 
-  @Field(() => [History], { nullable: true })
+  @Field(() => History)
   @OneToMany(() => History, (history) => history.user)
   histories: History[];
 }

@@ -30,7 +30,7 @@ export class Categories extends BaseEntity {
   @Column('text', { name: 'description', nullable: true })
   description: string | null;
 
-  @Field(() => Products, { nullable: true })
+  @Field(() => Products)
   @ManyToMany(() => Products, (products) => products.categories)
   @JoinTable({
     name: 'products_categories',

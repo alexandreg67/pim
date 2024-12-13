@@ -19,7 +19,7 @@ export class CharacteristicDefinitions extends BaseEntity {
   @Column('character varying', { name: 'name', unique: true, length: 100 })
   name: string;
 
-  @Field(() => ProductCharacteristics, { nullable: true })
+  @Field(() => ProductCharacteristics)
   @OneToMany(
     () => ProductCharacteristics,
     (productCharacteristics) => productCharacteristics.characteristic

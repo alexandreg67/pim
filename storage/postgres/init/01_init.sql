@@ -33,11 +33,23 @@ CREATE TABLE IF NOT EXISTS "users" (
 CREATE TABLE IF NOT EXISTS "brands" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     "name" VARCHAR(100) NOT NULL UNIQUE,
-    "description" TEXT,
     "logo" VARCHAR(500),
+    "description" TEXT,
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMP WITH TIME ZONE
+);
+
+-- Contacts de marques
+CREATE TABLE IF NOT EXISTS "contacts" (
+    "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    "brand_id" UUID NOT NULL REFERENCES "brands"("id"),
+    "email" VARCHAR(100),
+    "phone" VARCHAR(20),
+    "country" VARCHAR(100),
+    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(brand_id, country, email)
 );
 
 -- Table des produits
@@ -51,22 +63,10 @@ CREATE TABLE IF NOT EXISTS "products" (
     "status" VARCHAR(20) NOT NULL DEFAULT 'draft',
     "label" VARCHAR(50),
     "brand_id" UUID NOT NULL REFERENCES "brands"("id"),
+    "contact_id" UUID NOT NULL REFERENCES "contacts"("id"),
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMP WITH TIME ZONE
-);
-
--- Table des contacts
-CREATE TABLE IF NOT EXISTS "contacts" (
-    "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "brand_id" UUID REFERENCES "brands"("id"),
-    "product_id" UUID REFERENCES "products"("id"),
-    "email" VARCHAR(100) NULL,
-    "phone" VARCHAR(20) NULL,
-    "country" VARCHAR(100) NULL,
-     CONSTRAINT "contact_association" CHECK (
-        brand_id IS NOT NULL AND product_id IS NOT NULL
-    )
 );
 
 -- Table des catégories

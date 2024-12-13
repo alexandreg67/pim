@@ -18,6 +18,7 @@ services:
     build:
       context: ../../services/graphql-service
       dockerfile: Dockerfile
+    command: sh -c "npm run generate:entities && npm start"
     container_name: pim_api
     ports:
       - '4000:4000'

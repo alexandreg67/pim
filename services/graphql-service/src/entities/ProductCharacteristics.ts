@@ -29,11 +29,11 @@ export class ProductCharacteristics extends BaseEntity {
   })
   id: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @Column('uuid', { name: 'product_id', nullable: true, unique: true })
   productId: string | null;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @Column('uuid', { name: 'characteristic_id', nullable: true, unique: true })
   characteristicId: string | null;
 
@@ -50,6 +50,7 @@ export class ProductCharacteristics extends BaseEntity {
   @JoinColumn([{ name: 'characteristic_id', referencedColumnName: 'id' }])
   characteristic: CharacteristicDefinitions;
 
+  @Field(() => Products)
   @ManyToOne(() => Products, (products) => products.productCharacteristics, {
     onDelete: 'CASCADE',
   })

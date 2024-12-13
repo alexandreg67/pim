@@ -9,14 +9,14 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Contacts } from './Contacts';
 import { History } from './History';
 import { ProductCharacteristics } from './ProductCharacteristics';
 import { Images } from './Images';
 import { Brands } from './Brands';
+import { Contacts } from './Contacts';
 import { Categories } from './Categories';
 import { Tags } from './Tags';
-import { Field, Float, ObjectType } from 'type-graphql';
+import { Field, GraphQLISODateTime, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Index('idx_products_brand', ['brandId'], {})
@@ -54,17 +54,9 @@ export class Products extends BaseEntity {
   @Column('text', { name: 'description', nullable: true })
   description: string | null;
 
+  @Field(() => String)
   @Column('numeric', { name: 'price', precision: 10, scale: 2 })
-  private _price: string;
-
-  @Field(() => Float)
-  get price(): number {
-    return parseFloat(this._price);
-  }
-
-  set price(value: number) {
-    this._price = value.toFixed(2);
-  }
+  price: string;
 
   @Field(() => String)
   @Column('character varying', {
@@ -82,7 +74,7 @@ export class Products extends BaseEntity {
   @Column('uuid', { name: 'brand_id' })
   brandId: string;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,
@@ -90,7 +82,7 @@ export class Products extends BaseEntity {
   })
   createdAt: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'updated_at',
     nullable: true,
@@ -98,23 +90,22 @@ export class Products extends BaseEntity {
   })
   updatedAt: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
-  @OneToMany(() => Contacts, (contacts) => contacts.product)
-  contacts: Contacts[];
-
+  @Field(() => [History])
   @OneToMany(() => History, (history) => history.product)
   histories: History[];
 
-  @Field(() => [ProductCharacteristics], { nullable: true })
+  @Field(() => [ProductCharacteristics])
   @OneToMany(
     () => ProductCharacteristics,
     (productCharacteristics) => productCharacteristics.product
   )
   productCharacteristics: ProductCharacteristics[];
 
+  @Field(() => [Images])
   @ManyToMany(() => Images, (images) => images.products)
   images: Images[];
 
@@ -123,10 +114,16 @@ export class Products extends BaseEntity {
   @JoinColumn([{ name: 'brand_id', referencedColumnName: 'id' }])
   brand: Brands;
 
+  @Field(() => Contacts)
+  @ManyToOne(() => Contacts, (contacts) => contacts.products)
+  @JoinColumn([{ name: 'contact_id', referencedColumnName: 'id' }])
+  contact: Contacts;
+
   @Field(() => [Categories])
   @ManyToMany(() => Categories, (categories) => categories.products)
   categories: Categories[];
 
+  @Field(() => [Tags])
   @ManyToMany(() => Tags, (tags) => tags.products)
   @JoinTable({
     name: 'products_tags',

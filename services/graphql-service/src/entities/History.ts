@@ -9,7 +9,7 @@ import {
 import { Actions } from './Actions';
 import { Products } from './Products';
 import { Users } from './Users';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, GraphQLISODateTime, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Index('idx_history_created_at', ['createdAt'], {})
@@ -34,7 +34,7 @@ export class History extends BaseEntity {
   @Column('uuid', { name: 'product_id' })
   productId: string;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,

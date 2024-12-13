@@ -2,7 +2,7 @@ import { BaseEntity, Column, Entity, Index, OneToMany } from 'typeorm';
 import { Contacts } from './Contacts';
 import { Exchanges } from './Exchanges';
 import { Products } from './Products';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, GraphQLISODateTime, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Index('brands_pkey', ['id'], { unique: true })
@@ -22,14 +22,14 @@ export class Brands extends BaseEntity {
   name: string;
 
   @Field(() => String, { nullable: true })
-  @Column('text', { name: 'description', nullable: true })
-  description: string | null;
-
-  @Field(() => String, { nullable: true })
   @Column('character varying', { name: 'logo', nullable: true, length: 500 })
   logo: string | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => String, { nullable: true })
+  @Column('text', { name: 'description', nullable: true })
+  description: string | null;
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,
@@ -37,7 +37,7 @@ export class Brands extends BaseEntity {
   })
   createdAt: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'updated_at',
     nullable: true,
@@ -45,19 +45,19 @@ export class Brands extends BaseEntity {
   })
   updatedAt: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime)
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
-  @Field(() => [Contacts], { nullable: true })
+  @Field(() => [Contacts])
   @OneToMany(() => Contacts, (contacts) => contacts.brand)
   contacts: Contacts[];
 
-  @Field(() => [Exchanges], { nullable: true })
+  @Field(() => [Exchanges])
   @OneToMany(() => Exchanges, (exchanges) => exchanges.brand)
   exchanges: Exchanges[];
 
   @Field(() => [Products], { nullable: true })
-  @OneToMany(() => Products, (products) => products.brand)
+  @OneToMany(() => Products, (products) => products.brand, { nullable: true })
   products: Products[];
 }

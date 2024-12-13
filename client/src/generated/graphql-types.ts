@@ -34,31 +34,51 @@ export type Scalars = {
 
 export type Actions = {
   __typename?: 'Actions';
-  histories?: Maybe<History>;
-  id: Scalars['ID']['output'];
+  histories: History;
+  id: Scalars['String']['output'];
   name: Scalars['String']['output'];
 };
 
 export type Brands = {
   __typename?: 'Brands';
-  contacts?: Maybe<Array<Contacts>>;
+  contacts: Array<Contacts>;
   createdAt?: Maybe<Scalars['DateTimeISO']['output']>;
-  deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  deletedAt: Scalars['DateTimeISO']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  exchanges?: Maybe<Array<Exchanges>>;
+  exchanges: Array<Exchanges>;
   id: Scalars['String']['output'];
   logo?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
-  products?: Maybe<Array<Products>>;
+  products: Array<Products>;
   updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
+};
+
+export type Categories = {
+  __typename?: 'Categories';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  products: Products;
+};
+
+export type CharacteristicDefinitions = {
+  __typename?: 'CharacteristicDefinitions';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  productCharacteristics: ProductCharacteristics;
 };
 
 export type Contacts = {
   __typename?: 'Contacts';
+  brand: Brands;
+  brandId: Scalars['String']['output'];
   country?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTimeISO']['output']>;
   email?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   phone?: Maybe<Scalars['String']['output']>;
+  products: Products;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
 };
 
 export type DashboardStats = {
@@ -72,14 +92,14 @@ export type DashboardStats = {
 
 export type Exchanges = {
   __typename?: 'Exchanges';
-  brand?: Maybe<Brands>;
+  brand: Brands;
   brandId?: Maybe<Scalars['String']['output']>;
   closedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   createdAt?: Maybe<Scalars['DateTimeISO']['output']>;
   id: Scalars['String']['output'];
   message: Scalars['String']['output'];
   status: Scalars['String']['output'];
-  user?: Maybe<Users>;
+  user: Users;
   userId?: Maybe<Scalars['String']['output']>;
 };
 
@@ -100,6 +120,25 @@ export type HistoryEntry = {
   createdAt: Scalars['DateTime']['output'];
 };
 
+export type Images = {
+  __typename?: 'Images';
+  altText?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  isPrimary: Scalars['Boolean']['output'];
+  products: Products;
+  url: Scalars['String']['output'];
+};
+
+export type ProductCharacteristics = {
+  __typename?: 'ProductCharacteristics';
+  characteristic: CharacteristicDefinitions;
+  characteristicId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  product: Products;
+  productId?: Maybe<Scalars['String']['output']>;
+  value: Scalars['String']['output'];
+};
+
 export type ProductStat = {
   __typename?: 'ProductStat';
   categoryOrBrand?: Maybe<Scalars['String']['output']>;
@@ -110,28 +149,59 @@ export type Products = {
   __typename?: 'Products';
   brand: Brands;
   brandId: Scalars['String']['output'];
+  categories: Categories;
+  contact: Contacts;
   createdAt?: Maybe<Scalars['DateTimeISO']['output']>;
   deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  histories: History;
   id: Scalars['String']['output'];
+  images: Images;
   label?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
-  price: Scalars['Float']['output'];
+  price: Scalars['String']['output'];
+  productCharacteristics: ProductCharacteristics;
   reference: Scalars['String']['output'];
   shortDescription?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
+  tags: Tags;
   updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
 };
 
 export type Query = {
   __typename?: 'Query';
+  brand?: Maybe<Brands>;
+  brands: Array<Brands>;
   dashboardStats: DashboardStats;
   products: Array<Products>;
+  totalBrands: Scalars['Int']['output'];
+};
+
+export type QueryBrandArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QueryBrandsArgs = {
+  limit: Scalars['Int']['input'];
+  page: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type QueryProductsArgs = {
   limit?: Scalars['Int']['input'];
   page?: Scalars['Int']['input'];
+};
+
+export type QueryTotalBrandsArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Tags = {
+  __typename?: 'Tags';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  products: Products;
 };
 
 export type Users = {
@@ -140,16 +210,43 @@ export type Users = {
   deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   email: Scalars['String']['output'];
   endDate?: Maybe<Scalars['DateTimeISO']['output']>;
-  exchanges?: Maybe<Array<Exchanges>>;
+  exchanges: Exchanges;
   firstName: Scalars['String']['output'];
-  histories?: Maybe<Array<History>>;
+  histories: History;
   id: Scalars['String']['output'];
   isAdmin: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   password: Scalars['String']['output'];
   phone?: Maybe<Scalars['String']['output']>;
-  startDate?: Maybe<Scalars['DateTimeISO']['output']>;
+  startDate: Scalars['DateTimeISO']['output'];
   updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
+};
+
+export type GetBrandsQueryVariables = Exact<{
+  limit: Scalars['Int']['input'];
+  page: Scalars['Int']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+export type GetBrandsQuery = {
+  __typename?: 'Query';
+  totalBrands: number;
+  brands: Array<{
+    __typename?: 'Brands';
+    id: string;
+    name: string;
+    description?: string | null;
+    logo?: string | null;
+    createdAt?: Date | null;
+    contacts: Array<{
+      __typename?: 'Contacts';
+      id: string;
+      email?: string | null;
+      phone?: string | null;
+      country?: string | null;
+    }>;
+    products: Array<{ __typename?: 'Products'; id: string; name: string }>;
+  }>;
 };
 
 export type DashboardStatsQueryVariables = Exact<{ [key: string]: never }>;
@@ -190,7 +287,7 @@ export type GetProductsQuery = {
     id: string;
     name: string;
     reference: string;
-    price: number;
+    price: string;
     status: string;
     label?: string | null;
     createdAt?: Date | null;
@@ -199,6 +296,97 @@ export type GetProductsQuery = {
   dashboardStats: { __typename?: 'DashboardStats'; totalProducts: number };
 };
 
+export const GetBrandsDocument = gql`
+  query getBrands($limit: Int!, $page: Int!, $search: String) {
+    brands(limit: $limit, page: $page, search: $search) {
+      id
+      name
+      description
+      logo
+      createdAt
+      contacts {
+        id
+        email
+        phone
+        country
+      }
+      products {
+        id
+        name
+      }
+    }
+    totalBrands
+  }
+`;
+
+/**
+ * __useGetBrandsQuery__
+ *
+ * To run a query within a React component, call `useGetBrandsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBrandsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBrandsQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      page: // value for 'page'
+ *      search: // value for 'search'
+ *   },
+ * });
+ */
+export function useGetBrandsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetBrandsQuery,
+    GetBrandsQueryVariables
+  > &
+    ({ variables: GetBrandsQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetBrandsQuery, GetBrandsQueryVariables>(
+    GetBrandsDocument,
+    options
+  );
+}
+export function useGetBrandsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetBrandsQuery,
+    GetBrandsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetBrandsQuery, GetBrandsQueryVariables>(
+    GetBrandsDocument,
+    options
+  );
+}
+export function useGetBrandsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetBrandsQuery, GetBrandsQueryVariables>
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetBrandsQuery, GetBrandsQueryVariables>(
+    GetBrandsDocument,
+    options
+  );
+}
+export type GetBrandsQueryHookResult = ReturnType<typeof useGetBrandsQuery>;
+export type GetBrandsLazyQueryHookResult = ReturnType<
+  typeof useGetBrandsLazyQuery
+>;
+export type GetBrandsSuspenseQueryHookResult = ReturnType<
+  typeof useGetBrandsSuspenseQuery
+>;
+export type GetBrandsQueryResult = Apollo.QueryResult<
+  GetBrandsQuery,
+  GetBrandsQueryVariables
+>;
 export const DashboardStatsDocument = gql`
   query DashboardStats {
     dashboardStats {
