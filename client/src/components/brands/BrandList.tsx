@@ -1,74 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Grid, Pagination, TextField } from '@mui/material';
+import { useGetBrandsQuery } from '../../generated/graphql-types';
 import BrandCard from './BrandCard';
-
-// Données mockées
-const mockBrands = [
-  {
-    id: '1',
-    name: 'Dell',
-    logo: undefined,
-    country: 'USA',
-    productsCount: 245,
-    contactEmail: 'contact@dell.com',
-  },
-  {
-    id: '2',
-    name: 'HP',
-    logo: undefined,
-    country: 'USA',
-    productsCount: 189,
-    contactEmail: 'contact@hp.com',
-  },
-  {
-    id: '3',
-    name: 'Apple',
-    logo: undefined,
-    country: 'USA',
-    productsCount: 156,
-    contactEmail: 'contact@apple.com',
-  },
-  {
-    id: '4',
-    name: 'Samsung',
-    logo: undefined,
-    country: 'Corée du Sud',
-    productsCount: 324,
-    contactEmail: 'contact@samsung.com',
-  },
-  {
-    id: '5',
-    name: 'Seagate',
-    logo: undefined,
-    country: 'USA',
-    productsCount: 89,
-    contactEmail: 'contact@seagate.com',
-  },
-  {
-    id: '6',
-    name: 'Canon',
-    logo: undefined,
-    country: 'Japon',
-    productsCount: 167,
-    contactEmail: 'contact@canon.com',
-  },
-];
+import { Brands } from '../../generated/graphql-types';
 
 const BrandList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const filteredBrands = mockBrands.filter(
-    (brand) =>
-      brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      brand.country.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Débouncer la recherche
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300); // Attente de 300ms après la dernière frappe
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
 
-  const paginatedBrands = filteredBrands.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const {
+    data,
+    loading,
+    error,
+  }: {
+    data?: { brands: Brands[]; totalBrands: number };
+    loading: boolean;
+    error?: error;
+  } = useGetBrandsQuery({
+    variables: {
+      limit: itemsPerPage,
+      page: currentPage,
+      search: debouncedSearchQuery, // Transmettre la requête de recherche
+    },
+  });
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -77,8 +43,12 @@ const BrandList: React.FC = () => {
     setCurrentPage(page);
   };
 
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
   return (
     <Box>
+      {/* Barre de recherche */}
       <TextField
         fullWidth
         variant="outlined"
@@ -87,22 +57,25 @@ const BrandList: React.FC = () => {
         onChange={(e) => setSearchQuery(e.target.value)}
         sx={{ mb: 3 }}
       />
+
+      {/* Liste des marques */}
       <Grid container spacing={3}>
-        {paginatedBrands.map((brand) => (
+        {data?.brands.map((brand) => (
           <Grid item xs={12} sm={6} md={4} key={brand.id}>
             <BrandCard
               name={brand.name}
-              logo={brand.logo}
-              country={brand.country}
-              productsCount={brand.productsCount}
-              contactEmail={brand.contactEmail}
+              logo={brand.logo ?? ''}
+              description={brand.description ?? ''}
+              productsCount={0}
             />
           </Grid>
         ))}
       </Grid>
+
+      {/* Pagination */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
         <Pagination
-          count={Math.ceil(filteredBrands.length / itemsPerPage)}
+          count={Math.ceil((data?.totalBrands || 0) / itemsPerPage)} // Nombre total de pages
           page={currentPage}
           onChange={handlePageChange}
           color="primary"

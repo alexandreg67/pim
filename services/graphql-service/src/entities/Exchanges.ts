@@ -53,12 +53,12 @@ export class Exchanges extends BaseEntity {
   @Column('timestamp with time zone', { name: 'closed_at', nullable: true })
   closedAt: Date | null;
 
-  @Field(() => Brands, { nullable: true })
+  @Field(() => Brands)
   @ManyToOne(() => Brands, (brands) => brands.exchanges)
   @JoinColumn([{ name: 'brand_id', referencedColumnName: 'id' }])
   brand: Brands;
 
-  @Field(() => Users, { nullable: true })
+  @Field(() => Users)
   @ManyToOne(() => Users, (users) => users.exchanges)
   @JoinColumn([{ name: 'user_id', referencedColumnName: 'id' }])
   user: Users;

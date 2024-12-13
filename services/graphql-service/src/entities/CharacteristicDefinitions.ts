@@ -1,4 +1,4 @@
-import { Column, Entity, Index, OneToMany } from 'typeorm';
+import { BaseEntity, Column, Entity, Index, OneToMany } from 'typeorm';
 import { ProductCharacteristics } from './ProductCharacteristics';
 import { Field, ObjectType } from 'type-graphql';
 
@@ -6,7 +6,7 @@ import { Field, ObjectType } from 'type-graphql';
 @Index('characteristic_definitions_pkey', ['id'], { unique: true })
 @Index('characteristic_definitions_name_key', ['name'], { unique: true })
 @Entity('characteristic_definitions', { schema: 'public' })
-export class CharacteristicDefinitions {
+export class CharacteristicDefinitions extends BaseEntity {
   @Field(() => String)
   @Column('uuid', {
     primary: true,
@@ -19,7 +19,7 @@ export class CharacteristicDefinitions {
   @Column('character varying', { name: 'name', unique: true, length: 100 })
   name: string;
 
-  @Field(() => ProductCharacteristics, { nullable: true })
+  @Field(() => ProductCharacteristics)
   @OneToMany(
     () => ProductCharacteristics,
     (productCharacteristics) => productCharacteristics.characteristic

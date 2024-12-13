@@ -9,21 +9,46 @@ export class BrandResolver {
     @Arg('limit', () => Int) limit: number,
     @Arg('search', () => String, { nullable: true }) search?: string
   ): Promise<Brands[]> {
-    const qb = Brands.createQueryBuilder('brand')
+    const offset = (page - 1) * limit;
+
+    const query = Brands.createQueryBuilder('brand')
       .leftJoinAndSelect('brand.contacts', 'contacts')
-      .leftJoinAndSelect('brand.products', 'products')
-      .select([
-        'brand.id',
-        'brand.name',
-        'brand.description',
-        'brand.logo',
-        'contacts.id',
-        'contacts.email',
-        'contacts.phone',
-        'contacts.country',
-        'products.id',
-      ])
-      .where('brand.deletedAt IS NULL');
+      .orderBy('brand.name', 'ASC')
+      .skip(offset)
+      .take(limit);
+
+    if (search) {
+      query.andWhere(
+        'brand.name ILIKE :search OR brand.description ILIKE :search',
+        {
+          search: `%${search}%`,
+        }
+      );
+    }
+
+    return await query.getMany();
+  }
+
+  @Query(() => Brands, { nullable: true })
+  async brand(@Arg('id', () => ID) id: string): Promise<Brands | null> {
+    return await Brands.findOne({
+      where: { id },
+      relations: {
+        contacts: true,
+        products: {
+          contact: true,
+        },
+      },
+    });
+  }
+
+  @Query(() => Int)
+  async totalBrands(
+    @Arg('search', () => String, { nullable: true }) search?: string
+  ): Promise<number> {
+    const qb = Brands.createQueryBuilder('brand').where(
+      'brand.deletedAt IS NULL'
+    );
 
     if (search) {
       qb.andWhere(
@@ -32,17 +57,6 @@ export class BrandResolver {
       );
     }
 
-    return qb
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getMany();
-  }
-
-  @Query(() => Brands, { nullable: true })
-  async brand(@Arg('id', () => ID) id: string): Promise<Brands | null> {
-    return await Brands.findOne({
-      where: { id },
-      relations: ['products'],
-    });
+    return qb.getCount();
   }
 }

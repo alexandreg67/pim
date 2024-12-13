@@ -46,19 +46,18 @@ FROM temp_import
 WHERE brand_name IS NOT NULL;
 
 -- Contacts de marques par pays
-INSERT INTO brand_contacts (brand_id, country, email, phone)
-SELECT DISTINCT ON (b.id, ti.supplier_country) 
+INSERT INTO contacts (brand_id, country, email, phone)
+SELECT DISTINCT ON (b.id, ti.supplier_country, ti.supplier_email)
     b.id,
     ti.supplier_country,
     ti.supplier_email,
     ti.supplier_phone
 FROM temp_import ti
 JOIN brands b ON b.name = ti.brand_name
-WHERE ti.supplier_country IS NOT NULL
-ORDER BY b.id, ti.supplier_country, ti.supplier_email;
+WHERE ti.supplier_country IS NOT NULL;
 
 -- Étape 5 : Gestion des produits (products)
-INSERT INTO products (reference, name, short_description, description, price, brand_id, brand_contact_id)
+INSERT INTO products (reference, name, short_description, description, price, brand_id, contact_id)
 SELECT 
     ti.ref, 
     ti.name, 
@@ -66,10 +65,12 @@ SELECT
     ti.description, 
     ti.price, 
     b.id AS brand_id,
-    bc.id AS brand_contact_id
+    c.id AS contact_id
 FROM temp_import ti
 JOIN brands b ON b.name = ti.brand_name
-JOIN brand_contacts bc ON bc.brand_id = b.id AND bc.country = ti.supplier_country;
+JOIN contacts c ON c.brand_id = b.id 
+    AND c.country = ti.supplier_country
+    AND c.email = ti.supplier_email;
 
 -- Étape 6 : Gestion des images
 WITH image_data AS (

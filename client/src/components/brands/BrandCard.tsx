@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Card,
   CardContent,
@@ -11,17 +10,15 @@ import {
 interface BrandCardProps {
   name: string;
   logo?: string;
-  country: string;
+  description?: string;
   productsCount: number;
-  contactEmail: string;
 }
 
 const BrandCard: React.FC<BrandCardProps> = ({
   name,
   logo,
-  country,
+  description,
   productsCount,
-  contactEmail,
 }) => {
   return (
     <Card
@@ -36,8 +33,8 @@ const BrandCard: React.FC<BrandCardProps> = ({
     >
       <CardMedia
         component="img"
-        height="140"
-        image={logo || '/api/placeholder/200/140'}
+        height="120"
+        image={logo || '/api/placeholder/180/120'}
         alt={`${name} logo`}
         sx={{ objectFit: 'contain', p: 2, bgcolor: 'grey.50' }}
       />
@@ -45,17 +42,16 @@ const BrandCard: React.FC<BrandCardProps> = ({
         <Typography variant="h6" gutterBottom>
           {name}
         </Typography>
-        <Box sx={{ mb: 2 }}>
-          <Chip label={country} size="small" sx={{ mr: 1 }} />
+        <Typography variant="body2" color="textSecondary">
+          {description}
+        </Typography>
+        <Box sx={{ mt: 2 }}>
           <Chip
             label={`${productsCount} produits`}
             size="small"
             color="primary"
           />
         </Box>
-        <Typography variant="body2" color="text.secondary">
-          Contact: {contactEmail}
-        </Typography>
       </CardContent>
     </Card>
   );

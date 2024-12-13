@@ -12,11 +12,11 @@ import {
 import { History } from './History';
 import { ProductCharacteristics } from './ProductCharacteristics';
 import { Images } from './Images';
-import { BrandContacts } from './BrandContacts';
 import { Brands } from './Brands';
+import { Contacts } from './Contacts';
 import { Categories } from './Categories';
 import { Tags } from './Tags';
-import { Field, ObjectType } from 'type-graphql';
+import { Field, GraphQLISODateTime, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Index('idx_products_brand', ['brandId'], {})
@@ -74,7 +74,7 @@ export class Products extends BaseEntity {
   @Column('uuid', { name: 'brand_id' })
   brandId: string;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'created_at',
     nullable: true,
@@ -82,7 +82,7 @@ export class Products extends BaseEntity {
   })
   createdAt: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
     name: 'updated_at',
     nullable: true,
@@ -90,7 +90,7 @@ export class Products extends BaseEntity {
   })
   updatedAt: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
@@ -109,15 +109,15 @@ export class Products extends BaseEntity {
   @ManyToMany(() => Images, (images) => images.products)
   images: Images[];
 
-  @Field(() => BrandContacts, { nullable: true })
-  @ManyToOne(() => BrandContacts, (brandContacts) => brandContacts.products)
-  @JoinColumn([{ name: 'brand_contact_id', referencedColumnName: 'id' }])
-  brandContact: BrandContacts;
-
   @Field(() => Brands)
   @ManyToOne(() => Brands, (brands) => brands.products)
   @JoinColumn([{ name: 'brand_id', referencedColumnName: 'id' }])
   brand: Brands;
+
+  @Field(() => Contacts)
+  @ManyToOne(() => Contacts, (contacts) => contacts.products)
+  @JoinColumn([{ name: 'contact_id', referencedColumnName: 'id' }])
+  contact: Contacts;
 
   @Field(() => [Categories])
   @ManyToMany(() => Categories, (categories) => categories.products)
