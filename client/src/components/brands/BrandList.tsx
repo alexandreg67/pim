@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Box, Grid, Pagination, TextField } from '@mui/material';
 import { useGetBrandsQuery } from '../../generated/graphql-types';
 import BrandCard from './BrandCard';
-import { Brands } from '../../generated/graphql-types';
 
 const BrandList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,15 +19,7 @@ const BrandList: React.FC = () => {
     };
   }, [searchQuery]);
 
-  const {
-    data,
-    loading,
-    error,
-  }: {
-    data?: { brands: Brands[]; totalBrands: number };
-    loading: boolean;
-    error?: error;
-  } = useGetBrandsQuery({
+  const { data, loading, error } = useGetBrandsQuery({
     variables: {
       limit: itemsPerPage,
       page: currentPage,
