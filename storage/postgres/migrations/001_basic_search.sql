@@ -18,8 +18,10 @@ BEGIN
         );
 
         -- Ajoute l'extension pour la gestion des accents
-        CREATE EXTENSION IF NOT EXISTS unaccent;
-        
+        IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'unaccent') THEN
+            CREATE EXTENSION unaccent;
+        END IF;
+
         -- Fonction immutable pour unaccent
         CREATE OR REPLACE FUNCTION immutable_unaccent(text)
         RETURNS text AS
@@ -40,14 +42,19 @@ BEGIN
         $func$ LANGUAGE plpgsql IMMUTABLE;
 
         -- Ajoute la colonne search_vector
-        ALTER TABLE products 
-        ADD COLUMN IF NOT EXISTS search_vector tsvector;
-        
+        IF NOT EXISTS (
+            SELECT 1 
+            FROM information_schema.columns 
+            WHERE table_name = 'products' AND column_name = 'search_vector'
+        ) THEN
+            ALTER TABLE products ADD COLUMN search_vector tsvector;
+        END IF;
+
         -- Crée l'index GIN
         CREATE INDEX IF NOT EXISTS idx_products_search 
         ON products USING GIN (search_vector);
 
-        -- Met à jour les données existantes
+        -- Met à jour les données existantes en une seule requête
         UPDATE products
         SET search_vector = make_searchable_text(name, reference);
 
@@ -68,5 +75,4 @@ BEGIN
             FOR EACH ROW
             EXECUTE FUNCTION products_search_trigger();
     END IF;
-END;
-$$;
+END $$;
