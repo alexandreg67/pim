@@ -1,12 +1,29 @@
 import { createTheme } from '@mui/material';
 
 export const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
+  components: {
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          color: 'white', // Texte
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'white', // Contours
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'white', // Contours au survol
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'white', // Contours au focus
+          },
+        },
+      },
     },
-    secondary: {
-      main: '#dc004e',
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: 'white', // Placeholder
+        },
+      },
     },
   },
 });

@@ -3,7 +3,6 @@ import {
   Avatar,
   Badge,
   IconButton,
-  TextField,
   Toolbar,
   Typography,
   Menu,
@@ -14,6 +13,7 @@ import {
   Menu as MenuIcon,
 } from '@mui/icons-material';
 import React from 'react';
+import SearchBar from './SearchBar';
 
 interface AppBarProps {
   user: { name: string };
@@ -47,12 +47,7 @@ export const AppBarComponent: React.FC<AppBarProps> = ({
         <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
           PIM Platform
         </Typography>
-        <TextField
-          variant="outlined"
-          size="small"
-          placeholder="Rechercher un produit (nom ou référence)"
-          sx={{ width: 300, mr: 2 }}
-        />
+        <SearchBar />
         <IconButton color="inherit" onClick={onNotificationsOpen}>
           <Badge badgeContent={3} color="error">
             <NotificationsIcon />

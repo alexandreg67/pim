@@ -6,6 +6,7 @@ interface ProductCardProps {
   brand: string;
   price: number;
   status: string;
+  reference: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -13,6 +14,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   brand,
   price,
   status,
+  reference,
 }) => {
   return (
     <Card sx={{ minWidth: 275, maxWidth: 300, margin: 2 }}>
@@ -20,10 +22,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <Typography variant="h6" gutterBottom>
           {name}
         </Typography>
-        <Typography variant="body2" color="textSecondary">
-          Marque: {brand}
-        </Typography>
+        <Typography variant="body1">Marque: {brand}</Typography>
         <Typography variant="body1" sx={{ marginTop: 1 }}>
+          Reference: {reference}
+        </Typography>
+        <Typography variant="body2" sx={{ marginTop: 1 }}>
           Prix: {price} €
         </Typography>
         <Typography variant="body2" color="textSecondary">

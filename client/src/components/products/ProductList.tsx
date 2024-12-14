@@ -1,25 +1,57 @@
 import React, { useState } from 'react';
 import { Box, Grid, Pagination, Typography } from '@mui/material';
 import ProductCard from './ProductCard';
-import { useGetProductsQuery } from '../../generated/graphql-types';
+import {
+  useGetProductsQuery,
+  useSearchProductsQuery,
+} from '../../generated/graphql-types';
 
-const ProductList: React.FC = () => {
+interface ProductListProps {
+  searchQuery?: string; // Recherche optionnelle
+}
+
+const ProductList: React.FC<ProductListProps> = ({ searchQuery }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12; // Correspond au "limit" pour l'API
+  const itemsPerPage = 12;
 
-  // Récupération des produits via le hook GraphQL
-  const { data, loading, error } = useGetProductsQuery({
-    variables: { page: currentPage, limit: itemsPerPage },
+  // Requête pour la recherche
+  const {
+    data: searchData,
+    loading: searchLoading,
+    error: searchError,
+  } = useSearchProductsQuery({
+    variables: {
+      query: searchQuery || '', // Nécessaire même si `skip` est actif
+      page: currentPage,
+      limit: itemsPerPage,
+    },
+    skip: !searchQuery, // Désactive cette requête si aucun `searchQuery`
   });
 
-  // Gestion des erreurs ou du chargement
-  if (loading) return <Typography>Chargement...</Typography>;
-  if (error)
-    return <Typography color="error">Erreur : {error.message}</Typography>;
+  // Requête pour tous les produits
+  const {
+    data: allData,
+    loading: allLoading,
+    error: allError,
+  } = useGetProductsQuery({
+    variables: {
+      page: currentPage,
+      limit: itemsPerPage,
+    },
+    skip: !!searchQuery, // Désactive cette requête si `searchQuery` est actif
+  });
 
-  const products = data?.products || [];
-  const totalProducts = data?.dashboardStats.totalProducts || 0;
+  // Centralisation des états
+  const loading = searchQuery ? searchLoading : allLoading;
+  const error = searchQuery ? searchError : allError;
+  const products = searchQuery
+    ? searchData?.searchProducts?.items || []
+    : allData?.products?.items || [];
+  const totalProducts = searchQuery
+    ? searchData?.searchProducts?.total || 0
+    : allData?.products?.total || 0;
 
+  // Gestion de la pagination
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     page: number
@@ -27,15 +59,21 @@ const ProductList: React.FC = () => {
     setCurrentPage(page);
   };
 
+  // Gestion des erreurs ou du chargement
+  if (loading) return <Typography>Chargement...</Typography>;
+  if (error)
+    return <Typography color="error">Erreur : {error.message}</Typography>;
+
   return (
-    <Box sx={{ padding: 3 }}>
+    <Box>
       <Grid container spacing={2}>
         {products.map((product) => (
           <Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
             <ProductCard
               name={product.name}
               brand={product.brand?.name || 'Aucune marque'}
-              price={product.price}
+              price={parseFloat(product.price)}
+              reference={product.reference}
               status={product.status || 'Inconnu'}
             />
           </Grid>
