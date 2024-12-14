@@ -49,7 +49,7 @@ export type Brands = {
   id: Scalars['String']['output'];
   logo?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
-  products: Array<Products>;
+  products?: Maybe<Array<Products>>;
   updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
 };
 
@@ -129,6 +129,13 @@ export type Images = {
   url: Scalars['String']['output'];
 };
 
+export type PaginatedProductsResponse = {
+  __typename?: 'PaginatedProductsResponse';
+  hasMore: Scalars['Boolean']['output'];
+  items: Array<Products>;
+  total: Scalars['Float']['output'];
+};
+
 export type ProductCharacteristics = {
   __typename?: 'ProductCharacteristics';
   characteristic: CharacteristicDefinitions;
@@ -149,22 +156,22 @@ export type Products = {
   __typename?: 'Products';
   brand: Brands;
   brandId: Scalars['String']['output'];
-  categories: Categories;
+  categories: Array<Categories>;
   contact: Contacts;
   createdAt?: Maybe<Scalars['DateTimeISO']['output']>;
   deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   description?: Maybe<Scalars['String']['output']>;
-  histories: History;
+  histories: Array<History>;
   id: Scalars['String']['output'];
-  images: Images;
+  images: Array<Images>;
   label?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   price: Scalars['String']['output'];
-  productCharacteristics: ProductCharacteristics;
+  productCharacteristics: Array<ProductCharacteristics>;
   reference: Scalars['String']['output'];
   shortDescription?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
-  tags: Tags;
+  tags: Array<Tags>;
   updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
 };
 
@@ -173,7 +180,9 @@ export type Query = {
   brand?: Maybe<Brands>;
   brands: Array<Brands>;
   dashboardStats: DashboardStats;
-  products: Array<Products>;
+  products: PaginatedProductsResponse;
+  searchProducts: PaginatedProductsResponse;
+  searchProductsSuggestions: Array<Products>;
   totalBrands: Scalars['Int']['output'];
 };
 
@@ -190,6 +199,17 @@ export type QueryBrandsArgs = {
 export type QueryProductsArgs = {
   limit?: Scalars['Int']['input'];
   page?: Scalars['Int']['input'];
+};
+
+export type QuerySearchProductsArgs = {
+  limit?: Scalars['Int']['input'];
+  page?: Scalars['Int']['input'];
+  query: Scalars['String']['input'];
+};
+
+export type QuerySearchProductsSuggestionsArgs = {
+  limit?: Scalars['Int']['input'];
+  query: Scalars['String']['input'];
 };
 
 export type QueryTotalBrandsArgs = {
@@ -245,7 +265,11 @@ export type GetBrandsQuery = {
       phone?: string | null;
       country?: string | null;
     }>;
-    products: Array<{ __typename?: 'Products'; id: string; name: string }>;
+    products?: Array<{
+      __typename?: 'Products';
+      id: string;
+      name: string;
+    }> | null;
   }>;
 };
 
@@ -282,18 +306,48 @@ export type GetProductsQueryVariables = Exact<{
 
 export type GetProductsQuery = {
   __typename?: 'Query';
-  products: Array<{
-    __typename?: 'Products';
-    id: string;
-    name: string;
-    reference: string;
-    price: string;
-    status: string;
-    label?: string | null;
-    createdAt?: Date | null;
-    brand: { __typename?: 'Brands'; name: string };
-  }>;
-  dashboardStats: { __typename?: 'DashboardStats'; totalProducts: number };
+  products: {
+    __typename?: 'PaginatedProductsResponse';
+    total: number;
+    hasMore: boolean;
+    items: Array<{
+      __typename?: 'Products';
+      id: string;
+      name: string;
+      reference: string;
+      price: string;
+      status: string;
+      label?: string | null;
+      createdAt?: Date | null;
+      brand: { __typename?: 'Brands'; name: string };
+    }>;
+  };
+};
+
+export type SearchProductsQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type SearchProductsQuery = {
+  __typename?: 'Query';
+  searchProducts: {
+    __typename?: 'PaginatedProductsResponse';
+    total: number;
+    hasMore: boolean;
+    items: Array<{
+      __typename?: 'Products';
+      id: string;
+      name: string;
+      reference: string;
+      price: string;
+      status: string;
+      label?: string | null;
+      createdAt?: Date | null;
+      brand: { __typename?: 'Brands'; name: string };
+    }>;
+  };
 };
 
 export const GetBrandsDocument = gql`
@@ -480,19 +534,20 @@ export type DashboardStatsQueryResult = Apollo.QueryResult<
 export const GetProductsDocument = gql`
   query GetProducts($page: Int, $limit: Int) {
     products(page: $page, limit: $limit) {
-      id
-      name
-      reference
-      price
-      status
-      label
-      createdAt
-      brand {
+      items {
+        id
         name
+        reference
+        price
+        status
+        label
+        createdAt
+        brand {
+          name
+        }
       }
-    }
-    dashboardStats {
-      totalProducts
+      total
+      hasMore
     }
   }
 `;
@@ -565,4 +620,101 @@ export type GetProductsSuspenseQueryHookResult = ReturnType<
 export type GetProductsQueryResult = Apollo.QueryResult<
   GetProductsQuery,
   GetProductsQueryVariables
+>;
+export const SearchProductsDocument = gql`
+  query SearchProducts($query: String!, $page: Int, $limit: Int) {
+    searchProducts(query: $query, page: $page, limit: $limit) {
+      items {
+        id
+        name
+        reference
+        price
+        status
+        label
+        createdAt
+        brand {
+          name
+        }
+      }
+      total
+      hasMore
+    }
+  }
+`;
+
+/**
+ * __useSearchProductsQuery__
+ *
+ * To run a query within a React component, call `useSearchProductsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchProductsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchProductsQuery({
+ *   variables: {
+ *      query: // value for 'query'
+ *      page: // value for 'page'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useSearchProductsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    SearchProductsQuery,
+    SearchProductsQueryVariables
+  > &
+    (
+      | { variables: SearchProductsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<SearchProductsQuery, SearchProductsQueryVariables>(
+    SearchProductsDocument,
+    options
+  );
+}
+export function useSearchProductsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    SearchProductsQuery,
+    SearchProductsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<SearchProductsQuery, SearchProductsQueryVariables>(
+    SearchProductsDocument,
+    options
+  );
+}
+export function useSearchProductsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        SearchProductsQuery,
+        SearchProductsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    SearchProductsQuery,
+    SearchProductsQueryVariables
+  >(SearchProductsDocument, options);
+}
+export type SearchProductsQueryHookResult = ReturnType<
+  typeof useSearchProductsQuery
+>;
+export type SearchProductsLazyQueryHookResult = ReturnType<
+  typeof useSearchProductsLazyQuery
+>;
+export type SearchProductsSuspenseQueryHookResult = ReturnType<
+  typeof useSearchProductsSuspenseQuery
+>;
+export type SearchProductsQueryResult = Apollo.QueryResult<
+  SearchProductsQuery,
+  SearchProductsQueryVariables
 >;

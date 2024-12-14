@@ -44,9 +44,16 @@ services:
       - '5435:5432' # Exposition pour DBeaver uniquement
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # Structure initiale
       - ../../storage/postgres/init/01_init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      # Dossier des migrations
+      - ../../storage/postgres/migrations:/docker-entrypoint-migrations.d
+      # Script d'exécution des migrations
+      - ../../storage/postgres/run-migrations.sh:/docker-entrypoint.sh/run-migrations.sh
+      # Import des données après les migrations
       - ../../storage/postgres/init/02_import.sql:/docker-entrypoint-initdb.d/02_import.sql
       - ../../storage/postgres/data/products.csv:/docker-entrypoint-initdb.d/products.csv
+    command: /docker-entrypoint.sh/run-migrations.sh
     networks:
       - pim_network
     healthcheck:
@@ -59,7 +66,7 @@ services:
     image: nginx:latest
     container_name: pim_nginx
     ports:
-      - '8000:80' # Expose NGINX sur le port 80
+      - '8000:80' # Expose NGINX sur le port 8000
     volumes:
       - ../../nginx.conf:/etc/nginx/nginx.conf:ro # Monte le fichier nginx.conf
     depends_on:
