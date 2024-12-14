@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { TextField } from '@mui/material';
 
-const SearchBar: React.FC = () => {
-  const [searchInput, setSearchInput] = useState('');
-  const navigate = useNavigate();
+interface SearchBarProps {
+  onSearch: (query: string) => void; // Fonction déclenchée lorsque l'utilisateur valide
+}
 
-  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+  const [searchInput, setSearchInput] = useState('');
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Empêche le rechargement de la page
     if (searchInput.trim()) {
-      // Redirige vers la page des produits avec le paramètre de recherche
-      navigate(`/products?query=${encodeURIComponent(searchInput)}`);
+      onSearch(searchInput); // Appelle la fonction de recherche
+      setSearchInput(''); // Réinitialise l'input
     }
   };
 
   return (
-    <form onSubmit={handleSearchSubmit}>
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: 'flex', alignItems: 'center' }}
+    >
       <TextField
         variant="outlined"
         size="small"
@@ -23,7 +28,7 @@ const SearchBar: React.FC = () => {
         fullWidth
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
-        sx={{ width: 400, mr: 2 }}
+        sx={{ width: 400, mr: 48 }}
       />
     </form>
   );
