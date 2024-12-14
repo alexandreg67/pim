@@ -4,6 +4,10 @@ set -e  # Arrête le script si une erreur survient
 
 echo "🚀 Starting database migrations..."
 
+# Démarrage de PostgreSQL en arrière-plan
+docker-entrypoint.sh postgres &
+PG_PID=$!
+
 # Attendre que PostgreSQL soit prêt
 until pg_isready -U postgres; do
     echo "⏳ Waiting for PostgreSQL..."
@@ -20,3 +24,6 @@ for migration in $(ls -v /docker-entrypoint-migrations.d/*.sql | grep -v "versio
 done
 
 echo "✅ Migrations completed successfully!"
+
+# Attend que le processus PostgreSQL se termine
+wait $PG_PID
