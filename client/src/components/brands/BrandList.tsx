@@ -46,7 +46,27 @@ const BrandList: React.FC = () => {
         placeholder="Rechercher une marque..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        sx={{ mb: 3 }}
+        sx={{
+          width: 400,
+          mb: 3,
+          bgcolor: 'white',
+          '& .MuiInputBase-input::placeholder': {
+            color: 'grey.500', // Couleur du placeholder
+            opacity: 1, // Assure que le placeholder est visible
+          },
+          borderRadius: 1, // Arrondi des bordures
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: 'grey.500', // Couleur de la bordure
+            },
+            '&:hover fieldset': {
+              borderColor: 'black', // Couleur au survol
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'primary.main', // Couleur au focus
+            },
+          },
+        }}
       />
 
       {/* Liste des marques */}

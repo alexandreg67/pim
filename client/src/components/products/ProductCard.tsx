@@ -17,7 +17,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
   reference,
 }) => {
   return (
-    <Card sx={{ minWidth: 275, maxWidth: 300, margin: 2 }}>
+    <Card
+      sx={{
+        minWidth: 275,
+        maxWidth: 300,
+        margin: 2,
+        '&:hover': {
+          boxShadow: 6,
+        },
+      }}
+    >
       <CardContent>
         <Typography variant="h6" gutterBottom>
           {name}
