@@ -11,7 +11,7 @@ import '@fontsource/roboto/700.css';
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:4000/graphql',
+  uri: 'http://localhost:8000/api',
   cache: new InMemoryCache(),
 });
 
