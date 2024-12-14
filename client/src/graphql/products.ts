@@ -19,3 +19,24 @@ export const GET_PRODUCTS = gql`
     }
   }
 `;
+
+export const SEARCH_PRODUCTS = gql`
+  query SearchProducts($query: String!, $page: Int, $limit: Int) {
+    searchProducts(query: $query, page: $page, limit: $limit) {
+      items {
+        id
+        name
+        reference
+        price
+        status
+        label
+        createdAt
+        brand {
+          name
+        }
+      }
+      total
+      hasMore
+    }
+  }
+`;
