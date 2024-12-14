@@ -34,7 +34,9 @@ const BrandCard: React.FC<BrandCardProps> = ({
       <CardMedia
         component="img"
         height="120"
-        image={logo || '/api/placeholder/180/120'}
+        image={
+          `http://localhost:8000/logos/${logo}` || '/api/placeholder/180/120'
+        }
         alt={`${name} logo`}
         sx={{ objectFit: 'contain', p: 2, bgcolor: 'grey.50' }}
       />
@@ -42,6 +44,7 @@ const BrandCard: React.FC<BrandCardProps> = ({
         <Typography variant="h6" gutterBottom>
           {name}
         </Typography>
+        <Typography>{logo}</Typography>
         <Typography variant="body2" color="textSecondary">
           {description}
         </Typography>
