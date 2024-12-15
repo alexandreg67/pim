@@ -45,7 +45,7 @@ export class Brands extends BaseEntity {
   })
   updatedAt: Date | null;
 
-  @Field(() => GraphQLISODateTime)
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
   deletedAt: Date | null;
 
@@ -60,4 +60,10 @@ export class Brands extends BaseEntity {
   @Field(() => [Products], { nullable: true })
   @OneToMany(() => Products, (products) => products.brand, { nullable: true })
   products: Products[];
+
+  @Field(() => Number)
+  totalContacts: number;
+
+  @Field(() => Number)
+  totalProducts: number;
 }

@@ -8,6 +8,7 @@ export const BRANDS = gql`
       description
       logo
       createdAt
+      totalProducts
       contacts {
         id
         email
@@ -20,5 +21,28 @@ export const BRANDS = gql`
       }
     }
     totalBrands
+  }
+`;
+
+export const GET_BRAND = gql`
+  query getBrand($brandId: String!, $contactLimit: Int, $contactOffset: Int) {
+    brand(id: $brandId) {
+      id
+      name
+      logo
+      description
+      totalProducts
+      contacts(limit: $contactLimit, offset: $contactOffset) {
+        id
+        email
+        phone
+        country
+      }
+      products {
+        id
+        name
+      }
+      totalContacts
+    }
   }
 `;

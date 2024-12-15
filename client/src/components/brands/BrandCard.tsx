@@ -5,21 +5,26 @@ import {
   Typography,
   Box,
   Chip,
+  Button,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 interface BrandCardProps {
+  id: string;
   name: string;
   logo?: string;
   description?: string;
-  productsCount: number;
+  totalProducts: number;
 }
 
 const BrandCard: React.FC<BrandCardProps> = ({
+  id,
   name,
   logo,
   description,
-  productsCount,
+  totalProducts,
 }) => {
+  const navigate = useNavigate();
   return (
     <Card
       sx={{
@@ -44,13 +49,19 @@ const BrandCard: React.FC<BrandCardProps> = ({
         <Typography variant="h6" gutterBottom>
           {name}
         </Typography>
-        <Typography>{logo}</Typography>
         <Typography variant="body2" color="textSecondary">
           {description}
         </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate(`/brands/${id}`)}
+        >
+          Voir les détails
+        </Button>
         <Box sx={{ mt: 2 }}>
           <Chip
-            label={`${productsCount} produits`}
+            label={`${totalProducts} produits`}
             size="small"
             color="primary"
           />

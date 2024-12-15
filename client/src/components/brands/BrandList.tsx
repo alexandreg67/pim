@@ -9,11 +9,10 @@ const BrandList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Débouncer la recherche
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-    }, 300); // Attente de 300ms après la dernière frappe
+    }, 300);
     return () => {
       clearTimeout(handler);
     };
@@ -23,7 +22,7 @@ const BrandList: React.FC = () => {
     variables: {
       limit: itemsPerPage,
       page: currentPage,
-      search: debouncedSearchQuery, // Transmettre la requête de recherche
+      search: debouncedSearchQuery,
     },
   });
 
@@ -39,7 +38,6 @@ const BrandList: React.FC = () => {
 
   return (
     <Box>
-      {/* Barre de recherche */}
       <TextField
         fullWidth
         variant="outlined"
@@ -51,42 +49,39 @@ const BrandList: React.FC = () => {
           mb: 3,
           bgcolor: 'white',
           '& .MuiInputBase-input::placeholder': {
-            color: 'grey.500', // Couleur du placeholder
-            opacity: 1, // Assure que le placeholder est visible
+            color: 'grey.500',
+            opacity: 1,
           },
-          borderRadius: 1, // Arrondi des bordures
+          borderRadius: 1,
           '& .MuiOutlinedInput-root': {
             '& fieldset': {
-              borderColor: 'grey.500', // Couleur de la bordure
+              borderColor: 'grey.500',
             },
             '&:hover fieldset': {
-              borderColor: 'black', // Couleur au survol
+              borderColor: 'black',
             },
             '&.Mui-focused fieldset': {
-              borderColor: 'primary.main', // Couleur au focus
+              borderColor: 'primary.main',
             },
           },
         }}
       />
-
-      {/* Liste des marques */}
       <Grid container spacing={3}>
         {data?.brands.map((brand) => (
           <Grid item xs={12} sm={6} md={4} key={brand.id}>
             <BrandCard
+              id={brand.id}
               name={brand.name}
               logo={brand.logo ?? ''}
               description={brand.description ?? ''}
-              productsCount={0}
+              totalProducts={brand.totalProducts}
             />
           </Grid>
         ))}
       </Grid>
-
-      {/* Pagination */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
         <Pagination
-          count={Math.ceil((data?.totalBrands || 0) / itemsPerPage)} // Nombre total de pages
+          count={Math.ceil((data?.totalBrands || 0) / itemsPerPage)}
           page={currentPage}
           onChange={handlePageChange}
           color="primary"

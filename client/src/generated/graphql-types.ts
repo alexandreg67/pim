@@ -43,14 +43,21 @@ export type Brands = {
   __typename?: 'Brands';
   contacts: Array<Contacts>;
   createdAt?: Maybe<Scalars['DateTimeISO']['output']>;
-  deletedAt: Scalars['DateTimeISO']['output'];
+  deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   exchanges: Array<Exchanges>;
   id: Scalars['String']['output'];
   logo?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   products?: Maybe<Array<Products>>;
+  totalContacts: Scalars['Float']['output'];
+  totalProducts: Scalars['Float']['output'];
   updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
+};
+
+export type BrandsContactsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Categories = {
@@ -187,7 +194,7 @@ export type Query = {
 };
 
 export type QueryBrandArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars['String']['input'];
 };
 
 export type QueryBrandsArgs = {
@@ -258,6 +265,7 @@ export type GetBrandsQuery = {
     description?: string | null;
     logo?: string | null;
     createdAt?: Date | null;
+    totalProducts: number;
     contacts: Array<{
       __typename?: 'Contacts';
       id: string;
@@ -271,6 +279,37 @@ export type GetBrandsQuery = {
       name: string;
     }> | null;
   }>;
+};
+
+export type GetBrandQueryVariables = Exact<{
+  brandId: Scalars['String']['input'];
+  contactLimit?: InputMaybe<Scalars['Int']['input']>;
+  contactOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type GetBrandQuery = {
+  __typename?: 'Query';
+  brand?: {
+    __typename?: 'Brands';
+    id: string;
+    name: string;
+    logo?: string | null;
+    description?: string | null;
+    totalProducts: number;
+    totalContacts: number;
+    contacts: Array<{
+      __typename?: 'Contacts';
+      id: string;
+      email?: string | null;
+      phone?: string | null;
+      country?: string | null;
+    }>;
+    products?: Array<{
+      __typename?: 'Products';
+      id: string;
+      name: string;
+    }> | null;
+  } | null;
 };
 
 export type DashboardStatsQueryVariables = Exact<{ [key: string]: never }>;
@@ -358,6 +397,7 @@ export const GetBrandsDocument = gql`
       description
       logo
       createdAt
+      totalProducts
       contacts {
         id
         email
@@ -440,6 +480,94 @@ export type GetBrandsSuspenseQueryHookResult = ReturnType<
 export type GetBrandsQueryResult = Apollo.QueryResult<
   GetBrandsQuery,
   GetBrandsQueryVariables
+>;
+export const GetBrandDocument = gql`
+  query getBrand($brandId: String!, $contactLimit: Int, $contactOffset: Int) {
+    brand(id: $brandId) {
+      id
+      name
+      logo
+      description
+      totalProducts
+      contacts(limit: $contactLimit, offset: $contactOffset) {
+        id
+        email
+        phone
+        country
+      }
+      products {
+        id
+        name
+      }
+      totalContacts
+    }
+  }
+`;
+
+/**
+ * __useGetBrandQuery__
+ *
+ * To run a query within a React component, call `useGetBrandQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBrandQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBrandQuery({
+ *   variables: {
+ *      brandId: // value for 'brandId'
+ *      contactLimit: // value for 'contactLimit'
+ *      contactOffset: // value for 'contactOffset'
+ *   },
+ * });
+ */
+export function useGetBrandQuery(
+  baseOptions: Apollo.QueryHookOptions<GetBrandQuery, GetBrandQueryVariables> &
+    ({ variables: GetBrandQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetBrandQuery, GetBrandQueryVariables>(
+    GetBrandDocument,
+    options
+  );
+}
+export function useGetBrandLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetBrandQuery,
+    GetBrandQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetBrandQuery, GetBrandQueryVariables>(
+    GetBrandDocument,
+    options
+  );
+}
+export function useGetBrandSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetBrandQuery, GetBrandQueryVariables>
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetBrandQuery, GetBrandQueryVariables>(
+    GetBrandDocument,
+    options
+  );
+}
+export type GetBrandQueryHookResult = ReturnType<typeof useGetBrandQuery>;
+export type GetBrandLazyQueryHookResult = ReturnType<
+  typeof useGetBrandLazyQuery
+>;
+export type GetBrandSuspenseQueryHookResult = ReturnType<
+  typeof useGetBrandSuspenseQuery
+>;
+export type GetBrandQueryResult = Apollo.QueryResult<
+  GetBrandQuery,
+  GetBrandQueryVariables
 >;
 export const DashboardStatsDocument = gql`
   query DashboardStats {

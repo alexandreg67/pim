@@ -1,5 +1,7 @@
-import { Resolver, Query, Arg, ID, Int } from 'type-graphql';
+import { Resolver, Query, Arg, Int, FieldResolver, Root } from 'type-graphql';
 import { Brands } from '../entities/Brands';
+import { Contacts } from '../entities/Contacts';
+import { Products } from '../entities/Products';
 
 @Resolver(Brands)
 export class BrandResolver {
@@ -30,16 +32,31 @@ export class BrandResolver {
   }
 
   @Query(() => Brands, { nullable: true })
-  async brand(@Arg('id', () => ID) id: string): Promise<Brands | null> {
-    return await Brands.findOne({
-      where: { id },
-      relations: {
-        contacts: true,
-        products: {
-          contact: true,
-        },
-      },
+  async brand(@Arg('id', () => String) id: string): Promise<Brands | null> {
+    return await Brands.findOne({ where: { id } });
+  }
+
+  @FieldResolver(() => [Contacts])
+  async contacts(
+    @Root() brand: Brands,
+    @Arg('limit', () => Int, { nullable: true }) limit?: number,
+    @Arg('offset', () => Int, { nullable: true }) offset?: number
+  ): Promise<Contacts[]> {
+    return await Contacts.find({
+      where: { brand: { id: brand.id } },
+      take: limit || 10, // Limite par défaut
+      skip: offset || 0,
     });
+  }
+
+  @FieldResolver(() => Number)
+  async totalContacts(@Root() brand: Brands): Promise<number> {
+    return await Contacts.count({ where: { brand: { id: brand.id } } });
+  }
+
+  @FieldResolver(() => Number)
+  async totalProducts(@Root() brand: Brands): Promise<number> {
+    return await Products.count({ where: { brand: { id: brand.id } } });
   }
 
   @Query(() => Int)
