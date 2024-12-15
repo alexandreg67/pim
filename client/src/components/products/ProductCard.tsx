@@ -1,7 +1,9 @@
 import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
+  id: string;
   name: string;
   brand: string;
   price: number;
@@ -10,12 +12,19 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
+  id,
   name,
   brand,
   price,
   status,
   reference,
 }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/products/${id}`);
+  };
+
   return (
     <Card
       sx={{
@@ -26,6 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           boxShadow: 6,
         },
       }}
+      onClick={handleClick}
     >
       <CardContent>
         <Typography variant="h6" gutterBottom>
