@@ -56,9 +56,6 @@ export default class ProductsResolver {
     try {
       const offset = (page - 1) * limit;
 
-      console.info('🔍 Searching for:', query);
-
-      // Créez la requête avec le bon alias et les jointures
       const queryBuilder = Products.createQueryBuilder('product')
         .leftJoinAndSelect('product.brand', 'brand')
         .leftJoinAndSelect('product.productCharacteristics', 'characteristics')
@@ -77,9 +74,7 @@ export default class ProductsResolver {
 
       const [items, total] = await queryBuilder.getManyAndCount();
 
-      // Si pas de résultats, on fait un fallback sur LIKE
       if (total === 0) {
-        console.info('⚠️ No results with full-text search, trying LIKE');
         const [fallbackItems, fallbackTotal] = await Products.findAndCount({
           where: [
             { name: ILike(`%${query}%`) },
@@ -103,7 +98,6 @@ export default class ProductsResolver {
         };
       }
 
-      console.info(`✨ Found ${total} results with full-text search`);
       return {
         items,
         total,
@@ -136,6 +130,33 @@ export default class ProductsResolver {
     } catch (error) {
       console.error('Error fetching product suggestions:', error);
       throw new Error('Unable to fetch product suggestions');
+    }
+  }
+
+  @Query(() => Products, { nullable: true })
+  async product(@Arg('id', () => String) id: string): Promise<Products | null> {
+    try {
+      const product = await Products.findOne({
+        where: { id },
+        relations: [
+          'brand',
+          'productCharacteristics',
+          'productCharacteristics.characteristic',
+          'images',
+          'categories',
+          'tags',
+          'contact',
+        ],
+      });
+
+      if (!product) {
+        throw new Error(`Product with ID ${id} not found`);
+      }
+
+      return product;
+    } catch (error) {
+      console.error(`❌ Error fetching product by ID: ${error}`);
+      throw new Error('Unable to fetch product');
     }
   }
 }

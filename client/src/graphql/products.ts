@@ -41,3 +41,52 @@ export const SEARCH_PRODUCTS = gql`
     }
   }
 `;
+
+export const GET_PRODUCT = gql`
+  query GetProduct($productId: String!) {
+    product(id: $productId) {
+      id
+      name
+      reference
+      shortDescription
+      description
+      price
+      status
+      label
+      createdAt
+      updatedAt
+      deletedAt
+      brand {
+        id
+        name
+      }
+      contact {
+        email
+        phone
+        country
+      }
+      categories {
+        id
+        name
+      }
+      tags {
+        id
+        name
+      }
+      images {
+        id
+        url
+        altText
+        isPrimary
+      }
+      productCharacteristics {
+        id
+        characteristic {
+          id
+          name
+        }
+        value
+      }
+    }
+  }
+`;

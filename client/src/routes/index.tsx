@@ -4,6 +4,7 @@ import Dashboard from '../pages/Dashboard';
 import ProductsPage from '../pages/ProductsPage';
 import BrandsPage from '../pages/BrandsPage';
 import BrandDetailsPage from '../pages/BandDetailsPage';
+import ProductDetailsPage from '../pages/ProductDetailsPage';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,14 @@ const router = createBrowserRouter([
     element: (
       <MainLayout isAdmin={true}>
         <ProductsPage />
+      </MainLayout>
+    ),
+  },
+  {
+    path: '/products/:id',
+    element: (
+      <MainLayout isAdmin={true}>
+        <ProductDetailsPage />
       </MainLayout>
     ),
   },

@@ -70,6 +70,7 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery }) => {
         {products.map((product) => (
           <Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
             <ProductCard
+              id={product.id}
               name={product.name}
               brand={product.brand?.name || 'Aucune marque'}
               price={parseFloat(product.price)}
