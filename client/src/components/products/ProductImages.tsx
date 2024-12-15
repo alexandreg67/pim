@@ -5,69 +5,47 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface Image {
   id: string;
-  url: string; // Nom de l'image récupérée depuis la base
+  url: string | null; // URL peut être null ou manquant
   altText?: string;
   isPrimary: boolean;
 }
 
 const ProductImages: React.FC<{ images: Image[] }> = ({ images }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(
-    images.findIndex((img) => img.isPrimary) || 0
-  );
+  // Filtrer uniquement les images valides
+  const validImages = images.filter((img) => img && img.url);
 
-  const [invalidImageIndexes, setInvalidImageIndexes] = useState<number[]>([]); // Liste des images non valides
+  const [currentImageIndex, setCurrentImageIndex] = useState(() => {
+    const primaryIndex = validImages.findIndex((img) => img.isPrimary);
+    return primaryIndex >= 0 ? primaryIndex : 0;
+  });
+
+  if (!validImages || validImages.length === 0) {
+    return (
+      <Box sx={{ textAlign: 'center', marginTop: 2 }}>
+        <Typography variant="h6">
+          Aucune image disponible pour ce produit
+        </Typography>
+      </Box>
+    );
+  }
 
   const handleNext = () => {
-    let nextIndex = (currentImageIndex + 1) % images.length;
-    while (invalidImageIndexes.includes(nextIndex)) {
-      nextIndex = (nextIndex + 1) % images.length; // Sauter les images invalides
-    }
-    setCurrentImageIndex(nextIndex);
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % validImages.length);
   };
 
   const handlePrev = () => {
-    let prevIndex = (currentImageIndex - 1 + images.length) % images.length;
-    while (invalidImageIndexes.includes(prevIndex)) {
-      prevIndex = (prevIndex - 1 + images.length) % images.length; // Sauter les images invalides
-    }
-    setCurrentImageIndex(prevIndex);
-  };
-
-  const handleImageError = (index: number) => {
-    setInvalidImageIndexes((prev) => [...prev, index]);
-  };
-
-  if (!images || images.length === 0) {
-    return (
-      <Box sx={{ textAlign: 'center', marginTop: 2 }}>
-        <Typography>Aucune image disponible pour ce produit.</Typography>
-      </Box>
+    setCurrentImageIndex(
+      (prevIndex) => (prevIndex - 1 + validImages.length) % validImages.length
     );
-  }
-
-  const validImages = images.filter(
-    (_, index) => !invalidImageIndexes.includes(index)
-  );
-
-  if (validImages.length === 0) {
-    return (
-      <Box sx={{ textAlign: 'center', marginTop: 2 }}>
-        <Typography>Aucune image valide disponible pour ce produit.</Typography>
-      </Box>
-    );
-  }
+  };
 
   return (
     <Box sx={{ position: 'relative', marginBottom: 4 }}>
       <Card>
         <CardMedia
           component="img"
-          image={`http://localhost:8000/images/${images[currentImageIndex].url}`}
-          alt={
-            images[currentImageIndex].altText ||
-            `Image ${currentImageIndex + 1}`
-          }
-          onError={() => handleImageError(currentImageIndex)} // Marquer l'image comme invalide
+          image={`http://localhost:8000/images/${validImages[currentImageIndex].url}`}
+          alt={validImages[currentImageIndex].altText || `Image du produit`}
           sx={{ height: 400, objectFit: 'contain' }}
         />
       </Card>
@@ -120,7 +98,6 @@ const ProductImages: React.FC<{ images: Image[] }> = ({ images }) => {
               <img
                 src={`http://localhost:8000/images/${img.url}`}
                 alt={img.altText || `Miniature ${index + 1}`}
-                onError={() => handleImageError(index)} // Marquer la miniature comme invalide
                 style={{ height: 50, objectFit: 'contain' }}
               />
             </Box>
