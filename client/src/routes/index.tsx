@@ -3,6 +3,7 @@ import MainLayout from '../layouts/MainLayout';
 import Dashboard from '../pages/Dashboard';
 import ProductsPage from '../pages/ProductsPage';
 import BrandsPage from '../pages/BrandsPage';
+import BrandDetailsPage from '../pages/BandDetailsPage';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,14 @@ const router = createBrowserRouter([
     element: (
       <MainLayout isAdmin={true}>
         <BrandsPage />
+      </MainLayout>
+    ),
+  },
+  {
+    path: '/brands/:id',
+    element: (
+      <MainLayout isAdmin={true}>
+        <BrandDetailsPage />
       </MainLayout>
     ),
   },
