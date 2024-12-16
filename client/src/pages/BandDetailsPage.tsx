@@ -11,6 +11,7 @@ import {
   TableRow,
   TablePagination,
   Paper,
+  Card,
 } from '@mui/material';
 import { useGetBrandQuery } from '../generated/graphql-types';
 
@@ -66,21 +67,50 @@ const BrandDetailsPage: React.FC = () => {
 
   return (
     <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, padding: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        {brand?.name}
-      </Typography>
-      <Typography variant="body1" gutterBottom>
-        {brand?.description}
-      </Typography>
-      <img
-        src={
-          brand?.logo
-            ? `http://localhost:8000/logos/${brand.logo}`
-            : '/api/placeholder/200/200'
-        }
-        alt={brand?.name}
-        style={{ height: 120, marginBottom: 20 }}
-      />
+      {/* Nouvelle section header avec Card */}
+      <Card sx={{ mb: 4, p: 3 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 4,
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* Colonne gauche : Informations textuelles */}
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h4" gutterBottom>
+              {brand?.name}
+            </Typography>
+            <Typography variant="body1">{brand?.description}</Typography>
+          </Box>
+
+          {/* Colonne droite : Logo */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: '100px',
+              height: '100px',
+            }}
+          >
+            <img
+              src={
+                brand?.logo
+                  ? `http://localhost:8000/logos/${brand.logo}`
+                  : '/api/placeholder/200/200'
+              }
+              alt={brand?.name}
+              style={{
+                maxHeight: '100%',
+                maxWidth: '100%',
+                objectFit: 'contain',
+              }}
+            />
+          </Box>
+        </Box>
+      </Card>
 
       {/* Contacts Table */}
       <Typography variant="h5" gutterBottom>
