@@ -32,17 +32,18 @@ export const GET_BRAND = gql`
       logo
       description
       totalProducts
-      contacts(limit: $contactLimit, offset: $contactOffset) {
+      totalContacts
+      contacts(contactLimit: $contactLimit, contactOffset: $contactOffset) {
         id
         email
         phone
         country
+        totalProducts
       }
       products {
         id
         name
       }
-      totalContacts
     }
   }
 `;
