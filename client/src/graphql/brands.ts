@@ -25,15 +25,24 @@ export const BRANDS = gql`
 `;
 
 export const GET_BRAND = gql`
-  query getBrand($brandId: String!, $contactLimit: Int, $contactOffset: Int) {
+  query getBrand(
+    $brandId: String!
+    $contactLimit: Int
+    $contactOffset: Int
+    $countryFilter: String
+  ) {
     brand(id: $brandId) {
       id
       name
       logo
       description
       totalProducts
-      totalContacts
-      contacts(contactLimit: $contactLimit, contactOffset: $contactOffset) {
+      totalContacts(countryFilter: $countryFilter)
+      contacts(
+        contactLimit: $contactLimit
+        contactOffset: $contactOffset
+        countryFilter: $countryFilter
+      ) {
         id
         email
         phone
@@ -45,5 +54,11 @@ export const GET_BRAND = gql`
         name
       }
     }
+  }
+`;
+
+export const GET_BRAND_COUNTRIES = gql`
+  query getBrandCountries($brandId: String!) {
+    brandCountries(brandId: $brandId)
   }
 `;
