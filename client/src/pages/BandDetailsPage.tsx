@@ -12,6 +12,7 @@ import {
   TablePagination,
   Paper,
   Card,
+  Chip,
 } from '@mui/material';
 import { useGetBrandQuery } from '../generated/graphql-types';
 
@@ -29,6 +30,8 @@ const BrandDetailsPage: React.FC = () => {
     skip: !id,
   });
 
+  const brand = data?.brand;
+
   if (!id) {
     return (
       <Typography color="error">Error: ID is missing from the URL.</Typography>
@@ -38,8 +41,6 @@ const BrandDetailsPage: React.FC = () => {
   if (loading) return <Typography>Loading...</Typography>;
   if (error)
     return <Typography color="error">Error: {error.message}</Typography>;
-
-  const brand = data?.brand;
 
   const handlePageChange = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -61,6 +62,12 @@ const BrandDetailsPage: React.FC = () => {
       contactLimit: newRowsPerPage,
       contactOffset: 0,
     });
+  };
+
+  const getProductCountColor = (count: number) => {
+    if (count === 0) return 'default';
+    if (count < 6) return 'warning';
+    return 'success';
   };
 
   const drawerWidth = 240;
@@ -133,11 +140,11 @@ const BrandDetailsPage: React.FC = () => {
                 <TableCell>{contact.phone}</TableCell>
                 <TableCell>{contact.country}</TableCell>
                 <TableCell align="center">
-                  {
-                    brand?.products?.filter((product) =>
-                      product.name.includes(contact.country || '')
-                    ).length
-                  }
+                  <Chip
+                    label={contact.totalProducts}
+                    color={getProductCountColor(contact.totalProducts)}
+                    size="small"
+                  />
                 </TableCell>
               </TableRow>
             ))}

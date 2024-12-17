@@ -56,8 +56,8 @@ export type Brands = {
 };
 
 export type BrandsContactsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  contactLimit?: InputMaybe<Scalars['Int']['input']>;
+  contactOffset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Categories = {
@@ -85,6 +85,7 @@ export type Contacts = {
   id: Scalars['String']['output'];
   phone?: Maybe<Scalars['String']['output']>;
   products: Products;
+  totalProducts: Scalars['Int']['output'];
   updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
 };
 
@@ -308,6 +309,7 @@ export type GetBrandQuery = {
       email?: string | null;
       phone?: string | null;
       country?: string | null;
+      totalProducts: number;
     }>;
     products?: Array<{
       __typename?: 'Products';
@@ -542,17 +544,18 @@ export const GetBrandDocument = gql`
       logo
       description
       totalProducts
-      contacts(limit: $contactLimit, offset: $contactOffset) {
+      totalContacts
+      contacts(contactLimit: $contactLimit, contactOffset: $contactOffset) {
         id
         email
         phone
         country
+        totalProducts
       }
       products {
         id
         name
       }
-      totalContacts
     }
   }
 `;

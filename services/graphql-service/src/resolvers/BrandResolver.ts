@@ -39,13 +39,13 @@ export class BrandResolver {
   @FieldResolver(() => [Contacts])
   async contacts(
     @Root() brand: Brands,
-    @Arg('limit', () => Int, { nullable: true }) limit?: number,
-    @Arg('offset', () => Int, { nullable: true }) offset?: number
+    @Arg('contactLimit', () => Int, { nullable: true }) contactLimit?: number,
+    @Arg('contactOffset', () => Int, { nullable: true }) contactOffset?: number
   ): Promise<Contacts[]> {
     return await Contacts.find({
       where: { brand: { id: brand.id } },
-      take: limit || 10, // Limite par défaut
-      skip: offset || 0,
+      take: contactLimit || 5,
+      skip: contactOffset || 0,
     });
   }
 
