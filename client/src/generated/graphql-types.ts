@@ -58,6 +58,11 @@ export type Brands = {
 export type BrandsContactsArgs = {
   contactLimit?: InputMaybe<Scalars['Int']['input']>;
   contactOffset?: InputMaybe<Scalars['Int']['input']>;
+  countryFilter?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type BrandsTotalContactsArgs = {
+  countryFilter?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Categories = {
@@ -186,6 +191,7 @@ export type Products = {
 export type Query = {
   __typename?: 'Query';
   brand?: Maybe<Brands>;
+  brandCountries: Array<Scalars['String']['output']>;
   brands: Array<Brands>;
   dashboardStats: DashboardStats;
   product?: Maybe<Products>;
@@ -197,6 +203,10 @@ export type Query = {
 
 export type QueryBrandArgs = {
   id: Scalars['String']['input'];
+};
+
+export type QueryBrandCountriesArgs = {
+  brandId: Scalars['String']['input'];
 };
 
 export type QueryBrandsArgs = {
@@ -291,6 +301,7 @@ export type GetBrandQueryVariables = Exact<{
   brandId: Scalars['String']['input'];
   contactLimit?: InputMaybe<Scalars['Int']['input']>;
   contactOffset?: InputMaybe<Scalars['Int']['input']>;
+  countryFilter?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 export type GetBrandQuery = {
@@ -317,6 +328,15 @@ export type GetBrandQuery = {
       name: string;
     }> | null;
   } | null;
+};
+
+export type GetBrandCountriesQueryVariables = Exact<{
+  brandId: Scalars['String']['input'];
+}>;
+
+export type GetBrandCountriesQuery = {
+  __typename?: 'Query';
+  brandCountries: Array<string>;
 };
 
 export type DashboardStatsQueryVariables = Exact<{ [key: string]: never }>;
@@ -537,15 +557,24 @@ export type GetBrandsQueryResult = Apollo.QueryResult<
   GetBrandsQueryVariables
 >;
 export const GetBrandDocument = gql`
-  query getBrand($brandId: String!, $contactLimit: Int, $contactOffset: Int) {
+  query getBrand(
+    $brandId: String!
+    $contactLimit: Int
+    $contactOffset: Int
+    $countryFilter: String
+  ) {
     brand(id: $brandId) {
       id
       name
       logo
       description
       totalProducts
-      totalContacts
-      contacts(contactLimit: $contactLimit, contactOffset: $contactOffset) {
+      totalContacts(countryFilter: $countryFilter)
+      contacts(
+        contactLimit: $contactLimit
+        contactOffset: $contactOffset
+        countryFilter: $countryFilter
+      ) {
         id
         email
         phone
@@ -575,6 +604,7 @@ export const GetBrandDocument = gql`
  *      brandId: // value for 'brandId'
  *      contactLimit: // value for 'contactLimit'
  *      contactOffset: // value for 'contactOffset'
+ *      countryFilter: // value for 'countryFilter'
  *   },
  * });
  */
@@ -624,6 +654,86 @@ export type GetBrandSuspenseQueryHookResult = ReturnType<
 export type GetBrandQueryResult = Apollo.QueryResult<
   GetBrandQuery,
   GetBrandQueryVariables
+>;
+export const GetBrandCountriesDocument = gql`
+  query getBrandCountries($brandId: String!) {
+    brandCountries(brandId: $brandId)
+  }
+`;
+
+/**
+ * __useGetBrandCountriesQuery__
+ *
+ * To run a query within a React component, call `useGetBrandCountriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBrandCountriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBrandCountriesQuery({
+ *   variables: {
+ *      brandId: // value for 'brandId'
+ *   },
+ * });
+ */
+export function useGetBrandCountriesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetBrandCountriesQuery,
+    GetBrandCountriesQueryVariables
+  > &
+    (
+      | { variables: GetBrandCountriesQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetBrandCountriesQuery,
+    GetBrandCountriesQueryVariables
+  >(GetBrandCountriesDocument, options);
+}
+export function useGetBrandCountriesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetBrandCountriesQuery,
+    GetBrandCountriesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetBrandCountriesQuery,
+    GetBrandCountriesQueryVariables
+  >(GetBrandCountriesDocument, options);
+}
+export function useGetBrandCountriesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetBrandCountriesQuery,
+        GetBrandCountriesQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetBrandCountriesQuery,
+    GetBrandCountriesQueryVariables
+  >(GetBrandCountriesDocument, options);
+}
+export type GetBrandCountriesQueryHookResult = ReturnType<
+  typeof useGetBrandCountriesQuery
+>;
+export type GetBrandCountriesLazyQueryHookResult = ReturnType<
+  typeof useGetBrandCountriesLazyQuery
+>;
+export type GetBrandCountriesSuspenseQueryHookResult = ReturnType<
+  typeof useGetBrandCountriesSuspenseQuery
+>;
+export type GetBrandCountriesQueryResult = Apollo.QueryResult<
+  GetBrandCountriesQuery,
+  GetBrandCountriesQueryVariables
 >;
 export const DashboardStatsDocument = gql`
   query DashboardStats {

@@ -40,18 +40,61 @@ export class BrandResolver {
   async contacts(
     @Root() brand: Brands,
     @Arg('contactLimit', () => Int, { nullable: true }) contactLimit?: number,
-    @Arg('contactOffset', () => Int, { nullable: true }) contactOffset?: number
+    @Arg('contactOffset', () => Int, { nullable: true }) contactOffset?: number,
+    @Arg('countryFilter', () => String, { nullable: true })
+    countryFilter?: string
   ): Promise<Contacts[]> {
-    return await Contacts.find({
-      where: { brand: { id: brand.id } },
-      take: contactLimit || 5,
-      skip: contactOffset || 0,
-    });
+    const queryBuilder = Contacts.createQueryBuilder('contact').where(
+      'contact.brand = :brandId',
+      { brandId: brand.id }
+    );
+
+    if (countryFilter) {
+      queryBuilder.andWhere('LOWER(contact.country) LIKE LOWER(:country)', {
+        country: `%${countryFilter}%`,
+      });
+    }
+
+    queryBuilder
+      .take(contactLimit || 5)
+      .skip(contactOffset || 0)
+      .orderBy('contact.country', 'ASC');
+
+    return await queryBuilder.getMany();
   }
 
   @FieldResolver(() => Number)
-  async totalContacts(@Root() brand: Brands): Promise<number> {
-    return await Contacts.count({ where: { brand: { id: brand.id } } });
+  async totalContacts(
+    @Root() brand: Brands,
+    @Arg('countryFilter', () => String, { nullable: true })
+    countryFilter?: string
+  ): Promise<number> {
+    const queryBuilder = Contacts.createQueryBuilder('contact').where(
+      'contact.brand = :brandId',
+      { brandId: brand.id }
+    );
+
+    if (countryFilter) {
+      queryBuilder.andWhere('LOWER(contact.country) LIKE LOWER(:country)', {
+        country: `%${countryFilter}%`,
+      });
+    }
+
+    return await queryBuilder.getCount();
+  }
+
+  @Query(() => [String])
+  async brandCountries(
+    @Arg('brandId', () => String) brandId: string
+  ): Promise<string[]> {
+    const countries = await Contacts.createQueryBuilder('contact')
+      .select('DISTINCT contact.country')
+      .where('contact.brand = :brandId', { brandId })
+      .andWhere('contact.country IS NOT NULL')
+      .orderBy('contact.country', 'ASC')
+      .getRawMany();
+
+    return countries.map((c) => c.country).filter(Boolean);
   }
 
   @FieldResolver(() => Number)

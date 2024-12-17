@@ -13,19 +13,38 @@ import {
   Paper,
   Card,
   Chip,
+  Tooltip,
+  IconButton,
+  Autocomplete,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
-import { useGetBrandQuery } from '../generated/graphql-types';
+import {
+  FilterList as FilterIcon,
+  Clear as ClearIcon,
+} from '@mui/icons-material';
+import {
+  useGetBrandCountriesQuery,
+  useGetBrandQuery,
+} from '../generated/graphql-types';
 
 const BrandDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [countryFilter, setCountryFilter] = useState<string | null>(null);
+
+  const { data: countriesData } = useGetBrandCountriesQuery({
+    variables: { brandId: id || '' },
+    skip: !id,
+  });
 
   const { data, loading, error, refetch } = useGetBrandQuery({
     variables: {
       brandId: id || '',
       contactLimit: rowsPerPage,
       contactOffset: page * rowsPerPage,
+      countryFilter: countryFilter || undefined,
     },
     skip: !id,
   });
@@ -44,11 +63,7 @@ const BrandDetailsPage: React.FC = () => {
 
   const handlePageChange = (event: unknown, newPage: number) => {
     setPage(newPage);
-    refetch({
-      brandId: id || '',
-      contactLimit: rowsPerPage,
-      contactOffset: newPage * rowsPerPage,
-    });
+    refetch();
   };
 
   const handleRowsPerPageChange = (
@@ -57,11 +72,22 @@ const BrandDetailsPage: React.FC = () => {
     const newRowsPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(newRowsPerPage);
     setPage(0);
-    refetch({
-      brandId: id || '',
-      contactLimit: newRowsPerPage,
-      contactOffset: 0,
-    });
+    refetch();
+  };
+
+  const handleCountryFilterChange = (
+    _: React.ChangeEvent<unknown>,
+    newValue: string | null
+  ) => {
+    setCountryFilter(newValue);
+    setPage(0);
+    refetch();
+  };
+
+  const clearFilter = () => {
+    setCountryFilter(null);
+    setPage(0);
+    refetch();
   };
 
   const getProductCountColor = (count: number) => {
@@ -74,7 +100,6 @@ const BrandDetailsPage: React.FC = () => {
 
   return (
     <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, padding: 3 }}>
-      {/* Nouvelle section header avec Card */}
       <Card sx={{ mb: 4, p: 3 }}>
         <Box
           sx={{
@@ -119,10 +144,72 @@ const BrandDetailsPage: React.FC = () => {
         </Box>
       </Card>
 
-      {/* Contacts Table */}
-      <Typography variant="h5" gutterBottom>
-        Contacts
-      </Typography>
+      {/* Section Contacts avec Filtre */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+        }}
+      >
+        <Typography variant="h5">
+          Contacts
+          {countryFilter && (
+            <Chip
+              label={`Filtré: ${countryFilter}`}
+              size="small"
+              onDelete={clearFilter}
+              sx={{ ml: 2 }}
+            />
+          )}
+        </Typography>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Autocomplete
+            sx={{ width: 300 }}
+            options={countriesData?.brandCountries || []}
+            value={countryFilter}
+            onChange={handleCountryFilterChange}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                size="small"
+                placeholder="Filtrer par pays"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <>
+                      <InputAdornment position="start">
+                        <FilterIcon fontSize="small" color="action" />
+                      </InputAdornment>
+                      {params.InputProps.startAdornment}
+                    </>
+                  ),
+                  sx: {
+                    '& .MuiAutocomplete-input': {
+                      color: 'text.primary',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'divider',
+                    },
+                  },
+                }}
+              />
+            )}
+          />
+
+          {countryFilter && (
+            <Tooltip title="Effacer le filtre">
+              <IconButton onClick={clearFilter} size="small">
+                <ClearIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+      </Box>
+
+      {/* Table des contacts */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -150,11 +237,11 @@ const BrandDetailsPage: React.FC = () => {
             ))}
           </TableBody>
         </Table>
-        {/* Pagination */}
+
         <TablePagination
           rowsPerPageOptions={[5, 10, 20]}
           component="div"
-          count={data?.brand?.totalContacts || 0} // Ajoute ce champ dans la requête GraphQL
+          count={data?.brand?.totalContacts || 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handlePageChange}
