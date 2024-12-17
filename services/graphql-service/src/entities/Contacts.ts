@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Brands } from './Brands';
 import { Products } from './Products';
-import { Field, GraphQLISODateTime, ObjectType } from 'type-graphql';
+import { Field, GraphQLISODateTime, Int, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Index('contacts_brand_id_country_email_key', ['brandId', 'country', 'email'], {
@@ -76,4 +76,12 @@ export class Contacts extends BaseEntity {
   @Field(() => Products)
   @OneToMany(() => Products, (products) => products.contact)
   products: Products[];
+
+  @Field(() => Int)
+  async totalProducts(): Promise<number> {
+    const count = await Products.count({
+      where: { contact: { id: this.id } },
+    });
+    return count;
+  }
 }
