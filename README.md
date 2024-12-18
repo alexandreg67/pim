@@ -94,8 +94,8 @@ Load balancing for high-traffic scenarios
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/pim-platform.git
-cd pim-platform
+git clone https://github.com/alexandreg67/pim.git
+cd pim
 ```
 2. Start the application
 ```bash
