@@ -47,6 +47,7 @@ graph TD
     Product[Product Service]
     Upload[Upload Service]
     Mail[Mail Service]
+    Storage[Asset Storage]
     DB[(PostgreSQL)]
     Cache[(Redis)]
 
@@ -55,12 +56,22 @@ graph TD
     Gateway --> Product
     Gateway --> Upload
     Gateway --> Mail
+    Gateway --> Storage
     
     Auth --> DB
     Product --> DB
     Product --> Cache
     Upload --> DB
+    Upload --> Storage
 ```
+Static Assets Distribution
+Nginx handles static asset distribution efficiently:
+
+Product images and brand logos served directly
+Optimal caching headers for assets
+Automatic image compression and optimization
+Secure file access control
+Load balancing for high-traffic scenarios
 
 ### Technology Stack
 - **Frontend**: React + Vite, Material-UI
