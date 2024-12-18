@@ -193,6 +193,7 @@ export type Query = {
   brand?: Maybe<Brands>;
   brandCountries: Array<Scalars['String']['output']>;
   brands: Array<Brands>;
+  brandsForFilter: Array<Brands>;
   dashboardStats: DashboardStats;
   product?: Maybe<Products>;
   products: PaginatedProductsResponse;
@@ -337,6 +338,13 @@ export type GetBrandCountriesQueryVariables = Exact<{
 export type GetBrandCountriesQuery = {
   __typename?: 'Query';
   brandCountries: Array<string>;
+};
+
+export type GetBrandsForFilterQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetBrandsForFilterQuery = {
+  __typename?: 'Query';
+  brandsForFilter: Array<{ __typename?: 'Brands'; id: string; name: string }>;
 };
 
 export type DashboardStatsQueryVariables = Exact<{ [key: string]: never }>;
@@ -734,6 +742,84 @@ export type GetBrandCountriesSuspenseQueryHookResult = ReturnType<
 export type GetBrandCountriesQueryResult = Apollo.QueryResult<
   GetBrandCountriesQuery,
   GetBrandCountriesQueryVariables
+>;
+export const GetBrandsForFilterDocument = gql`
+  query getBrandsForFilter {
+    brandsForFilter {
+      id
+      name
+    }
+  }
+`;
+
+/**
+ * __useGetBrandsForFilterQuery__
+ *
+ * To run a query within a React component, call `useGetBrandsForFilterQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBrandsForFilterQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBrandsForFilterQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetBrandsForFilterQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetBrandsForFilterQuery,
+    GetBrandsForFilterQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetBrandsForFilterQuery,
+    GetBrandsForFilterQueryVariables
+  >(GetBrandsForFilterDocument, options);
+}
+export function useGetBrandsForFilterLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetBrandsForFilterQuery,
+    GetBrandsForFilterQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetBrandsForFilterQuery,
+    GetBrandsForFilterQueryVariables
+  >(GetBrandsForFilterDocument, options);
+}
+export function useGetBrandsForFilterSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetBrandsForFilterQuery,
+        GetBrandsForFilterQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetBrandsForFilterQuery,
+    GetBrandsForFilterQueryVariables
+  >(GetBrandsForFilterDocument, options);
+}
+export type GetBrandsForFilterQueryHookResult = ReturnType<
+  typeof useGetBrandsForFilterQuery
+>;
+export type GetBrandsForFilterLazyQueryHookResult = ReturnType<
+  typeof useGetBrandsForFilterLazyQuery
+>;
+export type GetBrandsForFilterSuspenseQueryHookResult = ReturnType<
+  typeof useGetBrandsForFilterSuspenseQuery
+>;
+export type GetBrandsForFilterQueryResult = Apollo.QueryResult<
+  GetBrandsForFilterQuery,
+  GetBrandsForFilterQueryVariables
 >;
 export const DashboardStatsDocument = gql`
   query DashboardStats {

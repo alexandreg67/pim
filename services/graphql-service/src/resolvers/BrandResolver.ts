@@ -119,4 +119,12 @@ export class BrandResolver {
 
     return qb.getCount();
   }
+
+  @Query(() => [Brands])
+  async brandsForFilter(): Promise<Brands[]> {
+    return await Brands.createQueryBuilder('brand')
+      .select(['brand.id', 'brand.name'])
+      .orderBy('brand.name', 'ASC')
+      .getMany();
+  }
 }

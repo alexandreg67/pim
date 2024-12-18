@@ -2,6 +2,8 @@ import React from 'react';
 import ProductList from '../components/products/ProductList';
 import { Box, Button, Typography } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { FilterContainer } from '../components/products/filters/FilterContainer';
+import { FilterState } from '../components/products/filters/types';
 
 const ProductsPage: React.FC = () => {
   const drawerWidth = 240;
@@ -17,6 +19,10 @@ const ProductsPage: React.FC = () => {
       pathname: '/products', // Navigue vers /products sans paramètres
       search: queryParams.toString(),
     });
+  };
+
+  const handleFiltersChange = (filters: FilterState) => {
+    console.info('Nouveaux filtres:', filters);
   };
 
   return (
@@ -45,6 +51,14 @@ const ProductsPage: React.FC = () => {
           <Typography variant="h4">Tous les produits</Typography>
         </Box>
       )}
+      <FilterContainer
+        onFilterChange={handleFiltersChange}
+        initialFilters={{
+          searchQuery: searchQuery || undefined,
+          status: '',
+          brandIds: [],
+        }}
+      />
       <ProductList searchQuery={searchQuery || undefined} />
     </Box>
   );
