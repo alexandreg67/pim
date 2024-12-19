@@ -1,6 +1,6 @@
 import { Box, Chip, Paper, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FilterState } from './types';
 import { StatusFilter } from './StatusFilter';
 import { BrandFilter } from './BrandFilter';
@@ -15,6 +15,8 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
   initialFilters = {},
 }) => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const [filters, setFilters] = useState<FilterState>({
     searchQuery: searchParams.get('query') || undefined,
     status: '',
@@ -30,7 +32,7 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
         searchQuery: query || undefined,
       }));
     }
-  }, [searchParams]);
+  }, [filters.searchQuery, searchParams]);
 
   const handleFilterChange = (filterUpdate: Partial<FilterState>) => {
     const newFilters = {
@@ -39,6 +41,14 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
     };
     setFilters(newFilters);
     onFilterChange(newFilters);
+  };
+
+  const handleResetSearch = () => {
+    searchParams.delete('query'); // Supprime le paramètre "query" de l'URL
+    navigate({
+      pathname: '/products', // Navigue vers /products sans paramètres
+      search: searchParams.toString(),
+    });
   };
 
   return (
@@ -62,7 +72,7 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
             </Typography>
             <Chip
               label={filters.searchQuery}
-              onDelete={() => handleFilterChange({ searchQuery: undefined })}
+              onDelete={() => handleResetSearch()}
               size="small"
             />
           </Box>

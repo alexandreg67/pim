@@ -8,7 +8,7 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value }) => {
   return (
-    <Card sx={{ minWidth: 200, margin: 1 }}>
+    <Card sx={{ minWidth: 200, margin: 1, boxShadow: 2 }}>
       <CardContent>
         <Typography variant="h6" color="text.secondary">
           {title}

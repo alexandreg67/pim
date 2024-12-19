@@ -31,8 +31,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         minWidth: 275,
         maxWidth: 300,
         margin: 2,
+        boxShadow: 2,
+        cursor: 'pointer',
+        transition: 'all 0.2s ease-in-out',
         '&:hover': {
           boxShadow: 6,
+          transform: 'translateY(-4px)',
         },
       }}
       onClick={handleClick}

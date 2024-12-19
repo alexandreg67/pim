@@ -1,12 +1,5 @@
 import { FC } from 'react';
-import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-  Box,
-} from '@mui/material';
+import { FormControl, Select, MenuItem, Chip, Box } from '@mui/material';
 import { ProductStatus, statusConfig } from './types';
 
 interface StatusFilterProps {
@@ -16,25 +9,49 @@ interface StatusFilterProps {
 
 export const StatusFilter: FC<StatusFilterProps> = ({ value, onChange }) => {
   return (
-    <FormControl size="small" sx={{ minWidth: 200 }}>
-      <InputLabel>Statut</InputLabel>
+    <FormControl
+      size="small"
+      sx={{
+        minWidth: 200,
+        borderColor: 'grey.500',
+        borderRadius: '8px',
+        boxShadow: 2,
+      }}
+    >
       <Select
         value={value}
         onChange={(e) => onChange(e.target.value as ProductStatus)}
-        label="Statut"
-        renderValue={(selected) => (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {selected && (
+        displayEmpty
+        renderValue={(selected) =>
+          selected ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 0.5,
+                minHeight: '40px',
+                alignItems: 'center',
+              }}
+            >
               <Chip
                 size="small"
                 label={statusConfig[selected as ProductStatus]?.label}
                 color={statusConfig[selected as ProductStatus]?.color}
                 sx={{ height: '30px', marginTop: '2px' }}
               />
-            )}
-          </Box>
-        )}
-        sx={{ color: 'text.primary' }}
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: '40px',
+              }}
+            >
+              <span style={{ color: 'gray', opacity: 0.5 }}>Statut</span>
+            </Box>
+          )
+        }
       >
         <MenuItem value="">
           <em>Tous</em>

@@ -59,7 +59,6 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery }) => {
     setCurrentPage(page);
   };
 
-  // Gestion des erreurs ou du chargement
   if (loading) return <Typography>Chargement...</Typography>;
   if (error)
     return <Typography color="error">Erreur : {error.message}</Typography>;

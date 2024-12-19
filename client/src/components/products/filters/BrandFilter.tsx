@@ -31,19 +31,18 @@ export const BrandFilter: FC<BrandFilterProps> = ({
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Marques"
+          // label="Marques"
           size="small"
-          placeholder={
-            selectedBrands.length === 0
-              ? 'Sélectionner une ou plusieurs marques'
-              : ''
-          }
+          placeholder={'Sélectionner une ou plusieurs marques'}
           sx={{ '& .MuiInputBase-input': { color: 'text.secondary' } }}
         />
       )}
       noOptionsText="Aucune marque trouvée"
       sx={{
-        minWidth: 300,
+        display: 'flex',
+        alignItems: 'center',
+        boxShadow: 2,
+        minWidth: 340,
         '& .MuiAutocomplete-input': { height: '20px' },
       }}
     />
