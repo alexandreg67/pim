@@ -62,3 +62,12 @@ export const GET_BRAND_COUNTRIES = gql`
     brandCountries(brandId: $brandId)
   }
 `;
+
+export const BRANDS_FOR_FILTER = gql`
+  query getBrandsForFilter {
+    brandsForFilter {
+      id
+      name
+    }
+  }
+`;

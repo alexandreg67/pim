@@ -25,7 +25,7 @@ const RecentHistory: React.FC<RecentHistoryProps> = ({ history }) => {
       <Typography variant="h6" gutterBottom>
         Historique récent
       </Typography>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ boxShadow: 2 }}>
         <Table>
           <TableBody>
             {history.length === 0 ? (

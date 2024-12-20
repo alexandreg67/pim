@@ -10,6 +10,9 @@ import {
   CircularProgress,
 } from '@mui/material';
 import ProductImages from '../components/products/ProductImages';
+import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
+import PublicIcon from '@mui/icons-material/Public';
 
 const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -68,10 +71,29 @@ const ProductDetailsPage: React.FC = () => {
               <strong>Marque :</strong> {brand?.name || 'Non spécifiée'}
             </Typography>
             {contact && (
-              <Typography variant="body1">
-                <strong>Contact :</strong> {contact.email}, {contact.phone},{' '}
-                {contact.country}
-              </Typography>
+              <>
+                <Typography variant="body1">
+                  <strong>Contact :</strong>
+                </Typography>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}
+                >
+                  <EmailIcon opacity="0.5" />
+                  <Typography variant="body1">{contact.email}</Typography>
+                </Box>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}
+                >
+                  <PhoneIcon opacity="0.5" />
+                  <Typography variant="body1">{contact.phone}</Typography>
+                </Box>
+                <Box
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}
+                >
+                  <PublicIcon opacity="0.5" />
+                  <Typography variant="body1">{contact.country}</Typography>
+                </Box>
+              </>
             )}
           </Box>
           <Box mt={2}>
@@ -86,6 +108,11 @@ const ProductDetailsPage: React.FC = () => {
               {tags && tags.length > 0
                 ? tags.map((tag) => tag.name).join(', ')
                 : 'Aucun'}
+            </Typography>
+          </Box>
+          <Box mt={2}>
+            <Typography variant="body1">
+              <strong>Status :</strong> {product.status}
             </Typography>
           </Box>
         </Grid>

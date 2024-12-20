@@ -100,7 +100,7 @@ const BrandDetailsPage: React.FC = () => {
 
   return (
     <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, padding: 3 }}>
-      <Card sx={{ mb: 4, p: 3 }}>
+      <Card sx={{ mb: 4, p: 3, boxShadow: 2 }}>
         <Box
           sx={{
             display: 'flex',

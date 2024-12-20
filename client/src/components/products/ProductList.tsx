@@ -1,55 +1,25 @@
 import React, { useState } from 'react';
 import { Box, Grid, Pagination, Typography } from '@mui/material';
 import ProductCard from './ProductCard';
-import {
-  useGetProductsQuery,
-  useSearchProductsQuery,
-} from '../../generated/graphql-types';
+import { useGetProductsQuery } from '../../generated/graphql-types';
 
 interface ProductListProps {
   searchQuery?: string; // Recherche optionnelle
+  status?: string; // Filtre optionnel
 }
 
-const ProductList: React.FC<ProductListProps> = ({ searchQuery }) => {
+const ProductList: React.FC<ProductListProps> = ({ searchQuery, status }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  // Requête pour la recherche
-  const {
-    data: searchData,
-    loading: searchLoading,
-    error: searchError,
-  } = useSearchProductsQuery({
-    variables: {
-      query: searchQuery || '', // Nécessaire même si `skip` est actif
-      page: currentPage,
-      limit: itemsPerPage,
-    },
-    skip: !searchQuery, // Désactive cette requête si aucun `searchQuery`
-  });
-
-  // Requête pour tous les produits
-  const {
-    data: allData,
-    loading: allLoading,
-    error: allError,
-  } = useGetProductsQuery({
+  const { data, loading, error } = useGetProductsQuery({
     variables: {
       page: currentPage,
       limit: itemsPerPage,
+      query: searchQuery,
+      status: status,
     },
-    skip: !!searchQuery, // Désactive cette requête si `searchQuery` est actif
   });
-
-  // Centralisation des états
-  const loading = searchQuery ? searchLoading : allLoading;
-  const error = searchQuery ? searchError : allError;
-  const products = searchQuery
-    ? searchData?.searchProducts?.items || []
-    : allData?.products?.items || [];
-  const totalProducts = searchQuery
-    ? searchData?.searchProducts?.total || 0
-    : allData?.products?.total || 0;
 
   // Gestion de la pagination
   const handlePageChange = (
@@ -59,7 +29,8 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery }) => {
     setCurrentPage(page);
   };
 
-  // Gestion des erreurs ou du chargement
+  const products = data?.products?.items || [];
+  const totalProducts = data?.products?.total || 0;
   if (loading) return <Typography>Chargement...</Typography>;
   if (error)
     return <Typography color="error">Erreur : {error.message}</Typography>;
