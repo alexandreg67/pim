@@ -99,7 +99,7 @@ cd pim
 ```
 2. Start the application
 ```bash
-docker-compose up -d
+npm run dev:build
 ```
 
 The application will be available at:
