@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ProductList from '../components/products/ProductList';
 import { Box, Typography } from '@mui/material';
 import { useLocation } from 'react-router-dom';
@@ -11,9 +11,10 @@ const ProductsPage: React.FC = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('query') || '';
+  const [selectedStatus, setSelectedStatus] = useState('');
 
   const handleFiltersChange = (filters: FilterState) => {
-    console.info('Nouveaux filtres:', filters);
+    setSelectedStatus(filters.status);
   };
 
   return (
@@ -30,7 +31,10 @@ const ProductsPage: React.FC = () => {
           brandIds: [],
         }}
       />
-      <ProductList searchQuery={searchQuery || undefined} />
+      <ProductList
+        searchQuery={searchQuery || undefined}
+        status={selectedStatus || undefined}
+      />
     </Box>
   );
 };

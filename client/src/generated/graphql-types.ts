@@ -197,7 +197,6 @@ export type Query = {
   dashboardStats: DashboardStats;
   product?: Maybe<Products>;
   products: PaginatedProductsResponse;
-  searchProducts: PaginatedProductsResponse;
   searchProductsSuggestions: Array<Products>;
   totalBrands: Scalars['Int']['output'];
 };
@@ -223,12 +222,8 @@ export type QueryProductArgs = {
 export type QueryProductsArgs = {
   limit?: Scalars['Int']['input'];
   page?: Scalars['Int']['input'];
-};
-
-export type QuerySearchProductsArgs = {
-  limit?: Scalars['Int']['input'];
-  page?: Scalars['Int']['input'];
-  query: Scalars['String']['input'];
+  query?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type QuerySearchProductsSuggestionsArgs = {
@@ -374,8 +369,10 @@ export type DashboardStatsQuery = {
 };
 
 export type GetProductsQueryVariables = Exact<{
-  page?: InputMaybe<Scalars['Int']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+  limit: Scalars['Int']['input'];
+  page: Scalars['Int']['input'];
 }>;
 
 export type GetProductsQuery = {
@@ -391,34 +388,6 @@ export type GetProductsQuery = {
       reference: string;
       price: string;
       status: string;
-      label?: string | null;
-      createdAt?: Date | null;
-      brand: { __typename?: 'Brands'; name: string };
-    }>;
-  };
-};
-
-export type SearchProductsQueryVariables = Exact<{
-  query: Scalars['String']['input'];
-  page?: InputMaybe<Scalars['Int']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-export type SearchProductsQuery = {
-  __typename?: 'Query';
-  searchProducts: {
-    __typename?: 'PaginatedProductsResponse';
-    total: number;
-    hasMore: boolean;
-    items: Array<{
-      __typename?: 'Products';
-      id: string;
-      name: string;
-      reference: string;
-      price: string;
-      status: string;
-      label?: string | null;
-      createdAt?: Date | null;
       brand: { __typename?: 'Brands'; name: string };
     }>;
   };
@@ -912,16 +881,19 @@ export type DashboardStatsQueryResult = Apollo.QueryResult<
   DashboardStatsQueryVariables
 >;
 export const GetProductsDocument = gql`
-  query GetProducts($page: Int, $limit: Int) {
-    products(page: $page, limit: $limit) {
+  query GetProducts(
+    $status: String
+    $query: String
+    $limit: Int!
+    $page: Int!
+  ) {
+    products(page: $page, limit: $limit, status: $status, query: $query) {
       items {
         id
         name
         reference
         price
         status
-        label
-        createdAt
         brand {
           name
         }
@@ -944,16 +916,22 @@ export const GetProductsDocument = gql`
  * @example
  * const { data, loading, error } = useGetProductsQuery({
  *   variables: {
- *      page: // value for 'page'
+ *      status: // value for 'status'
+ *      query: // value for 'query'
  *      limit: // value for 'limit'
+ *      page: // value for 'page'
  *   },
  * });
  */
 export function useGetProductsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     GetProductsQuery,
     GetProductsQueryVariables
-  >
+  > &
+    (
+      | { variables: GetProductsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<GetProductsQuery, GetProductsQueryVariables>(
@@ -1000,103 +978,6 @@ export type GetProductsSuspenseQueryHookResult = ReturnType<
 export type GetProductsQueryResult = Apollo.QueryResult<
   GetProductsQuery,
   GetProductsQueryVariables
->;
-export const SearchProductsDocument = gql`
-  query SearchProducts($query: String!, $page: Int, $limit: Int) {
-    searchProducts(query: $query, page: $page, limit: $limit) {
-      items {
-        id
-        name
-        reference
-        price
-        status
-        label
-        createdAt
-        brand {
-          name
-        }
-      }
-      total
-      hasMore
-    }
-  }
-`;
-
-/**
- * __useSearchProductsQuery__
- *
- * To run a query within a React component, call `useSearchProductsQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchProductsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSearchProductsQuery({
- *   variables: {
- *      query: // value for 'query'
- *      page: // value for 'page'
- *      limit: // value for 'limit'
- *   },
- * });
- */
-export function useSearchProductsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    SearchProductsQuery,
-    SearchProductsQueryVariables
-  > &
-    (
-      | { variables: SearchProductsQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<SearchProductsQuery, SearchProductsQueryVariables>(
-    SearchProductsDocument,
-    options
-  );
-}
-export function useSearchProductsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    SearchProductsQuery,
-    SearchProductsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<SearchProductsQuery, SearchProductsQueryVariables>(
-    SearchProductsDocument,
-    options
-  );
-}
-export function useSearchProductsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        SearchProductsQuery,
-        SearchProductsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    SearchProductsQuery,
-    SearchProductsQueryVariables
-  >(SearchProductsDocument, options);
-}
-export type SearchProductsQueryHookResult = ReturnType<
-  typeof useSearchProductsQuery
->;
-export type SearchProductsLazyQueryHookResult = ReturnType<
-  typeof useSearchProductsLazyQuery
->;
-export type SearchProductsSuspenseQueryHookResult = ReturnType<
-  typeof useSearchProductsSuspenseQuery
->;
-export type SearchProductsQueryResult = Apollo.QueryResult<
-  SearchProductsQuery,
-  SearchProductsQueryVariables
 >;
 export const GetProductDocument = gql`
   query GetProduct($productId: String!) {

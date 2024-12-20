@@ -1,6 +1,6 @@
 import { Resolver, Query, Arg, Int, ObjectType, Field } from 'type-graphql';
-import { ILike } from 'typeorm';
 import { Products } from '../entities/Products';
+import { FindOptionsWhere, ILike } from 'typeorm';
 
 @ObjectType()
 class PaginatedProductsResponse {
@@ -19,20 +19,30 @@ export default class ProductsResolver {
   @Query(() => PaginatedProductsResponse)
   async products(
     @Arg('page', () => Int, { defaultValue: 1 }) page: number,
-    @Arg('limit', () => Int, { defaultValue: 10 }) limit: number
+    @Arg('limit', () => Int, { defaultValue: 10 }) limit: number,
+    @Arg('query', () => String, { nullable: true }) query?: string,
+    @Arg('status', () => String, { nullable: true }) status?: string
   ): Promise<PaginatedProductsResponse> {
     try {
       const offset = (page - 1) * limit;
 
+      const where: FindOptionsWhere<Products> = {};
+
+      if (status) {
+        where.status = status;
+      }
+
+      if (query) {
+        where.name = ILike(`%${query}%`);
+      }
+
       const [items, total] = await Products.findAndCount({
+        where,
         skip: offset,
         take: limit,
         order: { createdAt: 'DESC' },
         relations: {
           brand: true,
-          productCharacteristics: {
-            characteristic: true,
-          },
         },
       });
 
@@ -44,68 +54,6 @@ export default class ProductsResolver {
     } catch (error) {
       console.error('Error fetching products:', error);
       throw new Error('Unable to fetch products');
-    }
-  }
-
-  @Query(() => PaginatedProductsResponse)
-  async searchProducts(
-    @Arg('query') query: string,
-    @Arg('page', () => Int, { defaultValue: 1 }) page: number,
-    @Arg('limit', () => Int, { defaultValue: 10 }) limit: number
-  ): Promise<PaginatedProductsResponse> {
-    try {
-      const offset = (page - 1) * limit;
-
-      const queryBuilder = Products.createQueryBuilder('product')
-        .leftJoinAndSelect('product.brand', 'brand')
-        .leftJoinAndSelect('product.productCharacteristics', 'characteristics')
-        .leftJoinAndSelect('characteristics.characteristic', 'definition')
-        .where(`product.search_vector @@ to_tsquery('french', :queryText)`, {
-          queryText: query.split(' ').join(' & '),
-        })
-        .addSelect(
-          `ts_rank(product.search_vector, to_tsquery('french', :queryText))`,
-          'rank'
-        )
-        .orderBy('rank', 'DESC')
-        .addOrderBy('product.createdAt', 'DESC')
-        .skip(offset)
-        .take(limit);
-
-      const [items, total] = await queryBuilder.getManyAndCount();
-
-      if (total === 0) {
-        const [fallbackItems, fallbackTotal] = await Products.findAndCount({
-          where: [
-            { name: ILike(`%${query}%`) },
-            { reference: ILike(`%${query}%`) },
-          ],
-          skip: offset,
-          take: limit,
-          order: { createdAt: 'DESC' },
-          relations: {
-            brand: true,
-            productCharacteristics: {
-              characteristic: true,
-            },
-          },
-        });
-
-        return {
-          items: fallbackItems,
-          total: fallbackTotal,
-          hasMore: fallbackTotal > offset + fallbackItems.length,
-        };
-      }
-
-      return {
-        items,
-        total,
-        hasMore: total > offset + items.length,
-      };
-    } catch (error) {
-      console.error('❌ Error searching products:', error);
-      throw new Error(`Unable to search products: ${error}`);
     }
   }
 
