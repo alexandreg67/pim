@@ -241,7 +241,7 @@ const CategoriesPage = () => {
         fullWidth
       >
         <DialogTitle>
-          {name ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
+          {editingCategory ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 2 }}>
@@ -266,7 +266,7 @@ const CategoriesPage = () => {
         <DialogActions>
           <Button onClick={handleCloseDialog}>Annuler</Button>
           <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-            {name ? 'Modifier' : 'Créer'}
+            {editingCategory ? 'Modifier' : 'Créer'}
           </Button>
         </DialogActions>
       </Dialog>
