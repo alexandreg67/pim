@@ -35,6 +35,8 @@ import {
   useDeleteCategoryMutation,
   useUpdateCategoryMutation,
 } from '../generated/graphql-types';
+import { useNotification } from '../hooks/useNotification';
+import { useDialog } from '../hooks/useDialog';
 
 const CategoriesPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -45,10 +47,14 @@ const CategoriesPage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
   const { data, loading: queryLoading, refetch } = useCategoriesQuery();
   const [createCategory] = useCreateCategoryMutation();
   const [updateCategory] = useUpdateCategoryMutation();
   const [deleteCategory] = useDeleteCategoryMutation();
+
+  const { success, error: showError } = useNotification();
+  const { confirmDelete } = useDialog();
 
   const categories = data?.categories || [];
 
@@ -79,7 +85,7 @@ const CategoriesPage = () => {
 
   const handleSubmit = async () => {
     if (!name) {
-      setError('Le nom de la catégorie est requis');
+      showError('Le nom de la catégorie est requis');
       return;
     }
     setLoading(true);
@@ -92,6 +98,7 @@ const CategoriesPage = () => {
             input: { name, description },
           },
         });
+        success('Catégorie modifiée avec succès', { duration: 3000 });
       } else {
         // Mode Créer
         await createCategory({
@@ -99,24 +106,29 @@ const CategoriesPage = () => {
             input: { name, description },
           },
         });
+        success('Catégorie créée avec succès', { duration: 3000 });
       }
       await refetch();
       handleCloseDialog();
     } catch (err) {
       console.error(err);
-      setError('Une erreur est survenue lors de la sauvegarde');
+      showError('Une erreur est survenue lors de la sauvegarde');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (categoryId: string) => {
+  const handleDelete = async (categoryId: string, categoryName: string) => {
     try {
-      await deleteCategory({ variables: { id: categoryId } });
-      await refetch();
+      const confirmed = await confirmDelete(`la catégorie "${categoryName}"`);
+      if (confirmed) {
+        await deleteCategory({ variables: { id: categoryId } });
+        await refetch();
+        success('Catégorie supprimée avec succès', { duration: 3000 });
+      }
     } catch (err) {
       console.error(err);
-      setError('Une erreur est survenue lors de la suppression');
+      showError('Une erreur est survenue lors de la suppression');
     }
   };
 
@@ -185,7 +197,9 @@ const CategoriesPage = () => {
                             </Tooltip>
                             <Tooltip title="Supprimer">
                               <IconButton
-                                onClick={() => handleDelete(category.id)}
+                                onClick={() =>
+                                  handleDelete(category.id, category.name)
+                                }
                                 size="small"
                                 color="error"
                               >
