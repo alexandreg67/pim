@@ -6,6 +6,7 @@ import ProductsResolver from './resolvers/ProductResolver';
 import { BrandResolver } from './resolvers/BrandResolver';
 import { DashboardResolver } from './resolvers/DashboardResolver';
 import { ContactResolver } from './resolvers/ContactResolver';
+import { CategoryResolver } from './resolvers/CategoryResolver';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -19,6 +20,7 @@ async function bootstrap() {
       BrandResolver,
       DashboardResolver,
       ContactResolver,
+      CategoryResolver,
     ],
     validate: false,
   });
