@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { getStatusLabel } from '../../utils/product.utils';
 
 interface ProductResultsSummaryProps {
@@ -34,7 +34,7 @@ const ProductResultsSummary = ({
         width: '100%',
         maxWidth: 'lg',
         mx: 'auto',
-        mb: 4,
+        mb: 1,
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
@@ -67,8 +67,6 @@ const ProductResultsSummary = ({
           </Typography>
         )}
       </Box>
-
-      <Divider className="w-1/3 mt-4" />
     </Box>
   );
 };
