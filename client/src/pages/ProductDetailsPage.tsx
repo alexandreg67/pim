@@ -13,6 +13,7 @@ import ProductImages from '../components/products/ProductImages';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PublicIcon from '@mui/icons-material/Public';
+import { getStatusLabel } from '../utils/product.utils';
 
 const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -112,7 +113,7 @@ const ProductDetailsPage: React.FC = () => {
           </Box>
           <Box mt={2}>
             <Typography variant="body1">
-              <strong>Status :</strong> {product.status}
+              <strong>Status :</strong> {getStatusLabel(product.status)}
             </Typography>
           </Box>
         </Grid>
