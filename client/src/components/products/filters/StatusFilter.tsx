@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { FormControl, Select, MenuItem, Chip, Box } from '@mui/material';
-import { ProductStatus, statusConfig } from './types';
+import { ProductStatus } from '../../../types/enum/product';
+import { statusConfig } from '../../../config/status.config';
 
 interface StatusFilterProps {
   value: ProductStatus | '';

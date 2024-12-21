@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Box, Grid, Pagination, Typography } from '@mui/material';
 import ProductCard from './ProductCard';
 import { useGetProductsQuery } from '../../generated/graphql-types';
+import ProductResultsSummary from './ProductResultsSummary';
+import { ProductStatus } from '../../types/enum/product';
+import { getStatusLabel } from '../../utils/product.utils';
 
 interface ProductListProps {
   searchQuery?: string; // Recherche optionnelle
@@ -37,6 +40,11 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, status }) => {
 
   return (
     <Box>
+      <ProductResultsSummary
+        total={totalProducts}
+        searchQuery={searchQuery}
+        status={status}
+      />
       <Grid container spacing={2}>
         {products.map((product) => (
           <Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
@@ -46,7 +54,7 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, status }) => {
               brand={product.brand?.name || 'Aucune marque'}
               price={parseFloat(product.price)}
               reference={product.reference}
-              status={product.status || 'Inconnu'}
+              status={getStatusLabel(product.status as ProductStatus)}
             />
           </Grid>
         ))}
