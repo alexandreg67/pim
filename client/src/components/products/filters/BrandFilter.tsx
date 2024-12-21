@@ -34,16 +34,15 @@ export const BrandFilter: FC<BrandFilterProps> = ({
           // label="Marques"
           size="small"
           placeholder={'Sélectionner une ou plusieurs marques'}
-          sx={{ '& .MuiInputBase-input': { color: 'text.secondary' } }}
         />
       )}
       noOptionsText="Aucune marque trouvée"
       sx={{
         display: 'flex',
         alignItems: 'center',
-        boxShadow: 2,
+        boxShadow: 1,
         minWidth: 340,
-        '& .MuiAutocomplete-input': { height: '20px' },
+        outline: 'none',
       }}
     />
   );

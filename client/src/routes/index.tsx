@@ -5,6 +5,7 @@ import ProductsPage from '../pages/ProductsPage';
 import BrandsPage from '../pages/BrandsPage';
 import BrandDetailsPage from '../pages/BandDetailsPage';
 import ProductDetailsPage from '../pages/ProductDetailsPage';
+import CategoriesPage from '../pages/CategoriesPage';
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,14 @@ const router = createBrowserRouter([
     element: (
       <MainLayout isAdmin={true}>
         <BrandDetailsPage />
+      </MainLayout>
+    ),
+  },
+  {
+    path: '/categories',
+    element: (
+      <MainLayout isAdmin={true}>
+        <CategoriesPage />
       </MainLayout>
     ),
   },

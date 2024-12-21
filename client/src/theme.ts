@@ -5,23 +5,15 @@ export const theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          color: 'white', // Texte
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'white', // Contours
+          backgroundColor: 'white', // Couleur de fond explicite
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: 'gray', // Couleur des bordures
+            },
+            '&:hover fieldset': {
+              borderColor: 'black', // Bordure au survol
+            },
           },
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'white', // Contours au survol
-          },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'white', // Contours au focus
-          },
-        },
-      },
-    },
-    MuiInputLabel: {
-      styleOverrides: {
-        root: {
-          color: 'white', // Placeholder
         },
       },
     },

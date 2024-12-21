@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Grid, Pagination, Typography } from '@mui/material';
+import { Box, Divider, Grid, Pagination, Typography } from '@mui/material';
 import ProductCard from './ProductCard';
 import { useGetProductsQuery } from '../../generated/graphql-types';
 import ProductResultsSummary from './ProductResultsSummary';
@@ -45,6 +45,7 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, status }) => {
         searchQuery={searchQuery}
         status={status}
       />
+      <Divider sx={{ mb: 2 }} />
       <Grid container spacing={2}>
         {products.map((product) => (
           <Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
