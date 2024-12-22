@@ -56,6 +56,8 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, status }) => {
               price={parseFloat(product.price)}
               reference={product.reference}
               status={getStatusLabel(product.status as ProductStatus)}
+              categories={product.categories.map((category) => category.name)}
+              tags={product.tags.map((tag) => tag.name)}
             />
           </Grid>
         ))}

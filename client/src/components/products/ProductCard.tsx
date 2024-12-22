@@ -9,6 +9,8 @@ interface ProductCardProps {
   price: number;
   status: string;
   reference: string;
+  categories: string[];
+  tags: string[];
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -18,6 +20,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   price,
   status,
   reference,
+  categories,
+  tags,
 }) => {
   const navigate = useNavigate();
 
@@ -45,15 +49,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <Typography variant="h6" gutterBottom>
           {name}
         </Typography>
-        <Typography variant="body1">Marque: {brand}</Typography>
+        <Typography variant="body1">Reference : {reference}</Typography>
         <Typography variant="body1" sx={{ marginTop: 1 }}>
-          Reference: {reference}
+          Marque : {brand}
         </Typography>
         <Typography variant="body2" sx={{ marginTop: 1 }}>
-          Prix: {price} €
+          Prix : {price} €
         </Typography>
-        <Typography variant="body2" color="textSecondary">
-          Status: {status}
+        <Typography variant="body2" sx={{ marginTop: 1 }}>
+          Catégories : {categories.join(', ')}
+        </Typography>
+        <Typography variant="body2">Tags : {tags.join(', ')}</Typography>
+        <Typography variant="body2" color="textSecondary" sx={{ marginTop: 1 }}>
+          Status : {status}
         </Typography>
       </CardContent>
     </Card>

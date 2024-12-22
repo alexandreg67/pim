@@ -11,9 +11,18 @@ export const GET_PRODUCTS = gql`
       items {
         id
         name
-        reference
         price
         status
+        createdAt
+        updatedAt
+        shortDescription
+        reference
+        categories {
+          name
+        }
+        tags {
+          name
+        }
         brand {
           name
         }

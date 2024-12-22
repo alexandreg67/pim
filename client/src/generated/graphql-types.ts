@@ -520,9 +520,14 @@ export type GetProductsQuery = {
       __typename?: 'Products';
       id: string;
       name: string;
-      reference: string;
       price: string;
       status: string;
+      createdAt?: Date | null;
+      updatedAt?: Date | null;
+      shortDescription?: string | null;
+      reference: string;
+      categories: Array<{ __typename?: 'Categories'; name: string }>;
+      tags: Array<{ __typename?: 'Tags'; name: string }>;
       brand: { __typename?: 'Brands'; name: string };
     }>;
   };
@@ -1307,9 +1312,18 @@ export const GetProductsDocument = gql`
       items {
         id
         name
-        reference
         price
         status
+        createdAt
+        updatedAt
+        shortDescription
+        reference
+        categories {
+          name
+        }
+        tags {
+          name
+        }
         brand {
           name
         }

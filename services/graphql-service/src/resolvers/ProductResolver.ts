@@ -82,6 +82,8 @@ export default class ProductsResolver {
         order: { createdAt: 'DESC' },
         relations: {
           brand: true,
+          categories: true,
+          tags: true,
         },
       });
 
