@@ -6,6 +6,7 @@ import BrandsPage from '../pages/BrandsPage';
 import BrandDetailsPage from '../pages/BandDetailsPage';
 import ProductDetailsPage from '../pages/ProductDetailsPage';
 import CategoriesPage from '../pages/CategoriesPage';
+import TagsPage from '../pages/TagsPage';
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,14 @@ const router = createBrowserRouter([
     element: (
       <MainLayout isAdmin={true}>
         <CategoriesPage />
+      </MainLayout>
+    ),
+  },
+  {
+    path: '/tags',
+    element: (
+      <MainLayout isAdmin={true}>
+        <TagsPage />
       </MainLayout>
     ),
   },
