@@ -72,3 +72,17 @@ export const GET_PRODUCT = gql`
     }
   }
 `;
+
+export const UPDATE_PRODUCT = gql`
+  mutation UpdateProduct($id: String!, $input: UpdateProductInput!) {
+    updateProduct(id: $id, input: $input) {
+      id
+      name
+      description
+      categories {
+        id
+        name
+      }
+    }
+  }
+`;
