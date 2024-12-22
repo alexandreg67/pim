@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   Button,
   Dialog,
@@ -153,85 +151,78 @@ const CategoriesPage = () => {
             Nouvelle Catégorie
           </Button>
         </Box>
-        <Card>
-          <CardContent>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Nom</TableCell>
-                    <TableCell>Description</TableCell>
-                    <TableCell align="right">Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {queryLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={4} align="center">
-                        Chargement des données...
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Nom</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {queryLoading ? (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    Chargement des données...
+                  </TableCell>
+                </TableRow>
+              ) : categories.length > 0 ? (
+                categories
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((category) => (
+                    <TableRow key={category.id}>
+                      <TableCell>{category.name}</TableCell>
+                      <TableCell>{category.description}</TableCell>
+                      <TableCell align="right">
+                        <Tooltip title="Modifier">
+                          <IconButton
+                            onClick={() =>
+                              handleOpenDialog({
+                                ...category,
+                                description: category.description || '',
+                              })
+                            }
+                            size="small"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Supprimer">
+                          <IconButton
+                            onClick={() =>
+                              handleDelete(category.id, category.name)
+                            }
+                            size="small"
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
-                  ) : categories.length > 0 ? (
-                    categories
-                      .slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                      .map((category) => (
-                        <TableRow key={category.id}>
-                          <TableCell>{category.name}</TableCell>
-                          <TableCell>{category.description}</TableCell>
-                          <TableCell align="right">
-                            <Tooltip title="Modifier">
-                              <IconButton
-                                onClick={() =>
-                                  handleOpenDialog({
-                                    ...category,
-                                    description: category.description || '',
-                                  })
-                                }
-                                size="small"
-                              >
-                                <EditIcon />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Supprimer">
-                              <IconButton
-                                onClick={() =>
-                                  handleDelete(category.id, category.name)
-                                }
-                                size="small"
-                                color="error"
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={4} align="center">
-                        Aucun élément trouvé.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                count={categories.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={(event, newPage) => setPage(newPage)}
-                onRowsPerPageChange={(event) =>
-                  setRowsPerPage(parseInt(event.target.value, 10))
-                }
-                labelRowsPerPage="Lignes par page"
-              />
-            </TableContainer>
-          </CardContent>
-        </Card>
+                  ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} align="center">
+                    Aucun élément trouvé.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            count={categories.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) =>
+              setRowsPerPage(parseInt(event.target.value, 10))
+            }
+            labelRowsPerPage="Lignes par page"
+          />
+        </TableContainer>
       </Stack>
 
       <Dialog

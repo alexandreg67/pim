@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useGetProductQuery } from '../generated/graphql-types';
 import {
   Box,
@@ -8,14 +8,17 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Button,
 } from '@mui/material';
 import ProductImages from '../components/products/ProductImages';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PublicIcon from '@mui/icons-material/Public';
 import { getStatusLabel } from '../utils/product.utils';
+import { Edit } from '@mui/icons-material';
 
 const ProductDetailsPage: React.FC = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { data, loading, error } = useGetProductQuery({
     variables: { productId: id || '' },
@@ -45,9 +48,28 @@ const ProductDetailsPage: React.FC = () => {
 
   return (
     <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, padding: 4 }}>
-      <Typography variant="h3" gutterBottom>
-        {name}
-      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 2,
+        }}
+      >
+        <Typography variant="h3" gutterBottom>
+          {name}
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<Edit />}
+          onClick={() => navigate(`/products/${id}/edit`)}
+          className="bg-blue-600"
+        >
+          Modifier
+        </Button>
+      </Box>
+
+      {/* Section Images */}
       <Grid container spacing={4}>
         {/* Colonne gauche : Image principale */}
         <Grid item xs={12} md={6}>

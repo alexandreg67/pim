@@ -1,6 +1,16 @@
-import { Resolver, Query, Arg, Int, ObjectType, Field } from 'type-graphql';
+import {
+  Resolver,
+  Query,
+  Arg,
+  Int,
+  ObjectType,
+  Field,
+  Mutation,
+  InputType,
+} from 'type-graphql';
 import { Products } from '../entities/Products';
-import { FindOptionsWhere, ILike } from 'typeorm';
+import { FindOptionsWhere, ILike, In } from 'typeorm';
+import { Categories } from '../entities/Categories';
 
 @ObjectType()
 class PaginatedProductsResponse {
@@ -12,6 +22,34 @@ class PaginatedProductsResponse {
 
   @Field()
   hasMore: boolean;
+}
+
+@InputType()
+class UpdateProductInput {
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field({ nullable: true })
+  shortDescription?: string;
+
+  @Field({ nullable: true })
+  price?: string;
+
+  @Field({ nullable: true })
+  status?: string;
+
+  @Field({ nullable: true })
+  label?: string;
+
+  // Relations
+  @Field(() => [String], { nullable: true })
+  categoryIds?: string[];
+
+  @Field(() => [String], { nullable: true })
+  tagIds?: string[];
 }
 
 @Resolver(Products)
@@ -106,5 +144,52 @@ export default class ProductsResolver {
       console.error(`❌ Error fetching product by ID: ${error}`);
       throw new Error('Unable to fetch product');
     }
+  }
+
+  @Mutation(() => Products)
+  async updateProduct(
+    @Arg('id', () => String) id: string,
+    @Arg('input') input: UpdateProductInput
+  ): Promise<Products> {
+    const { categoryIds, ...productData } = input;
+
+    // Récupérer le produit avec toutes les relations nécessaires
+    const product = await Products.findOne({
+      where: { id },
+      relations: ['categories'], // On peut ajouter d'autres relations au besoin
+    });
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    // Mise à jour des champs simples
+
+    // Mise à jour des relations si elles sont fournies
+    if (categoryIds) {
+      const categories = await Categories.findBy({
+        id: In(categoryIds),
+      });
+      product.categories = categories;
+    }
+
+    // if (tagIds) {
+    //   const tags = await Tags.findBy({
+    //     id: In(tagIds),
+    //   });
+    //   product.tags = tags;
+    // }
+
+    // Plus tard, d'autres relations
+    // if (characteristicIds) {
+    //   const characteristics = ...
+    //   product.characteristics = ...
+    // }
+
+    Object.assign(product, productData);
+    // Sauvegarder toutes les modifications
+    await product.save();
+
+    return product;
   }
 }

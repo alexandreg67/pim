@@ -7,6 +7,7 @@ import BrandDetailsPage from '../pages/BandDetailsPage';
 import ProductDetailsPage from '../pages/ProductDetailsPage';
 import CategoriesPage from '../pages/CategoriesPage';
 import TagsPage from '../pages/TagsPage';
+import EditProductPage from '../pages/EditProductPage';
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,14 @@ const router = createBrowserRouter([
     element: (
       <MainLayout isAdmin={true}>
         <ProductDetailsPage />
+      </MainLayout>
+    ),
+  },
+  {
+    path: '/products/:id/edit',
+    element: (
+      <MainLayout isAdmin={true}>
+        <EditProductPage />
       </MainLayout>
     ),
   },
