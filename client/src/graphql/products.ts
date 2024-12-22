@@ -83,6 +83,10 @@ export const UPDATE_PRODUCT = gql`
         id
         name
       }
+      tags {
+        id
+        name
+      }
     }
   }
 `;
