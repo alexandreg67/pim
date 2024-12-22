@@ -2,9 +2,9 @@ import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import StatCard from '../components/dashboard/StatCard';
 import ProductsByBrandChart from '../components/dashboard/ProductsByBrandChart';
-import ProductsByCategoryChart from '../components/dashboard/ProductsByCategoryChart';
 import RecentHistory from '../components/dashboard/RecentHistory';
 import { useDashboardStatsQuery } from '../generated/graphql-types';
+import CategoryGridStats from '../components/dashboard/CategoryGridStats';
 
 const drawerWidth = 240;
 
@@ -54,8 +54,8 @@ const Dashboard: React.FC = () => {
         <Grid item xs={12}>
           <RecentHistory history={recentHistoryData} />
         </Grid>
-        <Grid item xs={12} sm={8}>
-          <ProductsByCategoryChart data={productsByCategoryData} />
+        <Grid item xs={12}>
+          <CategoryGridStats data={productsByCategoryData} />
         </Grid>
         <Grid item xs={12}>
           <ProductsByBrandChart data={productsByBrandData} />
