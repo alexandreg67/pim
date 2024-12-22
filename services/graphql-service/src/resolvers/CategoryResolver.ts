@@ -51,10 +51,6 @@ export class CategoryResolver {
         );
       }
 
-      if (existingCategory) {
-        throw new Error('Une catégorie avec ce nom existe déjà');
-      }
-
       const category = new Categories();
       category.name = newCategory.name;
       category.description = newCategory.description ?? null;
