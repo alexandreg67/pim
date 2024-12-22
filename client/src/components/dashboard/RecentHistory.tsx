@@ -22,7 +22,7 @@ interface RecentHistoryProps {
 const RecentHistory: React.FC<RecentHistoryProps> = ({ history }) => {
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
         Historique récent
       </Typography>
       <TableContainer component={Paper} sx={{ boxShadow: 2 }}>

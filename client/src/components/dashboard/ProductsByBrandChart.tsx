@@ -19,7 +19,7 @@ const ProductsByBrandChart: React.FC<ProductsByBrandChartProps> = ({
 }) => {
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
         Produits par marque
       </Typography>
       <ResponsiveContainer width="100%" height={300}>
