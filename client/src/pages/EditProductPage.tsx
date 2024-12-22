@@ -7,7 +7,6 @@ import {
   Typography,
   Button,
   TextField,
-  Autocomplete,
   Grid,
   Card,
   CardMedia,
@@ -24,6 +23,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import CategoriesSection from '../components/products/edit/CategoriesSection';
 import { useNotification } from '../hooks/useNotification';
+import TagsSection from '../components/products/edit/TagsSection';
 
 type TabPanelProps = {
   children?: React.ReactNode;
@@ -54,6 +54,9 @@ const EditProductPage = () => {
   const [productCategories, setProductCategories] = useState<
     { __typename?: 'Categories'; id: string; name: string }[]
   >([]);
+  const [productTags, setProductTags] = useState<
+    { __typename?: 'Tags'; id: string; name: string }[]
+  >([]);
 
   const {
     data: productData,
@@ -68,6 +71,9 @@ const EditProductPage = () => {
     if (productData?.product?.categories) {
       setProductCategories(productData.product.categories);
     }
+    if (productData?.product?.tags) {
+      setProductTags(productData.product.tags);
+    }
   }, [productData]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -81,6 +87,7 @@ const EditProductPage = () => {
           id: id as string,
           input: {
             categoryIds: productCategories.map((cat) => cat.id),
+            tagIds: productTags.map((tag) => tag.id),
           },
         },
       });
@@ -178,18 +185,7 @@ const EditProductPage = () => {
               productCategories={productCategories}
               onChange={setProductCategories}
             />
-            <Grid item xs={12} md={6}>
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                Tags
-              </Typography>
-              <Autocomplete
-                multiple
-                options={[]}
-                renderInput={(params) => (
-                  <TextField {...params} placeholder="Sélectionner des tags" />
-                )}
-              />
-            </Grid>
+            <TagsSection productTags={productTags} onChange={setProductTags} />
           </Grid>
         </TabPanel>
 

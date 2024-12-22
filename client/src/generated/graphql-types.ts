@@ -589,6 +589,7 @@ export type UpdateProductMutation = {
     name: string;
     description?: string | null;
     categories: Array<{ __typename?: 'Categories'; id: string; name: string }>;
+    tags: Array<{ __typename?: 'Tags'; id: string; name: string }>;
   };
 };
 
@@ -1519,6 +1520,10 @@ export const UpdateProductDocument = gql`
       name
       description
       categories {
+        id
+        name
+      }
+      tags {
         id
         name
       }
