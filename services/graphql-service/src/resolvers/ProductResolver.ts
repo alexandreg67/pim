@@ -11,6 +11,7 @@ import {
 import { Products } from '../entities/Products';
 import { FindOptionsWhere, ILike, In } from 'typeorm';
 import { Categories } from '../entities/Categories';
+import { Tags } from '../entities/Tags';
 
 @ObjectType()
 class PaginatedProductsResponse {
@@ -151,12 +152,12 @@ export default class ProductsResolver {
     @Arg('id', () => String) id: string,
     @Arg('input') input: UpdateProductInput
   ): Promise<Products> {
-    const { categoryIds, ...productData } = input;
+    const { categoryIds, tagIds, ...productData } = input;
 
     // Récupérer le produit avec toutes les relations nécessaires
     const product = await Products.findOne({
       where: { id },
-      relations: ['categories'], // On peut ajouter d'autres relations au besoin
+      relations: ['categories', 'tags'], // On peut ajouter d'autres relations au besoin
     });
 
     if (!product) {
@@ -173,12 +174,12 @@ export default class ProductsResolver {
       product.categories = categories;
     }
 
-    // if (tagIds) {
-    //   const tags = await Tags.findBy({
-    //     id: In(tagIds),
-    //   });
-    //   product.tags = tags;
-    // }
+    if (tagIds) {
+      const tags = await Tags.findBy({
+        id: In(tagIds),
+      });
+      product.tags = tags;
+    }
 
     // Plus tard, d'autres relations
     // if (characteristicIds) {
