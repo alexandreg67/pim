@@ -6,7 +6,6 @@ import {
   Tabs,
   Typography,
   Button,
-  TextField,
   Grid,
   Card,
   CardMedia,
@@ -24,6 +23,21 @@ import { useNavigate, useParams } from 'react-router-dom';
 import CategoriesSection from '../components/products/edit/CategoriesSection';
 import { useNotification } from '../hooks/useNotification';
 import TagsSection from '../components/products/edit/TagsSection';
+import GeneralInfoSection from '../components/products/edit/GeneralInfoSection';
+import { ProductStatus } from '../types/enum/product';
+
+type GeneralInfo = {
+  reference: string;
+  name: string;
+  shortDescription: string;
+  description: string;
+  price: string;
+  status: ProductStatus;
+  label?: string;
+  brand: {
+    name: string;
+  };
+};
 
 type TabPanelProps = {
   children?: React.ReactNode;
@@ -57,6 +71,17 @@ const EditProductPage = () => {
   const [productTags, setProductTags] = useState<
     { __typename?: 'Tags'; id: string; name: string }[]
   >([]);
+  const [productInfo, setProductInfo] = useState<GeneralInfo>({
+    reference: '',
+    name: '',
+    shortDescription: '',
+    description: '',
+    price: '',
+    status: ProductStatus.DRAFT,
+    brand: {
+      name: '',
+    },
+  });
 
   const {
     data: productData,
@@ -74,6 +99,18 @@ const EditProductPage = () => {
     if (productData?.product?.tags) {
       setProductTags(productData.product.tags);
     }
+    setProductInfo({
+      reference: productData?.product?.reference || '',
+      name: productData?.product?.name || '',
+      shortDescription: productData?.product?.shortDescription || '',
+      description: productData?.product?.description || '',
+      price: productData?.product?.price || '',
+      status:
+        (productData?.product?.status as ProductStatus) || ProductStatus.DRAFT,
+      brand: {
+        name: productData?.product?.brand?.name || '',
+      },
+    });
   }, [productData]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -81,6 +118,9 @@ const EditProductPage = () => {
   };
 
   const handleSave = async () => {
+    if (!productInfo.name) {
+      return showError('Le nom du produit est requis');
+    }
     try {
       await updateProduct({
         variables: {
@@ -88,6 +128,11 @@ const EditProductPage = () => {
           input: {
             categoryIds: productCategories.map((cat) => cat.id),
             tagIds: productTags.map((tag) => tag.id),
+            name: productInfo.name,
+            shortDescription: productInfo.shortDescription,
+            description: productInfo.description,
+            price: productInfo.price,
+            status: productInfo.status as 'draft' | 'published',
           },
         },
       });
@@ -157,24 +202,12 @@ const EditProductPage = () => {
         {/* Informations générales */}
         <TabPanel value={currentTab} index={0}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <TextField fullWidth label="Référence" disabled sx={{ mb: 2 }} />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField fullWidth label="Nom" sx={{ mb: 2 }} />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Description courte"
-                multiline
-                rows={2}
-                sx={{ mb: 2 }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField fullWidth label="Description" multiline rows={4} />
-            </Grid>
+            <GeneralInfoSection
+              productInfo={productInfo}
+              onChange={(infos: Partial<GeneralInfo>) =>
+                setProductInfo((prevInfo) => ({ ...prevInfo, ...infos }))
+              }
+            />
           </Grid>
         </TabPanel>
 

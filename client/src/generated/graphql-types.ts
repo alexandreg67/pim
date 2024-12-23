@@ -160,6 +160,7 @@ export type Mutation = {
   deleteTag: Scalars['Boolean']['output'];
   updateCategory: Categories;
   updateProduct: Products;
+  updateProductDescription: Products;
   updateTag: Tags;
 };
 
@@ -187,6 +188,11 @@ export type MutationUpdateCategoryArgs = {
 export type MutationUpdateProductArgs = {
   id: Scalars['String']['input'];
   input: UpdateProductInput;
+};
+
+export type MutationUpdateProductDescriptionArgs = {
+  input: UpdateProductInput;
+  productId: Scalars['String']['input'];
 };
 
 export type MutationUpdateTagArgs = {
@@ -595,6 +601,21 @@ export type UpdateProductMutation = {
     description?: string | null;
     categories: Array<{ __typename?: 'Categories'; id: string; name: string }>;
     tags: Array<{ __typename?: 'Tags'; id: string; name: string }>;
+  };
+};
+
+export type UpdateProductDescriptionMutationVariables = Exact<{
+  input: UpdateProductInput;
+  productId: Scalars['String']['input'];
+}>;
+
+export type UpdateProductDescriptionMutation = {
+  __typename?: 'Mutation';
+  updateProductDescription: {
+    __typename?: 'Products';
+    name: string;
+    shortDescription?: string | null;
+    description?: string | null;
   };
 };
 
@@ -1588,6 +1609,63 @@ export type UpdateProductMutationOptions = Apollo.BaseMutationOptions<
   UpdateProductMutation,
   UpdateProductMutationVariables
 >;
+export const UpdateProductDescriptionDocument = gql`
+  mutation UpdateProductDescription(
+    $input: UpdateProductInput!
+    $productId: String!
+  ) {
+    updateProductDescription(input: $input, productId: $productId) {
+      name
+      shortDescription
+      description
+    }
+  }
+`;
+export type UpdateProductDescriptionMutationFn = Apollo.MutationFunction<
+  UpdateProductDescriptionMutation,
+  UpdateProductDescriptionMutationVariables
+>;
+
+/**
+ * __useUpdateProductDescriptionMutation__
+ *
+ * To run a mutation, you first call `useUpdateProductDescriptionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProductDescriptionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProductDescriptionMutation, { data, loading, error }] = useUpdateProductDescriptionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useUpdateProductDescriptionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateProductDescriptionMutation,
+    UpdateProductDescriptionMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateProductDescriptionMutation,
+    UpdateProductDescriptionMutationVariables
+  >(UpdateProductDescriptionDocument, options);
+}
+export type UpdateProductDescriptionMutationHookResult = ReturnType<
+  typeof useUpdateProductDescriptionMutation
+>;
+export type UpdateProductDescriptionMutationResult =
+  Apollo.MutationResult<UpdateProductDescriptionMutation>;
+export type UpdateProductDescriptionMutationOptions =
+  Apollo.BaseMutationOptions<
+    UpdateProductDescriptionMutation,
+    UpdateProductDescriptionMutationVariables
+  >;
 export const TagsDocument = gql`
   query Tags {
     tags {

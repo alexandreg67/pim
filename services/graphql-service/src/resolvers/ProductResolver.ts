@@ -195,4 +195,53 @@ export default class ProductsResolver {
 
     return product;
   }
+
+  @Mutation(() => Products)
+  async updateProductDescription(
+    @Arg('productId', () => String) productId: string,
+    @Arg('input', () => UpdateProductInput)
+    input: UpdateProductInput
+  ): Promise<Products> {
+    try {
+      const { name, shortDescription, description, ...productData } = input;
+
+      // 1. Trouver le produit existant
+      const product = await Products.findOne({
+        where: { id: productId },
+      });
+
+      if (!product) {
+        throw new Error(`Product with ID ${productId} not found`);
+      }
+
+      // 2. Mise à jour des champs descriptifs
+      Object.assign(product, {
+        name,
+        shortDescription,
+        description,
+        ...productData,
+      });
+
+      // 3. Sauvegarde des modifications
+      await product.save();
+
+      // 4. Création de l'historique
+      // const updateAction = await Actions.findOne({
+      //   where: { name: 'UPDATE_DESCRIPTION' },
+      // });
+
+      // if (updateAction) {
+      //   await History.create({
+      //     userId,
+      //     productId,
+      //     action: updateAction,
+      //   }).save();
+      // }
+
+      // 5. Retourner le produit mis à jour
+      return product;
+    } catch (error) {
+      throw new Error(`Failed to update product description: ${error}`);
+    }
+  }
 }

@@ -99,3 +99,16 @@ export const UPDATE_PRODUCT = gql`
     }
   }
 `;
+
+export const UPDATE_PRODUCT_DESCRIPTION = gql`
+  mutation UpdateProductDescription(
+    $input: UpdateProductInput!
+    $productId: String!
+  ) {
+    updateProductDescription(input: $input, productId: $productId) {
+      name
+      shortDescription
+      description
+    }
+  }
+`;

@@ -38,7 +38,7 @@ const TagsSection = ({ productTags, onChange }: TagsSectionProps) => {
   return (
     <Grid item xs={12} md={6}>
       <Typography variant="subtitle1" sx={{ mb: 1 }}>
-        Catégories
+        Tags
       </Typography>
       <Autocomplete
         multiple

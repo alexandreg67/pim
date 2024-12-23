@@ -15,7 +15,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PublicIcon from '@mui/icons-material/Public';
 import { getStatusLabel } from '../utils/product.utils';
-import { Edit } from '@mui/icons-material';
+import { ArrowBack, Edit } from '@mui/icons-material';
 
 const ProductDetailsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -56,6 +56,13 @@ const ProductDetailsPage: React.FC = () => {
           mb: 2,
         }}
       >
+        <Button
+          startIcon={<ArrowBack />}
+          variant="outlined"
+          onClick={() => navigate(`/products/`)}
+        >
+          Retour
+        </Button>
         <Typography variant="h3" gutterBottom>
           {name}
         </Typography>
@@ -92,6 +99,9 @@ const ProductDetailsPage: React.FC = () => {
           <Box mt={2}>
             <Typography variant="body1">
               <strong>Marque :</strong> {brand?.name || 'Non spécifiée'}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Reference :</strong> {product.reference}
             </Typography>
             {contact && (
               <>
