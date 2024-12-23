@@ -130,27 +130,28 @@ const CategoriesPage = () => {
     }
   };
 
-  const drawerWidth = 240;
-
   return (
-    <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, padding: 3 }}>
-      <Stack spacing={4}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
+    <Stack spacing={4} sx={{ width: '100%' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant="h5">Gestion des Catégories</Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog({})}
         >
-          <Typography variant="h5">Gestion des Catégories</Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenDialog({})}
-          >
-            Nouvelle Catégorie
-          </Button>
-        </Box>
+          Nouvelle Catégorie
+        </Button>
+      </Box>
+
+      {queryLoading ? (
+        <LinearProgress />
+      ) : (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -161,13 +162,7 @@ const CategoriesPage = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {queryLoading ? (
-                <TableRow>
-                  <TableCell colSpan={4} align="center">
-                    Chargement des données...
-                  </TableCell>
-                </TableRow>
-              ) : categories.length > 0 ? (
+              {categories.length > 0 ? (
                 categories
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((category) => (
@@ -204,7 +199,7 @@ const CategoriesPage = () => {
                   ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} align="center">
+                  <TableCell colSpan={3} align="center">
                     Aucun élément trouvé.
                   </TableCell>
                 </TableRow>
@@ -212,6 +207,7 @@ const CategoriesPage = () => {
             </TableBody>
           </Table>
           <TablePagination
+            component="div"
             rowsPerPageOptions={[5, 10, 25]}
             count={categories.length}
             rowsPerPage={rowsPerPage}
@@ -223,7 +219,7 @@ const CategoriesPage = () => {
             labelRowsPerPage="Lignes par page"
           />
         </TableContainer>
-      </Stack>
+      )}
 
       <Dialog
         open={openDialog}
@@ -261,7 +257,7 @@ const CategoriesPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Stack>
   );
 };
 

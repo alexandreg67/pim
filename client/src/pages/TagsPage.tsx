@@ -132,9 +132,8 @@ const TagsPage = () => {
     );
   }
 
-  const drawerWidth = 240;
   return (
-    <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, padding: 3 }}>
+    <Box sx={{ padding: 3 }}>
       {/* En-tête */}
       <Box
         sx={{

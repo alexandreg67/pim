@@ -6,8 +6,6 @@ import RecentHistory from '../components/dashboard/RecentHistory';
 import { useDashboardStatsQuery } from '../generated/graphql-types';
 import CategoryGridStats from '../components/dashboard/CategoryGridStats';
 
-const drawerWidth = 240;
-
 const Dashboard: React.FC = () => {
   const { data, loading, error } = useDashboardStatsQuery();
 
@@ -37,7 +35,6 @@ const Dashboard: React.FC = () => {
   return (
     <Box
       sx={{
-        marginLeft: { sm: `${drawerWidth}px` },
         padding: 3,
       }}
     >

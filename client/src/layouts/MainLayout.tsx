@@ -23,8 +23,10 @@ const MainLayout = ({
   const handleNotificationsClose = () => setNotificationsOpen(null);
 
   const handleSearch = (query: string) => {
-    navigate(`/products?query=${encodeURIComponent(query)}`); // Navigue vers la page des produits
+    navigate(`/products?query=${encodeURIComponent(query)}`);
   };
+
+  const drawerWidth = 240;
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -43,8 +45,26 @@ const MainLayout = ({
         mobileOpen={mobileOpen}
         onClose={handleDrawerToggle}
       />
-      <Box component="main" sx={{ flexGrow: 1, p: 3, mt: '64px' }}>
-        {children}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          mt: '64px',
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+        }}
+      >
+        <Box
+          sx={{
+            backgroundColor: 'background.paper',
+            borderRadius: 1,
+            p: 2,
+            minHeight: 'calc(100vh - 180px)',
+          }}
+        >
+          {children}
+        </Box>
       </Box>
     </Box>
   );

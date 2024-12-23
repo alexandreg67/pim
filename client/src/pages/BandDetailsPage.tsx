@@ -96,10 +96,8 @@ const BrandDetailsPage: React.FC = () => {
     return 'success';
   };
 
-  const drawerWidth = 240;
-
   return (
-    <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, padding: 3 }}>
+    <Box sx={{ padding: 3 }}>
       <Card sx={{ mb: 4, p: 3, boxShadow: 2 }}>
         <Box
           sx={{

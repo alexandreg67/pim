@@ -44,10 +44,8 @@ const ProductDetailsPage: React.FC = () => {
     productCharacteristics,
   } = product;
 
-  const drawerWidth = 240;
-
   return (
-    <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, padding: 4 }}>
+    <Box sx={{ padding: 4 }}>
       <Box
         sx={{
           display: 'flex',
