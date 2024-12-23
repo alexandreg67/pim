@@ -160,10 +160,8 @@ const EditProductPage = () => {
     );
   }
 
-  const drawerWidth = 240;
-
   return (
-    <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, p: 4 }}>
+    <Box sx={{ p: 4 }}>
       {/* Header */}
       <Box
         sx={{

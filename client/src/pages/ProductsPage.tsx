@@ -6,8 +6,6 @@ import { FilterContainer } from '../components/products/filters/FilterContainer'
 import { FilterState } from '../components/products/filters/types';
 
 const ProductsPage: React.FC = () => {
-  const drawerWidth = 240;
-
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('query') || '';
@@ -18,7 +16,7 @@ const ProductsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ marginLeft: { sm: `${drawerWidth}px` }, padding: 3 }}>
+    <Box sx={{ padding: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Typography variant="h4">Tous les produits</Typography>
       </Box>
