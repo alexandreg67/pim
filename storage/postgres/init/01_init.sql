@@ -133,7 +133,10 @@ CREATE TABLE IF NOT EXISTS "product_characteristics" (
 -- Table des actions
 CREATE TABLE IF NOT EXISTS "actions" (
     "id" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "name" VARCHAR(50) NOT NULL UNIQUE
+    "name" VARCHAR(50) NOT NULL UNIQUE,
+    "description" TEXT,
+    "type" VARCHAR(50) CHECK (type IN ('PRODUCT', 'MEDIA', 'CHARACTERISTIC', 'CATEGORY', 'TAG', 'WORKFLOW')),
+    "active" BOOLEAN DEFAULT true
 );
 
 -- Table historique
@@ -174,6 +177,7 @@ CREATE INDEX IF NOT EXISTS "idx_exchanges_brand_id" ON "exchanges"("brand_id");
 CREATE INDEX IF NOT EXISTS "idx_exchanges_status" ON "exchanges"("status");
 CREATE INDEX IF NOT EXISTS "idx_product_characteristics_product" ON "product_characteristics"("product_id");
 CREATE INDEX IF NOT EXISTS "idx_product_characteristics_characteristic" ON "product_characteristics"("characteristic_id");
+CREATE INDEX IF NOT EXISTS "idx_actions_type" ON "actions"("type");
 
 CREATE TRIGGER update_products_updated_at
     BEFORE UPDATE ON "products"
