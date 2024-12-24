@@ -1,29 +1,34 @@
-import { History } from '../entities/History';
-import { Actions } from '../entities/Actions';
-import { Users } from '../entities/Users';
 import { Service } from 'typedi';
+import { History } from '../entities/History';
+import { Users } from '../entities/Users';
+import { Actions } from '../entities/Actions';
+
+interface HistoryCreateInput {
+  user: Users | null;
+  action: Actions;
+  productId: string;
+  metadata?: Record<string, unknown>;
+}
 
 @Service()
 export class HistoryService {
-  async createHistory(params: {
-    user: Users;
-    action: Actions;
-    productId: string;
-  }): Promise<History> {
-    try {
-      const action = await Actions.findOneByOrFail({
-        name: params.action.name,
-        active: true, // Vérifier que l'action est active
-      });
-
-      const history = new History();
-      history.user = params.user;
-      history.action = action;
-      history.productId = params.productId;
-
-      return await history.save();
-    } catch (error) {
-      throw new Error(`Failed to create history: ${error}`);
+  async createHistory({
+    user,
+    action,
+    productId,
+    metadata,
+  }: HistoryCreateInput): Promise<History> {
+    if (!user) {
+      throw new Error('User is required to create history');
     }
+
+    const history = new History();
+
+    history.userId = user.id;
+    history.productId = productId;
+    history.action = action;
+    history.metadata = metadata || {};
+
+    return await history.save();
   }
 }

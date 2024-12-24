@@ -3,7 +3,9 @@ import { DashboardStats } from '../types/DashboardStats';
 import { Products } from '../entities/Products';
 import { History } from '../entities/History';
 import { Exchanges } from '../entities/Exchanges';
+import { Service } from 'typedi';
 
+@Service()
 @Resolver()
 export class DashboardResolver {
   @Query(() => DashboardStats)

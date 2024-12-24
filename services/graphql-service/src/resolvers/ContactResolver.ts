@@ -1,7 +1,9 @@
 import { FieldResolver, Resolver, Root } from 'type-graphql';
 import { Contacts } from '../entities/Contacts';
 import { Products } from '../entities/Products';
+import { Service } from 'typedi';
 
+@Service()
 @Resolver(Contacts)
 export class ContactResolver {
   @FieldResolver(() => Number)

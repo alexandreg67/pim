@@ -8,6 +8,7 @@ import {
   Mutation,
 } from 'type-graphql';
 import { Tags } from '../entities/Tags';
+import { Service } from 'typedi';
 
 @InputType()
 class CreateTagInput {
@@ -27,6 +28,7 @@ class UpdateTagInput {
   description?: string;
 }
 
+@Service()
 @Resolver(Tags)
 export class TagResolver {
   @Query(() => [Tags])

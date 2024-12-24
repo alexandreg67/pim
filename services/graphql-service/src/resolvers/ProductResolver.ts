@@ -15,8 +15,8 @@ import { Categories } from '../entities/Categories';
 import { Tags } from '../entities/Tags';
 import { Context } from '../types/Context';
 import { HistoryService } from '../services/HistoryService';
-import { Actions } from '../entities/Actions';
 import { Service } from 'typedi';
+import { Actions } from '../entities/Actions';
 
 @ObjectType()
 class PaginatedProductsResponse {
@@ -158,108 +158,63 @@ export default class ProductsResolver {
 
   @Mutation(() => Products)
   async updateProduct(
-    @Arg('id', () => String) id: string,
+    @Arg('id') id: string,
     @Arg('input') input: UpdateProductInput,
     @Ctx() { user }: Context
   ): Promise<Products> {
     if (!user) {
-      throw new Error('User not authenticated');
+      throw new Error('Authentication required');
     }
 
-    const { categoryIds, tagIds, ...productData } = input;
-
-    // Récupérer le produit avec toutes les relations nécessaires
-    const product = await Products.findOne({
-      where: { id },
-      relations: ['categories', 'tags'], // On peut ajouter d'autres relations au besoin
-    });
-
-    if (!product) {
-      throw new Error('Product not found');
-    }
-
-    // Mise à jour des champs simples
-
-    // Mise à jour des relations si elles sont fournies
-    if (categoryIds) {
-      const categories = await Categories.findBy({
-        id: In(categoryIds),
-      });
-      product.categories = categories;
-    }
-
-    if (tagIds) {
-      const tags = await Tags.findBy({
-        id: In(tagIds),
-      });
-      product.tags = tags;
-    }
-
-    // Plus tard, d'autres relations
-    // if (characteristicIds) {
-    //   const characteristics = ...
-    //   product.characteristics = ...
-    // }
-
-    Object.assign(product, productData);
-    // Sauvegarder toutes les modifications
-    await product.save();
-
-    await this.historyService.createHistory({
-      user,
-      action: { name: 'UPDATE_PRODUCT' } as Actions,
-      productId: product.id,
-    });
-
-    return product;
-  }
-
-  @Mutation(() => Products)
-  async updateProductDescription(
-    @Arg('productId', () => String) productId: string,
-    @Arg('input', () => UpdateProductInput)
-    input: UpdateProductInput
-  ): Promise<Products> {
     try {
-      const { name, shortDescription, description, ...productData } = input;
-
-      // 1. Trouver le produit existant
+      // 1. Récupérer le produit
       const product = await Products.findOne({
-        where: { id: productId },
+        where: { id },
+        relations: ['categories', 'tags'],
       });
 
       if (!product) {
-        throw new Error(`Product with ID ${productId} not found`);
+        throw new Error(`Product with ID ${id} not found`);
       }
 
-      // 2. Mise à jour des champs descriptifs
-      Object.assign(product, {
-        name,
-        shortDescription,
-        description,
-        ...productData,
+      // 2. Mise à jour des relations si fournies
+      if (input.categoryIds) {
+        product.categories = await Categories.findBy({
+          id: In(input.categoryIds),
+        });
+      }
+
+      if (input.tagIds) {
+        product.tags = await Tags.findBy({
+          id: In(input.tagIds),
+        });
+      }
+
+      // 3. Mise à jour des champs simples
+      Object.assign(product, input);
+
+      // 4. Sauvegarder les modifications
+      const updatedProduct = await product.save();
+
+      // 5. Récupérer l'action
+      const updateAction = await Actions.findOne({
+        where: { name: 'UPDATE_PRODUCT' },
       });
 
-      // 3. Sauvegarde des modifications
-      await product.save();
+      if (!updateAction) {
+        throw new Error('Update action not found');
+      }
 
-      // 4. Création de l'historique
-      // const updateAction = await Actions.findOne({
-      //   where: { name: 'UPDATE_DESCRIPTION' },
-      // });
+      // 5. Créer l'historique
+      await this.historyService.createHistory({
+        user,
+        action: updateAction,
+        productId: product.id,
+      });
 
-      // if (updateAction) {
-      //   await History.create({
-      //     userId,
-      //     productId,
-      //     action: updateAction,
-      //   }).save();
-      // }
-
-      // 5. Retourner le produit mis à jour
-      return product;
+      return updatedProduct;
     } catch (error) {
-      throw new Error(`Failed to update product description: ${error}`);
+      throw new Error(`Failed to update product: ${error}`);
     }
   }
 }
