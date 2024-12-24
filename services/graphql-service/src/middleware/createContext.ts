@@ -1,4 +1,5 @@
-import { UserService } from '../services/userService';
+import { HistoryService } from '../services/HistoryService';
+import { UserService } from '../services/UserService';
 import { Context } from '../types/Context';
 
 export async function createContext(): Promise<Context> {
@@ -7,5 +8,6 @@ export async function createContext(): Promise<Context> {
 
   return {
     user: await userService.getCurrentUser(mockUserId),
+    historyService: new HistoryService(),
   };
 }

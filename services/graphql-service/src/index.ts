@@ -10,6 +10,7 @@ import { CategoryResolver } from './resolvers/CategoryResolver';
 import { TagResolver } from './resolvers/TagResolver';
 import { UserResolver } from './resolvers/UserResolver';
 import { createContext } from './middleware/createContext';
+import Container from 'typedi';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -27,6 +28,7 @@ async function bootstrap() {
       TagResolver,
       UserResolver,
     ],
+    container: Container,
     validate: false,
   });
 

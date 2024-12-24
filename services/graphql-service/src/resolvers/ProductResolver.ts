@@ -7,11 +7,16 @@ import {
   Field,
   Mutation,
   InputType,
+  Ctx,
 } from 'type-graphql';
 import { Products } from '../entities/Products';
 import { FindOptionsWhere, ILike, In } from 'typeorm';
 import { Categories } from '../entities/Categories';
 import { Tags } from '../entities/Tags';
+import { Context } from '../types/Context';
+import { HistoryService } from '../services/HistoryService';
+import { Actions } from '../entities/Actions';
+import { Service } from 'typedi';
 
 @ObjectType()
 class PaginatedProductsResponse {
@@ -53,8 +58,10 @@ class UpdateProductInput {
   tagIds?: string[];
 }
 
+@Service()
 @Resolver(Products)
 export default class ProductsResolver {
+  constructor(private historyService: HistoryService) {}
   @Query(() => PaginatedProductsResponse)
   async products(
     @Arg('page', () => Int, { defaultValue: 1 }) page: number,
@@ -152,8 +159,13 @@ export default class ProductsResolver {
   @Mutation(() => Products)
   async updateProduct(
     @Arg('id', () => String) id: string,
-    @Arg('input') input: UpdateProductInput
+    @Arg('input') input: UpdateProductInput,
+    @Ctx() { user }: Context
   ): Promise<Products> {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
     const { categoryIds, tagIds, ...productData } = input;
 
     // Récupérer le produit avec toutes les relations nécessaires
@@ -192,6 +204,12 @@ export default class ProductsResolver {
     Object.assign(product, productData);
     // Sauvegarder toutes les modifications
     await product.save();
+
+    await this.historyService.createHistory({
+      user,
+      action: { name: 'UPDATE_PRODUCT' } as Actions,
+      productId: product.id,
+    });
 
     return product;
   }
