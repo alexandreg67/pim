@@ -8,6 +8,9 @@ import { DashboardResolver } from './resolvers/DashboardResolver';
 import { ContactResolver } from './resolvers/ContactResolver';
 import { CategoryResolver } from './resolvers/CategoryResolver';
 import { TagResolver } from './resolvers/TagResolver';
+import { UserResolver } from './resolvers/UserResolver';
+import { createContext } from './middleware/createContext';
+import Container from 'typedi';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -23,7 +26,9 @@ async function bootstrap() {
       ContactResolver,
       CategoryResolver,
       TagResolver,
+      UserResolver,
     ],
+    container: Container,
     validate: false,
   });
 
@@ -34,6 +39,7 @@ async function bootstrap() {
 
   // Démarrage du serveur standalone
   const { url } = await startStandaloneServer(server, {
+    context: createContext,
     listen: { port: 4000 },
   });
 

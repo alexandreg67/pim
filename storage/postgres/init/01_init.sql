@@ -145,6 +145,10 @@ CREATE TABLE IF NOT EXISTS "history" (
     "user_id" UUID NOT NULL,
     "action_id" UUID NOT NULL,
     "product_id" UUID NOT NULL,
+    "details" JSONB, -- Pour stocker les détails spécifiques de chaque action
+    "metadata" JSONB, -- Pour stocker des métadonnées additionnelles
+    "ip_address" VARCHAR(45), -- Pour tracer l'origine de l'action
+    "user_agent" TEXT, -- Pour identifier le navigateur/appareil
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "fk_history_user" FOREIGN KEY ("user_id") REFERENCES "users"("id"),
     CONSTRAINT "fk_history_action" FOREIGN KEY ("action_id") REFERENCES "actions"("id"),
@@ -172,6 +176,8 @@ CREATE INDEX IF NOT EXISTS "idx_products_name_trgm" ON "products" USING gin (nam
 CREATE INDEX IF NOT EXISTS "idx_history_user_id" ON "history"("user_id");
 CREATE INDEX IF NOT EXISTS "idx_history_product_id" ON "history"("product_id");
 CREATE INDEX IF NOT EXISTS "idx_history_created_at" ON "history"("created_at");
+CREATE INDEX IF NOT EXISTS "idx_history_action_id" ON "history"("action_id");
+CREATE INDEX IF NOT EXISTS "idx_history_details" ON "history" USING gin ("details");
 CREATE INDEX IF NOT EXISTS "idx_exchanges_user_id" ON "exchanges"("user_id");
 CREATE INDEX IF NOT EXISTS "idx_exchanges_brand_id" ON "exchanges"("brand_id");
 CREATE INDEX IF NOT EXISTS "idx_exchanges_status" ON "exchanges"("status");
