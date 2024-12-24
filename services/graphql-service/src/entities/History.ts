@@ -1,6 +1,7 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   Index,
   JoinColumn,
@@ -10,6 +11,20 @@ import { Actions } from './Actions';
 import { Products } from './Products';
 import { Users } from './Users';
 import { Field, GraphQLISODateTime, ObjectType } from 'type-graphql';
+import { GraphQLJSONObject } from 'graphql-type-json';
+
+interface HistoryDetails {
+  previous?: Record<string, unknown>;
+  current?: Record<string, unknown>;
+  changes?: string[];
+}
+
+interface HistoryMetadata {
+  browser?: string;
+  os?: string;
+  device?: string;
+  [key: string]: unknown;
+}
 
 @ObjectType()
 @Index('idx_history_created_at', ['createdAt'], {})
@@ -34,12 +49,24 @@ export class History extends BaseEntity {
   @Column('uuid', { name: 'product_id' })
   productId: string;
 
+  @Field(() => GraphQLJSONObject, { nullable: true })
+  @Column('jsonb', { nullable: true })
+  details: HistoryDetails;
+
+  @Field(() => GraphQLJSONObject, { nullable: true })
+  @Column('jsonb', { nullable: true })
+  metadata: HistoryMetadata;
+
+  @Field(() => String, { nullable: true })
+  @Column({ length: 45, nullable: true, name: 'ip_address' })
+  ipAddress: string;
+
+  @Field(() => String, { nullable: true })
+  @Column('text', { nullable: true, name: 'user_agent' })
+  userAgent: string;
+
   @Field(() => GraphQLISODateTime, { nullable: true })
-  @Column('timestamp with time zone', {
-    name: 'created_at',
-    nullable: true,
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
   createdAt: Date | null;
 
   @Field(() => Actions)

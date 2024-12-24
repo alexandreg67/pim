@@ -55,6 +55,7 @@ services:
       - ../../storage/postgres/init/03_categories_seed.sql:/docker-entrypoint-initdb.d/03_categories_seed.sql
       - ../../storage/postgres/init/04_tags_seed.sql:/docker-entrypoint-initdb.d/04_tags_seed.sql
       - ../../storage/postgres/init/05_actions_seed.sql:/docker-entrypoint-initdb.d/05_actions_seed.sql
+      - ../../storage/postgres/init/06_users_seed.sql:/docker-entrypoint-initdb.d/06_users_seed.sql
       - ../../storage/postgres/data/products.csv:/docker-entrypoint-initdb.d/products.csv
     command: /docker-entrypoint.sh/run-migrations.sh
     networks:
