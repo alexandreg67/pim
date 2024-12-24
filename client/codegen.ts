@@ -15,6 +15,7 @@ const config: CodegenConfig = {
         scalars: {
           DateTime: 'Date',
           DateTimeISO: 'Date',
+          JSONObject: 'Record<string, unknown>',
         },
       },
     },

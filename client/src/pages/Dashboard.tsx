@@ -21,8 +21,20 @@ const Dashboard: React.FC = () => {
 
   const recentHistoryData = (data?.dashboardStats.recentHistory || []).map(
     (entry) => ({
-      action: entry.action,
-      createdAt: entry.createdAt.toISOString(),
+      user: {
+        firstName: entry.user?.firstName || '',
+        lastName: entry.user?.lastName || '',
+      },
+      product: {
+        name: entry.product?.name || '',
+        reference: entry.product?.reference || '',
+      },
+      action: {
+        name: entry.action.name,
+        description: entry.action.description || 'Aucune description',
+        type: entry.action.type,
+      },
+      createdAt: entry.createdAt,
     })
   );
 

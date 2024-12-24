@@ -26,6 +26,7 @@ export class DashboardResolver {
       .getRawMany();
 
     const recentHistory = await History.find({
+      relations: ['action', 'user', 'product'],
       order: { createdAt: 'DESC' },
       take: 5,
     });
@@ -44,10 +45,7 @@ export class DashboardResolver {
         categoryOrBrand: category.category || 'Pas de catégorie',
         count: parseInt(category.count, 10),
       })),
-      recentHistory: recentHistory.map((history) => ({
-        action: history.action,
-        createdAt: history.createdAt,
-      })),
+      recentHistory,
       pendingCommunications,
     };
   }

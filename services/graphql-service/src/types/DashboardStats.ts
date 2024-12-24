@@ -1,5 +1,8 @@
 import { ObjectType, Field, Int } from 'type-graphql';
 import { GraphQLDateTime } from 'graphql-scalars';
+import { Actions } from '../entities/Actions';
+import { Users } from '../entities/Users';
+import { Products } from '../entities/Products';
 
 @ObjectType()
 export class ProductStat {
@@ -12,8 +15,14 @@ export class ProductStat {
 
 @ObjectType()
 export class HistoryEntry {
-  @Field(() => String)
-  action!: string;
+  @Field(() => Actions)
+  action!: Actions;
+
+  @Field(() => Users, { nullable: true })
+  user: Users;
+
+  @Field(() => Products, { nullable: true })
+  product: Products;
 
   @Field(() => GraphQLDateTime)
   createdAt!: Date;
