@@ -84,9 +84,11 @@ export const GET_PRODUCT = gql`
 
 export const UPDATE_PRODUCT = gql`
   mutation UpdateProduct($id: String!, $input: UpdateProductInput!) {
+    # Noter le changement de UpdateProductInput à ProductUpdateInput
     updateProduct(id: $id, input: $input) {
       id
       name
+      shortDescription
       description
       categories {
         id
@@ -96,19 +98,6 @@ export const UPDATE_PRODUCT = gql`
         id
         name
       }
-    }
-  }
-`;
-
-export const UPDATE_PRODUCT_DESCRIPTION = gql`
-  mutation UpdateProductDescription(
-    $input: UpdateProductInput!
-    $productId: String!
-  ) {
-    updateProductDescription(input: $input, productId: $productId) {
-      name
-      shortDescription
-      description
     }
   }
 `;

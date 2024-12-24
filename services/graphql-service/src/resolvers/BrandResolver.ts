@@ -2,7 +2,9 @@ import { Resolver, Query, Arg, Int, FieldResolver, Root } from 'type-graphql';
 import { Brands } from '../entities/Brands';
 import { Contacts } from '../entities/Contacts';
 import { Products } from '../entities/Products';
+import { Service } from 'typedi';
 
+@Service()
 @Resolver(Brands)
 export class BrandResolver {
   @Query(() => [Brands])

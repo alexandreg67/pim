@@ -1,6 +1,7 @@
 import { Resolver, Query, Mutation, Arg, InputType, Field } from 'type-graphql';
 import { Categories } from '../entities/Categories';
 import { IsNotEmpty, Length } from 'class-validator';
+import { Service } from 'typedi';
 
 @InputType()
 export class CreateCategoryInput {
@@ -30,6 +31,7 @@ export class UpdateCategoryInput {
   description?: string;
 }
 
+@Service()
 @Resolver(Categories)
 export class CategoryResolver {
   @Query(() => [Categories])

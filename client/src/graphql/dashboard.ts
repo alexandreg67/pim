@@ -13,7 +13,21 @@ export const DASHBOARD_STATS = gql`
         count
       }
       recentHistory {
-        action
+        action {
+          name
+          description
+          type
+          active
+        }
+        createdAt
+        user {
+          firstName
+          lastName
+        }
+        product {
+          name
+          reference
+        }
         createdAt
       }
       pendingCommunications
