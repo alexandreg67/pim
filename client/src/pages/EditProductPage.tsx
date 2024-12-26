@@ -11,7 +11,6 @@ import {
   CardMedia,
   IconButton,
   Stack,
-  Alert,
   CircularProgress,
 } from '@mui/material';
 import { Save, ArrowBack, Delete, CloudUpload } from '@mui/icons-material';
@@ -25,6 +24,8 @@ import { useNotification } from '../hooks/useNotification';
 import TagsSection from '../components/products/edit/TagsSection';
 import GeneralInfoSection from '../components/products/edit/GeneralInfoSection';
 import { ProductStatus } from '../types/enum/product';
+import { CharacteristicType } from '../types/Characteristic';
+import CharacteristicsSection from '../components/products/edit/CharacteristicsSection';
 
 type GeneralInfo = {
   reference: string;
@@ -61,6 +62,9 @@ const TabPanel = (props: TabPanelProps) => {
 };
 
 const EditProductPage = () => {
+  const [productCharacteristics, setProductCharacteristics] = useState<
+    CharacteristicType[]
+  >([]);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState(0);
@@ -98,6 +102,9 @@ const EditProductPage = () => {
     }
     if (productData?.product?.tags) {
       setProductTags(productData.product.tags);
+    }
+    if (productData?.product?.productCharacteristics) {
+      setProductCharacteristics(productData.product.productCharacteristics);
     }
     setProductInfo({
       reference: productData?.product?.reference || '',
@@ -278,12 +285,11 @@ const EditProductPage = () => {
 
         {/* Caractéristiques */}
         <TabPanel value={currentTab} index={3}>
-          <Alert severity="info" sx={{ mb: 4 }}>
-            Vous pourrez ajouter des caractéristiques une fois le produit créé
-          </Alert>
-          <Grid container spacing={2}>
-            {/* Liste des caractéristiques à implémenter */}
-          </Grid>
+          <CharacteristicsSection
+            productCharacteristics={productCharacteristics}
+            productId={id as string}
+            onUpdate={() => refetch()}
+          />
         </TabPanel>
       </Paper>
     </Box>

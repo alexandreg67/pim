@@ -11,6 +11,8 @@ import { TagResolver } from './resolvers/TagResolver';
 import { UserResolver } from './resolvers/UserResolver';
 import { createContext } from './middleware/createContext';
 import Container from 'typedi';
+import { ProductCharacteristicsResolver } from './resolvers/ProductCharacteristicsResolver';
+import { CharacteristicDefinitionResolver } from './resolvers/CharacteristicDefinitionResolver';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -27,6 +29,8 @@ async function bootstrap() {
       CategoryResolver,
       TagResolver,
       UserResolver,
+      ProductCharacteristicsResolver,
+      CharacteristicDefinitionResolver,
     ],
     container: Container,
     validate: false,

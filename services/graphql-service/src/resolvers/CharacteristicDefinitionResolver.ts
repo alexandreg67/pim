@@ -7,9 +7,7 @@ import { Service } from 'typedi';
 export class CharacteristicDefinitionResolver {
   @Query(() => [CharacteristicDefinitions])
   async characteristicDefinitions(): Promise<CharacteristicDefinitions[]> {
-    return await CharacteristicDefinitions.find({
-      relations: ['productCharacteristics'],
-    });
+    return await CharacteristicDefinitions.find();
   }
 
   @Query(() => CharacteristicDefinitions, { nullable: true })
