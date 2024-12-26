@@ -177,13 +177,22 @@ export type Images = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addProductCharacteristic: Products;
   createCategory: Categories;
   createTag: Tags;
   deleteCategory: Scalars['Boolean']['output'];
   deleteTag: Scalars['Boolean']['output'];
+  removeProductCharacteristic: Products;
   updateCategory: Categories;
   updateProduct: Products;
+  updateProductCharacteristicValue: Products;
   updateTag: Tags;
+};
+
+export type MutationAddProductCharacteristicArgs = {
+  characteristicId: Scalars['String']['input'];
+  productId: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type MutationCreateCategoryArgs = {
@@ -202,6 +211,11 @@ export type MutationDeleteTagArgs = {
   id: Scalars['String']['input'];
 };
 
+export type MutationRemoveProductCharacteristicArgs = {
+  characteristicId: Scalars['String']['input'];
+  productId: Scalars['String']['input'];
+};
+
 export type MutationUpdateCategoryArgs = {
   id: Scalars['String']['input'];
   input: UpdateCategoryInput;
@@ -210,6 +224,12 @@ export type MutationUpdateCategoryArgs = {
 export type MutationUpdateProductArgs = {
   id: Scalars['String']['input'];
   input: UpdateProductInput;
+};
+
+export type MutationUpdateProductCharacteristicValueArgs = {
+  characteristicId: Scalars['String']['input'];
+  productId: Scalars['String']['input'];
+  value: Scalars['String']['input'];
 };
 
 export type MutationUpdateTagArgs = {
@@ -270,6 +290,8 @@ export type Query = {
   brands: Array<Brands>;
   brandsForFilter: Array<Brands>;
   categories: Array<Categories>;
+  characteristicDefinition?: Maybe<CharacteristicDefinitions>;
+  characteristicDefinitions: Array<CharacteristicDefinitions>;
   dashboardStats: DashboardStats;
   me?: Maybe<Users>;
   product?: Maybe<Products>;
@@ -293,6 +315,10 @@ export type QueryBrandsArgs = {
   limit: Scalars['Int']['input'];
   page: Scalars['Int']['input'];
   search?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type QueryCharacteristicDefinitionArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type QueryProductArgs = {
@@ -499,6 +525,106 @@ export type UpdateCategoryMutation = {
     name: string;
     description?: string | null;
   };
+};
+
+export type AddProductCharacteristicMutationVariables = Exact<{
+  productId: Scalars['String']['input'];
+  characteristicId: Scalars['String']['input'];
+  value: Scalars['String']['input'];
+}>;
+
+export type AddProductCharacteristicMutation = {
+  __typename?: 'Mutation';
+  addProductCharacteristic: {
+    __typename?: 'Products';
+    id: string;
+    productCharacteristics: Array<{
+      __typename?: 'ProductCharacteristics';
+      id: string;
+      value: string;
+      characteristic: {
+        __typename?: 'CharacteristicDefinitions';
+        id: string;
+        name: string;
+      };
+    }>;
+  };
+};
+
+export type UpdateProductCharacteristicMutationVariables = Exact<{
+  productId: Scalars['String']['input'];
+  characteristicId: Scalars['String']['input'];
+  value: Scalars['String']['input'];
+}>;
+
+export type UpdateProductCharacteristicMutation = {
+  __typename?: 'Mutation';
+  updateProductCharacteristicValue: {
+    __typename?: 'Products';
+    id: string;
+    productCharacteristics: Array<{
+      __typename?: 'ProductCharacteristics';
+      id: string;
+      value: string;
+      characteristic: {
+        __typename?: 'CharacteristicDefinitions';
+        name: string;
+      };
+    }>;
+  };
+};
+
+export type RemoveProductCharacteristicMutationVariables = Exact<{
+  productId: Scalars['String']['input'];
+  characteristicId: Scalars['String']['input'];
+}>;
+
+export type RemoveProductCharacteristicMutation = {
+  __typename?: 'Mutation';
+  removeProductCharacteristic: {
+    __typename?: 'Products';
+    id: string;
+    productCharacteristics: Array<{
+      __typename?: 'ProductCharacteristics';
+      id: string;
+      value: string;
+      characteristic: {
+        __typename?: 'CharacteristicDefinitions';
+        name: string;
+      };
+    }>;
+  };
+};
+
+export type GetCharacteristicDefinitionsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetCharacteristicDefinitionsQuery = {
+  __typename?: 'Query';
+  characteristicDefinitions: Array<{
+    __typename?: 'CharacteristicDefinitions';
+    id: string;
+    name: string;
+  }>;
+};
+
+export type GetCharacteristicDefinitionQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type GetCharacteristicDefinitionQuery = {
+  __typename?: 'Query';
+  characteristicDefinition?: {
+    __typename?: 'CharacteristicDefinitions';
+    id: string;
+    name: string;
+    productCharacteristics: {
+      __typename?: 'ProductCharacteristics';
+      id: string;
+      value: string;
+    };
+  } | null;
 };
 
 export type DashboardStatsQueryVariables = Exact<{ [key: string]: never }>;
@@ -1251,6 +1377,373 @@ export type UpdateCategoryMutationResult =
 export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<
   UpdateCategoryMutation,
   UpdateCategoryMutationVariables
+>;
+export const AddProductCharacteristicDocument = gql`
+  mutation AddProductCharacteristic(
+    $productId: String!
+    $characteristicId: String!
+    $value: String!
+  ) {
+    addProductCharacteristic(
+      productId: $productId
+      characteristicId: $characteristicId
+      value: $value
+    ) {
+      id
+      productCharacteristics {
+        id
+        value
+        characteristic {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+export type AddProductCharacteristicMutationFn = Apollo.MutationFunction<
+  AddProductCharacteristicMutation,
+  AddProductCharacteristicMutationVariables
+>;
+
+/**
+ * __useAddProductCharacteristicMutation__
+ *
+ * To run a mutation, you first call `useAddProductCharacteristicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddProductCharacteristicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addProductCharacteristicMutation, { data, loading, error }] = useAddProductCharacteristicMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *      characteristicId: // value for 'characteristicId'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useAddProductCharacteristicMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AddProductCharacteristicMutation,
+    AddProductCharacteristicMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    AddProductCharacteristicMutation,
+    AddProductCharacteristicMutationVariables
+  >(AddProductCharacteristicDocument, options);
+}
+export type AddProductCharacteristicMutationHookResult = ReturnType<
+  typeof useAddProductCharacteristicMutation
+>;
+export type AddProductCharacteristicMutationResult =
+  Apollo.MutationResult<AddProductCharacteristicMutation>;
+export type AddProductCharacteristicMutationOptions =
+  Apollo.BaseMutationOptions<
+    AddProductCharacteristicMutation,
+    AddProductCharacteristicMutationVariables
+  >;
+export const UpdateProductCharacteristicDocument = gql`
+  mutation UpdateProductCharacteristic(
+    $productId: String!
+    $characteristicId: String!
+    $value: String!
+  ) {
+    updateProductCharacteristicValue(
+      productId: $productId
+      characteristicId: $characteristicId
+      value: $value
+    ) {
+      id
+      productCharacteristics {
+        id
+        value
+        characteristic {
+          name
+        }
+      }
+    }
+  }
+`;
+export type UpdateProductCharacteristicMutationFn = Apollo.MutationFunction<
+  UpdateProductCharacteristicMutation,
+  UpdateProductCharacteristicMutationVariables
+>;
+
+/**
+ * __useUpdateProductCharacteristicMutation__
+ *
+ * To run a mutation, you first call `useUpdateProductCharacteristicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProductCharacteristicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProductCharacteristicMutation, { data, loading, error }] = useUpdateProductCharacteristicMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *      characteristicId: // value for 'characteristicId'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useUpdateProductCharacteristicMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateProductCharacteristicMutation,
+    UpdateProductCharacteristicMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateProductCharacteristicMutation,
+    UpdateProductCharacteristicMutationVariables
+  >(UpdateProductCharacteristicDocument, options);
+}
+export type UpdateProductCharacteristicMutationHookResult = ReturnType<
+  typeof useUpdateProductCharacteristicMutation
+>;
+export type UpdateProductCharacteristicMutationResult =
+  Apollo.MutationResult<UpdateProductCharacteristicMutation>;
+export type UpdateProductCharacteristicMutationOptions =
+  Apollo.BaseMutationOptions<
+    UpdateProductCharacteristicMutation,
+    UpdateProductCharacteristicMutationVariables
+  >;
+export const RemoveProductCharacteristicDocument = gql`
+  mutation RemoveProductCharacteristic(
+    $productId: String!
+    $characteristicId: String!
+  ) {
+    removeProductCharacteristic(
+      productId: $productId
+      characteristicId: $characteristicId
+    ) {
+      id
+      productCharacteristics {
+        id
+        value
+        characteristic {
+          name
+        }
+      }
+    }
+  }
+`;
+export type RemoveProductCharacteristicMutationFn = Apollo.MutationFunction<
+  RemoveProductCharacteristicMutation,
+  RemoveProductCharacteristicMutationVariables
+>;
+
+/**
+ * __useRemoveProductCharacteristicMutation__
+ *
+ * To run a mutation, you first call `useRemoveProductCharacteristicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveProductCharacteristicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeProductCharacteristicMutation, { data, loading, error }] = useRemoveProductCharacteristicMutation({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *      characteristicId: // value for 'characteristicId'
+ *   },
+ * });
+ */
+export function useRemoveProductCharacteristicMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RemoveProductCharacteristicMutation,
+    RemoveProductCharacteristicMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RemoveProductCharacteristicMutation,
+    RemoveProductCharacteristicMutationVariables
+  >(RemoveProductCharacteristicDocument, options);
+}
+export type RemoveProductCharacteristicMutationHookResult = ReturnType<
+  typeof useRemoveProductCharacteristicMutation
+>;
+export type RemoveProductCharacteristicMutationResult =
+  Apollo.MutationResult<RemoveProductCharacteristicMutation>;
+export type RemoveProductCharacteristicMutationOptions =
+  Apollo.BaseMutationOptions<
+    RemoveProductCharacteristicMutation,
+    RemoveProductCharacteristicMutationVariables
+  >;
+export const GetCharacteristicDefinitionsDocument = gql`
+  query GetCharacteristicDefinitions {
+    characteristicDefinitions {
+      id
+      name
+    }
+  }
+`;
+
+/**
+ * __useGetCharacteristicDefinitionsQuery__
+ *
+ * To run a query within a React component, call `useGetCharacteristicDefinitionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCharacteristicDefinitionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCharacteristicDefinitionsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCharacteristicDefinitionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetCharacteristicDefinitionsQuery,
+    GetCharacteristicDefinitionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetCharacteristicDefinitionsQuery,
+    GetCharacteristicDefinitionsQueryVariables
+  >(GetCharacteristicDefinitionsDocument, options);
+}
+export function useGetCharacteristicDefinitionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCharacteristicDefinitionsQuery,
+    GetCharacteristicDefinitionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetCharacteristicDefinitionsQuery,
+    GetCharacteristicDefinitionsQueryVariables
+  >(GetCharacteristicDefinitionsDocument, options);
+}
+export function useGetCharacteristicDefinitionsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetCharacteristicDefinitionsQuery,
+        GetCharacteristicDefinitionsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetCharacteristicDefinitionsQuery,
+    GetCharacteristicDefinitionsQueryVariables
+  >(GetCharacteristicDefinitionsDocument, options);
+}
+export type GetCharacteristicDefinitionsQueryHookResult = ReturnType<
+  typeof useGetCharacteristicDefinitionsQuery
+>;
+export type GetCharacteristicDefinitionsLazyQueryHookResult = ReturnType<
+  typeof useGetCharacteristicDefinitionsLazyQuery
+>;
+export type GetCharacteristicDefinitionsSuspenseQueryHookResult = ReturnType<
+  typeof useGetCharacteristicDefinitionsSuspenseQuery
+>;
+export type GetCharacteristicDefinitionsQueryResult = Apollo.QueryResult<
+  GetCharacteristicDefinitionsQuery,
+  GetCharacteristicDefinitionsQueryVariables
+>;
+export const GetCharacteristicDefinitionDocument = gql`
+  query GetCharacteristicDefinition($id: ID!) {
+    characteristicDefinition(id: $id) {
+      id
+      name
+      productCharacteristics {
+        id
+        value
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetCharacteristicDefinitionQuery__
+ *
+ * To run a query within a React component, call `useGetCharacteristicDefinitionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCharacteristicDefinitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCharacteristicDefinitionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetCharacteristicDefinitionQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetCharacteristicDefinitionQuery,
+    GetCharacteristicDefinitionQueryVariables
+  > &
+    (
+      | { variables: GetCharacteristicDefinitionQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetCharacteristicDefinitionQuery,
+    GetCharacteristicDefinitionQueryVariables
+  >(GetCharacteristicDefinitionDocument, options);
+}
+export function useGetCharacteristicDefinitionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetCharacteristicDefinitionQuery,
+    GetCharacteristicDefinitionQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetCharacteristicDefinitionQuery,
+    GetCharacteristicDefinitionQueryVariables
+  >(GetCharacteristicDefinitionDocument, options);
+}
+export function useGetCharacteristicDefinitionSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetCharacteristicDefinitionQuery,
+        GetCharacteristicDefinitionQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetCharacteristicDefinitionQuery,
+    GetCharacteristicDefinitionQueryVariables
+  >(GetCharacteristicDefinitionDocument, options);
+}
+export type GetCharacteristicDefinitionQueryHookResult = ReturnType<
+  typeof useGetCharacteristicDefinitionQuery
+>;
+export type GetCharacteristicDefinitionLazyQueryHookResult = ReturnType<
+  typeof useGetCharacteristicDefinitionLazyQuery
+>;
+export type GetCharacteristicDefinitionSuspenseQueryHookResult = ReturnType<
+  typeof useGetCharacteristicDefinitionSuspenseQuery
+>;
+export type GetCharacteristicDefinitionQueryResult = Apollo.QueryResult<
+  GetCharacteristicDefinitionQuery,
+  GetCharacteristicDefinitionQueryVariables
 >;
 export const DashboardStatsDocument = gql`
   query DashboardStats {
