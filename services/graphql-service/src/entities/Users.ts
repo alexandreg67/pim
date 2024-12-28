@@ -1,7 +1,24 @@
 import { BaseEntity, Column, Entity, Index, OneToMany } from 'typeorm';
 import { Exchanges } from './Exchanges';
 import { History } from './History';
-import { Field, GraphQLISODateTime, ObjectType } from 'type-graphql';
+import {
+  Field,
+  GraphQLISODateTime,
+  ObjectType,
+  registerEnumType,
+} from 'type-graphql';
+
+export enum UserRole {
+  SUPER_ADMIN = 'super_admin',
+  ADMIN = 'admin',
+  COLLABORATOR = 'collaborator',
+}
+
+// Enregistrer l'enum pour GraphQL
+registerEnumType(UserRole, {
+  name: 'UserRole',
+  description: 'Les différents rôles utilisateur',
+});
 
 @ObjectType()
 @Index('users_email_key', ['email'], { unique: true })
@@ -36,6 +53,34 @@ export class Users extends BaseEntity {
   @Column('character varying', { name: 'phone', nullable: true, length: 20 })
   phone: string | null;
 
+  @Field(() => UserRole)
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.COLLABORATOR,
+  })
+  role: UserRole;
+
+  @Field(() => Boolean)
+  @Column('boolean', { name: 'is_first_login', default: true })
+  isFirstLogin: boolean;
+
+  @Field(() => String, { nullable: true })
+  @Column('character varying', {
+    name: 'temporary_password',
+    nullable: true,
+    length: 100,
+    select: false,
+  })
+  temporaryPassword?: string;
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  @Column('timestamp with time zone', {
+    name: 'temporary_password_expires',
+    nullable: true,
+  })
+  temporaryPasswordExpires?: Date;
+
   @Field(() => GraphQLISODateTime)
   @Column('timestamp with time zone', { name: 'start_date' })
   startDate: Date;
@@ -43,10 +88,6 @@ export class Users extends BaseEntity {
   @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', { name: 'end_date', nullable: true })
   endDate: Date | null;
-
-  @Field(() => Boolean)
-  @Column('boolean', { name: 'is_admin', default: () => 'false' })
-  isAdmin: boolean;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   @Column('timestamp with time zone', {
@@ -75,4 +116,15 @@ export class Users extends BaseEntity {
   @Field(() => History)
   @OneToMany(() => History, (history) => history.user)
   histories: History[];
+
+  // Méthodes utilitaires
+  @Field(() => Boolean)
+  isActive(): boolean {
+    const now = new Date();
+    return (
+      now >= this.startDate &&
+      (!this.endDate || now <= this.endDate) &&
+      !this.deletedAt
+    );
+  }
 }
