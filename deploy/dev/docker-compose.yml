@@ -67,12 +67,12 @@ services:
 
   auth:
     build:
-      context: ./services/auth-service
+      context: ../../services/auth-service
       dockerfile: Dockerfile
     container_name: pim_auth
     volumes:
-      - ./services/auth-service/src:/app/src
-      - ./services/auth-service/dist:/app/dist
+      - ../../services/auth-service/src:/app/src
+      - ../../services/auth-service/dist:/app/dist
     environment:
       - NODE_ENV=development
       - AUTH_SERVICE_PORT=4001
