@@ -7,5 +7,9 @@
   "services/graphql-service/src/**/*.ts": [
     "prettier --write",
     "npm --prefix services/graphql-service run lint:fix"
+  ],
+  "services/autth-service/src/**/*.ts": [
+    "prettier --write",
+    "npm --prefix services/auth-service run lint:fix"
   ]
 }

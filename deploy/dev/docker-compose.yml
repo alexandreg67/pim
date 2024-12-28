@@ -65,6 +65,30 @@ services:
       timeout: 5s
       retries: 5
 
+  auth:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: pim_auth
+    volumes:
+      - ./services/auth-service/src:/app/src
+      - ./services/auth-service/dist:/app/dist
+    environment:
+      - NODE_ENV=development
+      - AUTH_SERVICE_PORT=4001
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=pim_db
+      - JWT_ACCESS_TOKEN_SECRET=my_dev_access_secret
+      - JWT_REFRESH_TOKEN_SECRET=my_dev_refresh_secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pim_network
+
   nginx:
     image: nginx:latest
     container_name: pim_nginx
