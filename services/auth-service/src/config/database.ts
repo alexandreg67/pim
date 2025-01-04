@@ -1,4 +1,3 @@
-// services/auth-service/src/config/database.ts
 import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
 import dotenv from 'dotenv';

@@ -1,6 +1,5 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { AppDataSource } from './config/database';
 import { authRoutes } from './routes/auth.routes';
@@ -11,7 +10,6 @@ async function startServer() {
   const app = express();
 
   // Middlewares
-  app.use(cors());
   app.use(cookieParser());
   app.use(express.json());
 
@@ -21,7 +19,7 @@ async function startServer() {
     await AppDataSource.initialize();
     console.info('📦 Database connection successful');
 
-    const PORT = process.env.PORT || 3001;
+    const PORT = process.env.PORT || 4001;
     app.listen(PORT, () => {
       console.info(`🚀 Auth service running on port ${PORT}`);
     });

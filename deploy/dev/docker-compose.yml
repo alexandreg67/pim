@@ -89,6 +89,20 @@ services:
     networks:
       - pim_network
 
+  mail-service:
+    build:
+      context: ../../services/mail-service
+      dockerfile: Dockerfile
+    container_name: pim_mail
+    volumes:
+      - ../../services/mail-service/src:/app/src
+      - ../../services/mail-service/dist:/app/dist
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+    networks:
+      - pim_network
+
   nginx:
     image: nginx:latest
     container_name: pim_nginx
