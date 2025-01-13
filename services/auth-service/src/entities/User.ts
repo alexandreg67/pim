@@ -1,22 +1,22 @@
-// src/entities/User.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  BaseEntity,
 } from 'typeorm';
 
 @Entity('users')
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
-  firstName!: string;
+  first_name!: string;
 
   @Column()
-  lastName!: string;
+  last_name!: string;
 
   @Column({ unique: true })
   email!: string;
@@ -28,23 +28,23 @@ export class User {
   phone!: string;
 
   @Column()
-  startDate!: Date;
+  start_date!: Date;
 
   @Column({ nullable: true })
-  endDate!: Date;
+  end_date!: Date;
 
-  @Column({ default: false })
-  isAdmin!: boolean;
+  @Column({ default: 'admin' })
+  role!: string;
 
   @Column({ default: true })
-  isFirstLogin!: boolean;
+  is_first_login!: boolean;
 
   @CreateDateColumn()
-  createdAt!: Date;
+  created_at!: Date;
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updated_at!: Date;
 
   @Column({ nullable: true })
-  deletedAt!: Date;
+  deleted_at!: Date;
 }

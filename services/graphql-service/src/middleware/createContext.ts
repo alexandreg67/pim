@@ -5,7 +5,7 @@ import { Context } from '../types/Context';
 export async function createContext(): Promise<Context> {
   const userService = new UserService();
   // Pour le développement, on peut garder le mockUserId
-  const mockUserId = 'd4823c2d-206a-4f53-b5eb-11feff72c49e';
+  const mockUserId = '3a73bafd-7913-488e-8b6c-bb91f844b93d';
 
   const user = await userService.getCurrentUser(mockUserId);
 

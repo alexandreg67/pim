@@ -1,9 +1,27 @@
-import express from 'express';
+// src/routes/auth.routes.ts
+import { Router } from 'express';
+import { authController } from '../controllers/auth.controller';
+// import { authMiddleware } from '../middlewares/auth.middleware';
+import { validateDto } from '../middlewares/validate.middleware';
+import { LoginDto, RegisterDto } from '../dtos/auth.dto';
 
-const router = express.Router();
+const router = Router();
 
-router.get('/health', (req, res) => {
-  res.json({ status: 'Auth service is running' });
-});
+// Routes publiques
+router.post('/login', validateDto(LoginDto), authController.login);
+// router.post('/reset-password', authController.resetPassword);
 
-export const authRoutes = router;
+// Routes protégées (admin uniquement)
+router.post(
+  '/register',
+  // authMiddleware,
+  validateDto(RegisterDto),
+  authController.register
+);
+
+// Routes protégées (utilisateur connecté)
+router.get('/me', authController.getCurrentUser); // Ajout de authMiddleware
+router.post('/logout', authController.logout); // Ajout de authMiddleware
+router.put('/change-password', authController.changePassword); // Ajout de authMiddleware
+
+export { router as authRoutes };

@@ -89,7 +89,7 @@ services:
     networks:
       - pim_network
 
-  mail-service:
+  mail:
     build:
       context: ../../services/mail-service
       dockerfile: Dockerfile

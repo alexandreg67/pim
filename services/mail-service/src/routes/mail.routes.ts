@@ -3,8 +3,6 @@ import { MailController } from '../controllers/mail.controller';
 
 const controller = new MailController();
 
-// router.post('/send', controller.sendMail.bind(controller));
-
 const router = express.Router();
 
 router.get('/health', (req, res) => {
@@ -13,8 +11,7 @@ router.get('/health', (req, res) => {
 
 router.post('/send', async (req: Request, res: Response) => {
   try {
-    const result = await controller.sendMail(req, res);
-    res.json(result);
+    await controller.sendMail(req, res);
   } catch (error) {
     res.status(500).json({
       error: 'Failed to send email',
