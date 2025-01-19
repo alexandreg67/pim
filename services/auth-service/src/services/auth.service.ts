@@ -22,11 +22,11 @@ export class AuthService {
   async validateAccess(user: User): Promise<void> {
     const now = new Date();
 
-    if (user.endDate && now > user.endDate) {
+    if (user.end_date && now > user.end_date) {
       throw new AppError('Access expired', 403);
     }
 
-    if (now < user.startDate) {
+    if (now < user.start_date) {
       throw new AppError('Access not yet started', 403);
     }
   }

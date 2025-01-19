@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { User } from '../entities/User';
+import jwt from 'jsonwebtoken';
 import { MailService } from './mail.service';
 import { generateTemporaryPassword } from '../utils/password.util';
 import { AppError } from '../utils/error.util';
@@ -12,7 +13,7 @@ export class UserService {
     lastName: string;
     startDate: Date;
     endDate?: Date;
-    isAdmin?: boolean;
+    role: string;
   }): Promise<User> {
     // Vérifier si l'utilisateur existe déjà
     const existingUser = await User.findOne({
@@ -38,8 +39,10 @@ export class UserService {
     user.email = userData.email;
     user.first_name = userData.firstName;
     user.last_name = userData.lastName;
+    user.role = userData.role;
     user.start_date = userData.startDate;
     user.password = hashedPassword;
+    user.is_first_login = true;
 
     await user.save();
 
@@ -108,6 +111,34 @@ export class UserService {
         temporaryPassword,
       },
     });
+  }
+
+  async login(
+    email: string,
+    password: string
+  ): Promise<{
+    user: User;
+    token: string;
+  }> {
+    const user = await User.findOne({ where: { email } });
+    if (!user) throw new Error('Invalid credentials');
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) throw new Error('Invalid credentials');
+
+    // Vérification des dates d'accès
+    const now = new Date();
+    if (now < user.start_date || (user.end_date && now > user.end_date)) {
+      throw new Error('Account access period invalid');
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, role: user.role },
+      process.env.JWT_SECRET!,
+      { expiresIn: '1h' }
+    );
+
+    return { user, token };
   }
 }
 

@@ -27,14 +27,18 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   phone!: string;
 
+  @Column({
+    type: 'enum',
+    enum: ['admin', 'collaborator'],
+    default: 'collaborator',
+  })
+  role!: string;
+
   @Column()
   start_date!: Date;
 
   @Column({ nullable: true })
   end_date!: Date;
-
-  @Column({ default: 'admin' })
-  role!: string;
 
   @Column({ default: true })
   is_first_login!: boolean;
