@@ -10,12 +10,13 @@ export const authMiddleware = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const token = req.cookies.token;
 
     if (!token) {
-      return res.status(401).json({ message: 'Non authentifié' });
+      res.status(401).json({ message: 'Non authentifié' });
+      return;
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
@@ -25,23 +26,27 @@ export const authMiddleware = async (
     const user = await User.findOneBy({ id: decoded.userId });
 
     if (!user) {
-      return res.status(401).json({ message: 'Utilisateur non trouvé' });
+      res.status(401).json({ message: 'Utilisateur non trouvé' });
+      return;
     }
 
     // Vérifier si l'utilisateur a toujours accès (dates)
     const now = new Date();
-    if (user.end_date && now > user.end_date) {
-      return res.status(403).json({ message: 'Accès expiré' });
+    if (user.endDate && now > user.endDate) {
+      res.status(403).json({ message: 'Accès expiré' });
+      return;
     }
-    if (now < user.start_date) {
-      return res
-        .status(403)
-        .json({ message: "L'accès n'a pas encore commencé" });
+    if (now < user.startDate) {
+      res.status(403).json({
+        message: "L'accès n'a pas encore commencé",
+      });
+      return;
     }
 
     req.user = user;
     next();
   } catch {
-    return res.status(401).json({ message: 'Token invalide' });
+    res.status(401).json({ message: 'Token invalide' });
+    return;
   }
 };
