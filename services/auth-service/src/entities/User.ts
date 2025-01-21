@@ -1,10 +1,10 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
+  BaseEntity,
   Column,
   CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
-  BaseEntity,
 } from 'typeorm';
 
 @Entity('users')
@@ -12,11 +12,11 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
-  first_name!: string;
+  @Column({ name: 'first_name' })
+  firstName!: string;
 
-  @Column()
-  last_name!: string;
+  @Column({ name: 'last_name' })
+  lastName!: string;
 
   @Column({ unique: true })
   email!: string;
@@ -34,21 +34,21 @@ export class User extends BaseEntity {
   })
   role!: string;
 
-  @Column()
-  start_date!: Date;
+  @Column({ name: 'start_date' })
+  startDate!: Date;
 
-  @Column({ nullable: true })
-  end_date!: Date;
+  @Column({ name: 'end_date', nullable: true })
+  endDate!: Date;
 
-  @Column({ default: true })
-  is_first_login!: boolean;
+  @Column({ name: 'is_first_login', default: true })
+  isFirstLogin!: boolean;
 
-  @CreateDateColumn()
-  created_at!: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt!: Date;
 
-  @UpdateDateColumn()
-  updated_at!: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date;
 
-  @Column({ nullable: true })
-  deleted_at!: Date;
+  @Column({ name: 'deleted_at', nullable: true })
+  deletedAt!: Date;
 }
