@@ -4,6 +4,9 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 import { userService } from '../services/user.service';
 import { authService } from '../services/auth.service';
 import { User } from '../entities/User';
+import { MailService } from '../services/mail.service';
+import { AppError } from '../utils/error.util';
+import { generateTemporaryPassword } from '../utils/password.util';
 
 class AuthController {
   async register(req: Request, res: Response): Promise<void> {
@@ -89,15 +92,30 @@ class AuthController {
     try {
       const user = req.user;
       if (!user) {
-        res.status(401).json({ message: 'Not authenticated' });
-        return;
+        throw new AppError('Not authenticated', 401);
       }
 
       const { currentPassword, newPassword } = req.body;
-      await userService.updateUserPassword(user, currentPassword, newPassword);
+      await authService.validateCredentials(user.email, currentPassword);
+
+      // Hachage et mise à jour du mot de passe
+      const hashedPassword = await authService.hashPassword(newPassword);
+      user.password = hashedPassword;
+      user.isFirstLogin = false;
+      await user.save();
+
+      // Envoi de l'email de confirmation
+      await MailService.sendMail({
+        to: user.email,
+        template: 'PASSWORD_CHANGED',
+        data: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+      });
 
       res.json({ message: 'Password updated successfully' });
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Change password error:', error);
       const err = error as Error & { statusCode?: number };
       res.status(err.statusCode || 500).json({
@@ -109,23 +127,58 @@ class AuthController {
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
-      await userService.resetPassword(email);
+      const tempPassword = generateTemporaryPassword();
 
-      res.json({
-        message:
-          'If an account exists with that email, a password reset link has been sent',
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        // Pour des raisons de sécurité, on renvoie le même message
+        res.json({
+          message: 'If the email exists, a reset link has been sent',
+        });
+        return;
+      }
+
+      // Mise à jour du mot de passe temporaire
+      const hashedPassword = await authService.hashPassword(tempPassword);
+      user.password = hashedPassword;
+      user.isFirstLogin = true;
+      await user.save();
+
+      // Envoi de l'email avec le mot de passe temporaire
+      await MailService.sendMail({
+        to: email,
+        template: 'TEMP_PASSWORD',
+        data: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          temporaryPassword: tempPassword,
+        },
       });
-    } catch (error: unknown) {
+
+      res.json({ message: 'If the email exists, a reset link has been sent' });
+    } catch (error) {
       console.error('Reset password error:', error);
-      res.status(500).json({
-        message: 'Error processing password reset',
-      });
+      res.status(500).json({ message: 'Error processing reset request' });
     }
   }
 
-  async logout(req: Request, res: Response): Promise<void> {
-    res.clearCookie('token');
-    res.json({ message: 'Logged out successfully' });
+  async logout(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      // Effacer le cookie JWT
+      res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      });
+
+      // Journalisation de la déconnexion
+      console.info(`User ${req.user?.id} logged out successfully`);
+
+      res.json({ message: 'Logged out successfully' });
+    } catch (error) {
+      console.error('Logout error:', error);
+      res.status(500).json({ message: 'Error during logout' });
+    }
   }
 
   async getUsers(req: Request, res: Response) {
