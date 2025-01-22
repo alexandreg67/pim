@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../middlewares/auth.middleware';
 import { userService } from '../services/user.service';
 import { authService } from '../services/auth.service';
+import { User } from '../entities/User';
 
 class AuthController {
   async register(req: Request, res: Response): Promise<void> {
@@ -13,8 +14,8 @@ class AuthController {
         user: {
           id: user.id,
           email: user.email,
-          firstName: user.first_name,
-          lastName: user.last_name,
+          firstName: user.firstName,
+          lastName: user.lastName,
         },
       });
     } catch (error: unknown) {
@@ -46,8 +47,8 @@ class AuthController {
         user: {
           id: user.id,
           email: user.email,
-          firstName: user.first_name,
-          lastName: user.last_name,
+          firstName: user.firstName,
+          lastName: user.lastName,
         },
       });
     } catch (error: unknown) {
@@ -71,8 +72,8 @@ class AuthController {
         user: {
           id: user.id,
           email: user.email,
-          firstName: user.first_name,
-          lastName: user.last_name,
+          firstName: user.firstName,
+          lastName: user.lastName,
         },
       });
     } catch (error: unknown) {
@@ -125,6 +126,24 @@ class AuthController {
   async logout(req: Request, res: Response): Promise<void> {
     res.clearCookie('token');
     res.json({ message: 'Logged out successfully' });
+  }
+
+  async getUsers(req: Request, res: Response) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+
+      const users = await User.find({
+        skip: (page - 1) * limit,
+        take: limit,
+        order: { createdAt: 'DESC' },
+      });
+
+      res.json({ users });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ message: 'Error fetching users' });
+    }
   }
 }
 

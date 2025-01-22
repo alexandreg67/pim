@@ -22,22 +22,22 @@ export class AuthService {
   async validateAccess(user: User): Promise<void> {
     const now = new Date();
 
-    if (user.end_date && now > user.end_date) {
+    if (user.endDate && now > user.endDate) {
       throw new AppError('Access expired', 403);
     }
 
-    if (now < user.start_date) {
+    if (now < user.startDate) {
       throw new AppError('Access not yet started', 403);
     }
   }
 
   generateTokens(userId: string) {
-    const accessToken = jwt.sign({ userId }, jwtConfig.secret, {
-      expiresIn: jwtConfig.expiresIn,
+    const accessToken = jwt.sign({ userId }, jwtConfig.accessToken.secret, {
+      expiresIn: jwtConfig.accessToken.expiresIn,
     });
 
-    const refreshToken = jwt.sign({ userId }, jwtConfig.secret, {
-      expiresIn: jwtConfig.refreshExpiresIn,
+    const refreshToken = jwt.sign({ userId }, jwtConfig.refreshToken.secret, {
+      expiresIn: jwtConfig.refreshToken.expiresIn,
     });
 
     return { accessToken, refreshToken };

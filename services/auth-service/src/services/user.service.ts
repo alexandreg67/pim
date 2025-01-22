@@ -28,21 +28,17 @@ export class UserService {
     const temporaryPassword = generateTemporaryPassword();
     const hashedPassword = await authService.hashPassword(temporaryPassword);
 
-    // Créer l'utilisateur
-    // const user = User.create({
-    //   ...userData,
-    //   password: hashedPassword,
-    //   is_first_login: true,
-    // });
-
     const user = new User();
     user.email = userData.email;
-    user.first_name = userData.firstName;
-    user.last_name = userData.lastName;
+    user.firstName = userData.firstName;
+    user.lastName = userData.lastName;
     user.role = userData.role;
-    user.start_date = userData.startDate;
+    user.startDate = userData.startDate;
+    if (userData.endDate) {
+      user.endDate = userData.endDate;
+    }
     user.password = hashedPassword;
-    user.is_first_login = true;
+    user.isFirstLogin = true;
 
     await user.save();
 
@@ -51,8 +47,8 @@ export class UserService {
       to: user.email,
       template: 'TEMP_PASSWORD',
       data: {
-        firstName: user.first_name,
-        lastName: user.last_name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         temporaryPassword,
       },
     });
@@ -74,7 +70,7 @@ export class UserService {
     }
 
     user.password = await authService.hashPassword(newPassword);
-    user.is_first_login = false;
+    user.isFirstLogin = false;
     await user.save();
 
     // Envoyer un email de confirmation
@@ -82,8 +78,8 @@ export class UserService {
       to: user.email,
       template: 'PASSWORD_CHANGED',
       data: {
-        firstName: user.first_name,
-        lastName: user.last_name,
+        firstName: user.firstName,
+        lastName: user.lastName,
       },
     });
   }
@@ -99,15 +95,15 @@ export class UserService {
     const hashedPassword = await authService.hashPassword(temporaryPassword);
 
     user.password = hashedPassword;
-    user.is_first_login = true;
+    user.isFirstLogin = true;
     await user.save();
 
     await MailService.sendMail({
       to: email,
       template: 'TEMP_PASSWORD',
       data: {
-        firstName: user.first_name,
-        lastName: user.last_name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         temporaryPassword,
       },
     });
@@ -128,7 +124,7 @@ export class UserService {
 
     // Vérification des dates d'accès
     const now = new Date();
-    if (now < user.start_date || (user.end_date && now > user.end_date)) {
+    if (now < user.startDate || (user.endDate && now > user.endDate)) {
       throw new Error('Account access period invalid');
     }
 

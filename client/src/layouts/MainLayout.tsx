@@ -4,14 +4,10 @@ import { AppBarComponent } from './components/AppBarComponent';
 import { DrawerComponent } from './components/DrawerComponent';
 import { menuItemsAdmin, menuItemsCollaborator } from './constants/constants';
 import { useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
-const MainLayout = ({
-  children,
-  isAdmin,
-}: {
-  children: React.ReactNode;
-  isAdmin: boolean;
-}) => {
+const MainLayout = ({ isAdmin }: { isAdmin: boolean }) => {
+  // Supprimé children de props
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] =
     useState<HTMLElement | null>(null);
@@ -63,7 +59,7 @@ const MainLayout = ({
             minHeight: 'calc(100vh - 180px)',
           }}
         >
-          {children}
+          <Outlet />
         </Box>
       </Box>
     </Box>

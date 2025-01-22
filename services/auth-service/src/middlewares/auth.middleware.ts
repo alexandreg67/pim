@@ -19,7 +19,10 @@ export const authMiddleware = async (
       return;
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_ACCESS_TOKEN_SECRET as string
+    ) as {
       userId: string;
     };
 

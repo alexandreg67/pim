@@ -4,6 +4,7 @@ import {
   Inventory as InventoryIcon,
   Business as BusinessIcon,
   Person as PersonIcon,
+  AdminPanelSettings,
 } from '@mui/icons-material';
 
 export const menuItemsAdmin = [
@@ -18,6 +19,11 @@ export const menuItemsAdmin = [
     path: '/characteristics',
   },
   { text: 'Historique', icon: <CategoryIcon />, path: '/history' },
+  {
+    text: 'Administration',
+    icon: <AdminPanelSettings />,
+    path: '/admin',
+  },
 ];
 
 export const menuItemsCollaborator = [

@@ -1,7 +1,20 @@
+if (!process.env.JWT_ACCESS_TOKEN_SECRET) {
+  throw new Error('JWT_ACCESS_TOKEN_SECRET must be defined');
+}
+
+if (!process.env.JWT_REFRESH_TOKEN_SECRET) {
+  throw new Error('JWT_REFRESH_TOKEN_SECRET must be defined');
+}
+
 export const jwtConfig = {
-  secret: process.env.JWT_SECRET || 'your-secret-key',
-  expiresIn: '1h',
-  refreshExpiresIn: '7d',
+  accessToken: {
+    secret: process.env.JWT_ACCESS_TOKEN_SECRET || 'your-secret-key',
+    expiresIn: '1h',
+  },
+  refreshToken: {
+    secret: process.env.JWT_REFRESH_TOKEN_SECRET || 'your-refresh-secret-key',
+    expiresIn: '7d',
+  },
   cookieOptions: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

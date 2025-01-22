@@ -1,20 +1,22 @@
 // src/routes/auth.routes.ts
 import { Router } from 'express';
 import { authController } from '../controllers/auth.controller';
-// import { authMiddleware } from '../middlewares/auth.middleware';
+import { authMiddleware } from '../middlewares/auth.middleware';
 import { validateDto } from '../middlewares/validate.middleware';
 import { LoginDto, RegisterDto } from '../dtos/auth.dto';
+import { adminMiddleware } from '../middlewares/admin.middleware';
 
 const router = Router();
 
 // Routes publiques
 router.post('/login', validateDto(LoginDto), authController.login);
-// router.post('/reset-password', authController.resetPassword);
+router.post('/reset-password', authController.resetPassword);
 
 // Routes protégées (admin uniquement)
 router.post(
   '/register',
-  // authMiddleware,
+  authMiddleware,
+  adminMiddleware,
   validateDto(RegisterDto),
   authController.register
 );
