@@ -12,6 +12,10 @@ import {
 
 const router = Router();
 
+router.get('/', (req, res) => {
+  res.json({ message: 'Auth Service' });
+});
+
 // Routes publiques
 router.post(
   '/login',

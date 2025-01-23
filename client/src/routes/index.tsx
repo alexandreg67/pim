@@ -9,11 +9,22 @@ import CategoriesPage from '../pages/CategoriesPage';
 import TagsPage from '../pages/TagsPage';
 import EditProductPage from '../pages/EditProductPage';
 import AdminPage from '../pages/admin/AdminPage';
+import { ProtectedRoute } from '../components/auth/ProtectedRoute';
+import LoginPage from '../pages/LoginPage';
+import ProfilePage from '../pages/ProfilePage';
 
 const router = createBrowserRouter([
   {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
     path: '/',
-    element: <MainLayout isAdmin={true} />,
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -21,7 +32,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'admin',
-        element: <AdminPage />,
+        element: (
+          <ProtectedRoute requireAdmin>
+            <AdminPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'dashboard',
@@ -64,6 +79,10 @@ const router = createBrowserRouter([
       {
         path: 'tags',
         element: <TagsPage />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
       },
     ],
   },

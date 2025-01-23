@@ -75,7 +75,7 @@ services:
       - ../../services/auth-service/dist:/app/dist
     environment:
       - NODE_ENV=development
-      - AUTH_SERVICE_PORT=4001
+      - PORT=4001
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USERNAME=postgres

@@ -52,6 +52,7 @@ class AuthController {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
+          role: user.role,
         },
       });
     } catch (error: unknown) {
@@ -77,6 +78,9 @@ class AuthController {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
+          role: user.role,
+          startDate: user.startDate,
+          endDate: user.endDate,
         },
       });
     } catch (error: unknown) {

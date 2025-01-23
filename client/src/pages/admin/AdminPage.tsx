@@ -20,7 +20,11 @@ const TabPanel = (props: TabPanelProps) => {
       aria-labelledby={`admin-tab-${index}`}
       {...other}
     >
-      {value === index && children}
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
     </div>
   );
 };
@@ -33,31 +37,23 @@ const AdminPage = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
-        Administration
-      </Typography>
-
-      <Paper sx={{ mb: 3 }}>
+    <Box sx={{ width: '100%' }}>
+      <Paper sx={{ width: '100%', mb: 2 }}>
         <Tabs
           value={currentTab}
           onChange={handleTabChange}
           aria-label="admin tabs"
-          sx={{
-            borderColor: 'divider',
-          }}
         >
+          <Tab label="Liste des utilisateurs" />
           <Tab label="Créer un utilisateur" />
-          <Tab label="Gérer les utilisateurs" />
         </Tabs>
       </Paper>
 
       <TabPanel value={currentTab} index={0}>
-        <UserCreationForm />
-      </TabPanel>
-
-      <TabPanel value={currentTab} index={1}>
         <UsersList />
+      </TabPanel>
+      <TabPanel value={currentTab} index={1}>
+        <UserCreationForm />
       </TabPanel>
     </Box>
   );

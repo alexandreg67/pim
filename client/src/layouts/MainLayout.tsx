@@ -5,13 +5,16 @@ import { DrawerComponent } from './components/DrawerComponent';
 import { menuItemsAdmin, menuItemsCollaborator } from './constants/constants';
 import { useNavigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
+import { useAppSelector } from '../store/hooks';
 
-const MainLayout = ({ isAdmin }: { isAdmin: boolean }) => {
-  // Supprimé children de props
+const MainLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] =
     useState<HTMLElement | null>(null);
   const navigate = useNavigate();
+
+  const { user } = useAppSelector((state) => state.auth);
+  const isAdmin = user?.role === 'admin';
 
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const handleNotificationsOpen = (event: React.MouseEvent<HTMLElement>) =>
@@ -28,7 +31,7 @@ const MainLayout = ({ isAdmin }: { isAdmin: boolean }) => {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBarComponent
-        user={{ name: 'John Doe' }}
+        user={user}
         notificationsOpen={notificationsOpen}
         onToggleDrawer={handleDrawerToggle}
         onNotificationsOpen={handleNotificationsOpen}

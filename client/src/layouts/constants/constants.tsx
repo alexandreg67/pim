@@ -3,7 +3,6 @@ import {
   Category as CategoryIcon,
   Inventory as InventoryIcon,
   Business as BusinessIcon,
-  Person as PersonIcon,
   AdminPanelSettings,
 } from '@mui/icons-material';
 
@@ -29,5 +28,5 @@ export const menuItemsAdmin = [
 export const menuItemsCollaborator = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Produits', icon: <InventoryIcon />, path: '/products' },
-  { text: 'Profil', icon: <PersonIcon />, path: '/profile' },
+  { text: 'Marques', icon: <BusinessIcon />, path: '/brands' },
 ];
