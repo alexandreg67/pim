@@ -1,1 +1,25 @@
-node_modules
+# Dependencies
+node_modules/
+dist/
+
+# Environment
+.env
+.env.*
+!.env.sample
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# System
+.DS_Store
+EOL
