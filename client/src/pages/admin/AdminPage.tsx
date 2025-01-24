@@ -37,8 +37,11 @@ const AdminPage = () => {
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
+    <Box sx={{ padding: 3 }}>
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+        <Typography variant="h4">Administration</Typography>
+      </Box>
+      <Paper sx={{ mb: 2 }}>
         <Tabs
           value={currentTab}
           onChange={handleTabChange}

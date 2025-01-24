@@ -92,6 +92,33 @@ class AuthController {
     }
   }
 
+  async verifyToken(req: AuthRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({ message: 'Not authenticated' });
+        return;
+      }
+
+      const now = new Date();
+      const isActive =
+        (!req.user.endDate || now <= req.user.endDate) &&
+        now >= req.user.startDate;
+
+      if (!isActive) {
+        res.status(403).json({ message: 'User access period invalid' });
+        return;
+      }
+
+      res.json({
+        userId: req.user.id,
+        role: req.user.role,
+      });
+    } catch (error) {
+      console.error('Token verification error:', error);
+      res.status(500).json({ message: 'Error verifying token' });
+    }
+  }
+
   async changePassword(req: AuthRequest, res: Response): Promise<void> {
     try {
       const user = req.user;

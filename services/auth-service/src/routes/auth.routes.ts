@@ -1,4 +1,3 @@
-// src/routes/auth.routes.ts
 import { Router } from 'express';
 import { authController } from '../controllers/auth.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
@@ -11,10 +10,6 @@ import {
 } from '../middlewares/rateLimiter.middleware';
 
 const router = Router();
-
-router.get('/', (req, res) => {
-  res.json({ message: 'Auth Service' });
-});
 
 // Routes publiques
 router.post(
@@ -37,6 +32,8 @@ router.post(
   validateDto(RegisterDto),
   authController.register
 );
+
+router.get('/verify', authMiddleware, authController.verifyToken);
 
 // Routes protégées (utilisateur connecté)
 router.get('/me', authMiddleware, authController.getCurrentUser);

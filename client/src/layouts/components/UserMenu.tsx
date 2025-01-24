@@ -10,7 +10,7 @@ import {
   Divider,
   ListItemIcon,
 } from '@mui/material';
-import { Settings, Logout, Person } from '@mui/icons-material';
+import { Logout, Person } from '@mui/icons-material';
 import { logout } from '../../store/slices/authSlice';
 
 export default function UserMenu() {
@@ -39,7 +39,7 @@ export default function UserMenu() {
         open={Boolean(anchorEl)}
         onClose={handleClose}
         PaperProps={{
-          elevation: 0,
+          elevation: 2,
           sx: {
             mt: 1.5,
             minWidth: 200,
@@ -56,12 +56,12 @@ export default function UserMenu() {
           </ListItemIcon>
           Profile
         </MenuItem>
-        <MenuItem onClick={() => navigate('/settings')}>
+        {/* <MenuItem onClick={() => navigate('/settings')}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
           Settings
-        </MenuItem>
+        </MenuItem> */}
         <Divider />
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
