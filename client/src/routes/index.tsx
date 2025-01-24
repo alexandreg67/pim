@@ -8,79 +8,83 @@ import ProductDetailsPage from '../pages/ProductDetailsPage';
 import CategoriesPage from '../pages/CategoriesPage';
 import TagsPage from '../pages/TagsPage';
 import EditProductPage from '../pages/EditProductPage';
+import AdminPage from '../pages/admin/AdminPage';
+import { ProtectedRoute } from '../components/auth/ProtectedRoute';
+import LoginPage from '../pages/LoginPage';
+import ProfilePage from '../pages/ProfilePage';
 
 const router = createBrowserRouter([
   {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
     path: '/',
     element: (
-      <MainLayout isAdmin={true}>
-        <Dashboard />
-      </MainLayout>
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
     ),
-  },
-  {
-    path: '/dashboard',
-    element: (
-      <MainLayout isAdmin={true}>
-        <Dashboard />
-      </MainLayout>
-    ),
-  },
-  {
-    path: '/products',
-    element: (
-      <MainLayout isAdmin={true}>
-        <ProductsPage />
-      </MainLayout>
-    ),
-  },
-  {
-    path: '/products/:id',
-    element: (
-      <MainLayout isAdmin={true}>
-        <ProductDetailsPage />
-      </MainLayout>
-    ),
-  },
-  {
-    path: '/products/:id/edit',
-    element: (
-      <MainLayout isAdmin={true}>
-        <EditProductPage />
-      </MainLayout>
-    ),
-  },
-  {
-    path: '/brands',
-    element: (
-      <MainLayout isAdmin={true}>
-        <BrandsPage />
-      </MainLayout>
-    ),
-  },
-  {
-    path: '/brands/:id',
-    element: (
-      <MainLayout isAdmin={true}>
-        <BrandDetailsPage />
-      </MainLayout>
-    ),
-  },
-  {
-    path: '/categories',
-    element: (
-      <MainLayout isAdmin={true}>
-        <CategoriesPage />
-      </MainLayout>
-    ),
-  },
-  {
-    path: '/tags',
-    element: (
-      <MainLayout isAdmin={true}>
-        <TagsPage />
-      </MainLayout>
-    ),
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: 'admin',
+        element: (
+          <ProtectedRoute requireAdmin>
+            <AdminPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'dashboard',
+        element: <Dashboard />,
+      },
+      {
+        path: 'products',
+        children: [
+          {
+            index: true,
+            element: <ProductsPage />,
+          },
+          {
+            path: ':id',
+            element: <ProductDetailsPage />,
+          },
+          {
+            path: ':id/edit',
+            element: <EditProductPage />,
+          },
+        ],
+      },
+      {
+        path: 'brands',
+        children: [
+          {
+            index: true,
+            element: <BrandsPage />,
+          },
+          {
+            path: ':id',
+            element: <BrandDetailsPage />,
+          },
+        ],
+      },
+      {
+        path: 'categories',
+        element: <CategoriesPage />,
+      },
+      {
+        path: 'tags',
+        element: <TagsPage />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
+      },
+    ],
   },
 ]);
 

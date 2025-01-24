@@ -75,7 +75,7 @@ services:
       - ../../services/auth-service/dist:/app/dist
     environment:
       - NODE_ENV=development
-      - AUTH_SERVICE_PORT=4001
+      - PORT=4001
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USERNAME=postgres
@@ -86,6 +86,20 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - pim_network
+
+  mail:
+    build:
+      context: ../../services/mail-service
+      dockerfile: Dockerfile
+    container_name: pim_mail
+    volumes:
+      - ../../services/mail-service/src:/app/src
+      - ../../services/mail-service/dist:/app/dist
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
     networks:
       - pim_network
 

@@ -1,6 +1,5 @@
 import {
   AppBar,
-  Avatar,
   Badge,
   IconButton,
   Toolbar,
@@ -15,9 +14,11 @@ import {
 } from '@mui/icons-material';
 import React from 'react';
 import SearchBar from './SearchBar';
+import { User } from '../../types/auth.types';
+import UserMenu from './UserMenu';
 
 interface AppBarProps {
-  user: { name: string };
+  user: User | null;
   notificationsOpen: HTMLElement | null;
   onToggleDrawer: () => void;
   onNotificationsOpen: (event: React.MouseEvent<HTMLElement>) => void;
@@ -81,10 +82,10 @@ export const AppBarComponent: React.FC<AppBarProps> = ({
             <MenuItem>Marque Y a répondu à votre demande</MenuItem>
           </Menu>
           <Typography variant="body2" sx={{ mx: 2 }}>
-            Bonjour, {user.name}
+            Bonjour, {user ? `${user.firstName} ${user.lastName}` : 'Invité'}
           </Typography>
-          <Avatar alt={user.name} src="/path/to/avatar.jpg" />
         </Box>
+        <UserMenu />
       </Toolbar>
     </AppBar>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from '@mui/material';
 import { RouterProvider } from 'react-router-dom';
@@ -11,22 +11,42 @@ import '@fontsource/roboto/700.css';
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import { DialogProvider } from './components/providers/DialogProvider';
 import { NotificationProvider } from './components/providers/NotificationProvider';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import { checkAuth } from './store/slices/authSlice';
+import { useAppDispatch } from './store/hooks';
 
 const client = new ApolloClient({
   uri: 'http://localhost:8000/api',
   cache: new InMemoryCache(),
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
+
+function App() {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
+  return <RouterProvider router={router} />;
+}
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={theme}>
-        <DialogProvider>
-          <NotificationProvider>
-            <RouterProvider router={router} />
-          </NotificationProvider>
-        </DialogProvider>
-      </ThemeProvider>
-    </ApolloProvider>
+    <Provider store={store}>
+      <ApolloProvider client={client}>
+        <ThemeProvider theme={theme}>
+          <DialogProvider>
+            <NotificationProvider>
+              <App />
+            </NotificationProvider>
+          </DialogProvider>
+        </ThemeProvider>
+      </ApolloProvider>
+    </Provider>
   </React.StrictMode>
 );

@@ -1,24 +1,32 @@
 import express from 'express';
-import 'reflect-metadata';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import { AppDataSource } from './config/database';
+import { authRoutes } from './routes/auth.routes';
 
 dotenv.config();
 
-const app = express();
-const port = process.env.AUTH_SERVICE_PORT || 4001;
+async function startServer() {
+  const app = express();
 
-// Middleware de base
-app.use(express.json());
+  // Middlewares
+  app.use(cookieParser());
+  app.use(express.json());
 
-// Route de test
-app.get('/auth', (req, res) => {
-  res.json({ message: 'Auth service is running' });
-});
+  app.use('/auth', authRoutes);
 
-app.get('/auth/health', (req, res) => {
-  res.json({ status: 'OK' });
-});
+  try {
+    await AppDataSource.initialize();
+    console.info('📦 Database connection successful');
 
-app.listen(port, () => {
-  console.info(`Auth service running on port ${port}`);
-});
+    const PORT = process.env.PORT || 4001;
+    app.listen(PORT, () => {
+      console.info(`🚀 Auth service running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Error starting server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
