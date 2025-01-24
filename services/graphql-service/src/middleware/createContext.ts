@@ -15,16 +15,6 @@ export async function createContext({ req }: RequestContext): Promise<Context> {
   const userService = new UserService();
   const token = req.headers.cookie?.match(/token=([^;]+)/)?.[1];
 
-  if (process.env.NODE_ENV === 'development' && !token) {
-    // Fallback pour le dev
-    const mockUserId = '3a73bafd-7913-488e-8b6c-bb91f844b93d';
-    const user = await userService.getCurrentUser(mockUserId);
-    return {
-      user,
-      historyService: new HistoryService(),
-    };
-  }
-
   try {
     const response = await axios.get('http://auth:4001/auth/verify', {
       headers: { Cookie: `token=${token}` },
