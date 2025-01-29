@@ -6,7 +6,6 @@ import { authService } from '../services/auth.service';
 import { User } from '../entities/User';
 import { MailService } from '../services/mail.service';
 import { AppError } from '../utils/error.util';
-import { generateTemporaryPassword } from '../utils/password.util';
 
 class AuthController {
   async register(req: Request, res: Response): Promise<void> {
@@ -158,38 +157,19 @@ class AuthController {
   async resetPassword(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
-      const tempPassword = generateTemporaryPassword();
 
-      const user = await User.findOne({ where: { email } });
-      if (!user) {
-        // Pour des raisons de sécurité, on renvoie le même message
-        res.json({
-          message: 'If the email exists, a reset link has been sent',
-        });
-        return;
-      }
+      // On délègue tout le travail au service
+      await userService.resetPassword(email);
 
-      // Mise à jour du mot de passe temporaire
-      const hashedPassword = await authService.hashPassword(tempPassword);
-      user.password = hashedPassword;
-      user.isFirstLogin = true;
-      await user.save();
-
-      // Envoi de l'email avec le mot de passe temporaire
-      await MailService.sendMail({
-        to: email,
-        template: 'TEMP_PASSWORD',
-        data: {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          temporaryPassword: tempPassword,
-        },
+      // On renvoie toujours le même message pour la sécurité
+      res.json({
+        message: "Si l'adresse email existe, les instructions ont été envoyées",
       });
-
-      res.json({ message: 'If the email exists, a reset link has been sent' });
     } catch (error) {
       console.error('Reset password error:', error);
-      res.status(500).json({ message: 'Error processing reset request' });
+      res.status(500).json({
+        message: 'Une erreur est survenue lors de la réinitialisation',
+      });
     }
   }
 

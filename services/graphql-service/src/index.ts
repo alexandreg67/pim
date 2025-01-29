@@ -13,6 +13,7 @@ import { createContext } from './middleware/createContext';
 import Container from 'typedi';
 import { ProductCharacteristicsResolver } from './resolvers/ProductCharacteristicsResolver';
 import { CharacteristicDefinitionResolver } from './resolvers/CharacteristicDefinitionResolver';
+import { authChecker } from './middleware/authMiddleware';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -32,6 +33,7 @@ async function bootstrap() {
       ProductCharacteristicsResolver,
       CharacteristicDefinitionResolver,
     ],
+    authChecker,
     container: Container,
     validate: false,
   });

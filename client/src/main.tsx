@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from '@mui/material';
 import { RouterProvider } from 'react-router-dom';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { fr } from 'date-fns/locale';
 import { theme } from './theme';
 import router from './routes';
 import '@fontsource/roboto/300.css';
@@ -40,11 +43,13 @@ createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <ApolloProvider client={client}>
         <ThemeProvider theme={theme}>
-          <DialogProvider>
-            <NotificationProvider>
-              <App />
-            </NotificationProvider>
-          </DialogProvider>
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
+            <DialogProvider>
+              <NotificationProvider>
+                <App />
+              </NotificationProvider>
+            </DialogProvider>
+          </LocalizationProvider>
         </ThemeProvider>
       </ApolloProvider>
     </Provider>

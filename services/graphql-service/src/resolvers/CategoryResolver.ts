@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Arg, InputType, Field } from 'type-graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Arg,
+  InputType,
+  Field,
+  Authorized,
+} from 'type-graphql';
 import { Categories } from '../entities/Categories';
 import { IsNotEmpty, Length } from 'class-validator';
 import { Service } from 'typedi';
@@ -35,11 +43,13 @@ export class UpdateCategoryInput {
 @Resolver(Categories)
 export class CategoryResolver {
   @Query(() => [Categories])
+  @Authorized(['admin', 'collaborator'])
   async categories(): Promise<Categories[]> {
     return await Categories.find();
   }
 
   @Mutation(() => Categories)
+  @Authorized(['admin', 'collaborator'])
   async createCategory(
     @Arg('input') newCategory: CreateCategoryInput
   ): Promise<Categories> {
@@ -65,6 +75,7 @@ export class CategoryResolver {
   }
 
   @Mutation(() => Boolean)
+  @Authorized(['admin', 'collaborator'])
   async deleteCategory(@Arg('id', () => String) id: string): Promise<boolean> {
     try {
       const category = await Categories.findOne({
@@ -82,6 +93,7 @@ export class CategoryResolver {
   }
 
   @Mutation(() => Categories)
+  @Authorized(['admin', 'collaborator'])
   async updateCategory(
     @Arg('id', () => String) id: string,
     @Arg('input') input: UpdateCategoryInput

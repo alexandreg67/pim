@@ -45,7 +45,6 @@ export class Users extends BaseEntity {
   @Column('character varying', { name: 'email', unique: true, length: 100 })
   email: string;
 
-  @Field(() => String)
   @Column('character varying', { name: 'password', length: 100 })
   password: string;
 
@@ -65,21 +64,21 @@ export class Users extends BaseEntity {
   @Column('boolean', { name: 'is_first_login', default: true })
   isFirstLogin: boolean;
 
-  @Field(() => String, { nullable: true })
-  @Column('character varying', {
-    name: 'temporary_password',
-    nullable: true,
-    length: 100,
-    select: false,
-  })
-  temporaryPassword?: string;
+  // @Field(() => String, { nullable: true })
+  // @Column('character varying', {
+  //   name: 'temporary_password',
+  //   nullable: true,
+  //   length: 100,
+  //   select: false,
+  // })
+  // temporaryPassword?: string;
 
-  @Field(() => GraphQLISODateTime, { nullable: true })
-  @Column('timestamp with time zone', {
-    name: 'temporary_password_expires',
-    nullable: true,
-  })
-  temporaryPasswordExpires?: Date;
+  // @Field(() => GraphQLISODateTime, { nullable: true })
+  // @Column('timestamp with time zone', {
+  //   name: 'temporary_password_expires',
+  //   nullable: true,
+  // })
+  // temporaryPasswordExpires?: Date;
 
   @Field(() => GraphQLISODateTime)
   @Column('timestamp with time zone', { name: 'start_date' })

@@ -35,10 +35,14 @@ export const login = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-  await fetch('http://localhost:8000/auth/logout', {
+  const response = await fetch('http://localhost:8000/auth/logout', {
     method: 'POST',
     credentials: 'include',
   });
+
+  if (!response.ok) {
+    throw new Error(`Erreur lors de la déconnexion : ${response.statusText}`);
+  }
 });
 
 export const checkAuth = createAsyncThunk('auth/check', async () => {
@@ -77,6 +81,8 @@ const authSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
+        state.isLoading = false;
+        state.error = null;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
         state.isLoading = false;

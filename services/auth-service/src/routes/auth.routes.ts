@@ -18,11 +18,6 @@ router.post(
   validateDto(LoginDto),
   authController.login
 );
-router.post(
-  '/reset-password',
-  resetPasswordLimiter,
-  authController.resetPassword
-);
 
 // Routes protégées (admin uniquement)
 router.post(
@@ -32,10 +27,16 @@ router.post(
   validateDto(RegisterDto),
   authController.register
 );
-
-router.get('/verify', authMiddleware, authController.verifyToken);
+router.post(
+  '/reset-password',
+  resetPasswordLimiter,
+  authMiddleware,
+  adminMiddleware,
+  authController.resetPassword
+);
 
 // Routes protégées (utilisateur connecté)
+router.get('/verify', authMiddleware, authController.verifyToken);
 router.get('/me', authMiddleware, authController.getCurrentUser);
 router.post('/logout', authMiddleware, authController.logout);
 router.put('/change-password', authMiddleware, authController.changePassword);

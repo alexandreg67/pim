@@ -1,4 +1,4 @@
-import { Resolver, Query } from 'type-graphql';
+import { Resolver, Query, Authorized } from 'type-graphql';
 import { DashboardStats } from '../types/DashboardStats';
 import { Products } from '../entities/Products';
 import { History } from '../entities/History';
@@ -9,6 +9,7 @@ import { Service } from 'typedi';
 @Resolver()
 export class DashboardResolver {
   @Query(() => DashboardStats)
+  @Authorized(['admin', 'collaborator'])
   async dashboardStats() {
     const totalProducts = await Products.count();
     const productsByBrand = await Products.createQueryBuilder('product')

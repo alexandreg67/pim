@@ -183,10 +183,12 @@ export type Mutation = {
   deleteCategory: Scalars['Boolean']['output'];
   deleteTag: Scalars['Boolean']['output'];
   removeProductCharacteristic: Products;
+  resetUserPassword: Scalars['Boolean']['output'];
   updateCategory: Categories;
   updateProduct: Products;
   updateProductCharacteristicValue: Products;
   updateTag: Tags;
+  updateUser: Users;
 };
 
 export type MutationAddProductCharacteristicArgs = {
@@ -216,6 +218,10 @@ export type MutationRemoveProductCharacteristicArgs = {
   productId: Scalars['String']['input'];
 };
 
+export type MutationResetUserPasswordArgs = {
+  userId: Scalars['String']['input'];
+};
+
 export type MutationUpdateCategoryArgs = {
   id: Scalars['String']['input'];
   input: UpdateCategoryInput;
@@ -235,6 +241,11 @@ export type MutationUpdateProductCharacteristicValueArgs = {
 export type MutationUpdateTagArgs = {
   id: Scalars['String']['input'];
   input: UpdateTagInput;
+};
+
+export type MutationUpdateUserArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateUserInput;
 };
 
 export type PaginatedProductsResponse = {
@@ -293,7 +304,6 @@ export type Query = {
   characteristicDefinition?: Maybe<CharacteristicDefinitions>;
   characteristicDefinitions: Array<CharacteristicDefinitions>;
   dashboardStats: DashboardStats;
-  me?: Maybe<Users>;
   product?: Maybe<Products>;
   productTags: Array<Tags>;
   products: PaginatedProductsResponse;
@@ -301,6 +311,9 @@ export type Query = {
   tag?: Maybe<Tags>;
   tags: Array<Tags>;
   totalBrands: Scalars['Int']['output'];
+  totalUsers: Scalars['Int']['output'];
+  user?: Maybe<Users>;
+  users: Array<Users>;
 };
 
 export type QueryBrandArgs = {
@@ -349,6 +362,15 @@ export type QueryTotalBrandsArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type QueryUserArgs = {
+  id: Scalars['String']['input'];
+};
+
+export type QueryUsersArgs = {
+  limit: Scalars['Int']['input'];
+  page: Scalars['Int']['input'];
+};
+
 export type Tags = {
   __typename?: 'Tags';
   description?: Maybe<Scalars['String']['output']>;
@@ -378,6 +400,21 @@ export type UpdateTagInput = {
   name: Scalars['String']['input'];
 };
 
+export type UpdateUserInput = {
+  endDate?: InputMaybe<Scalars['DateTimeISO']['input']>;
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
+  startDate: Scalars['DateTimeISO']['input'];
+};
+
+/** Les différents rôles utilisateur */
+export enum UserRole {
+  Admin = 'ADMIN',
+  Collaborator = 'COLLABORATOR',
+  SuperAdmin = 'SUPER_ADMIN',
+}
+
 export type Users = {
   __typename?: 'Users';
   createdAt?: Maybe<Scalars['DateTimeISO']['output']>;
@@ -388,10 +425,11 @@ export type Users = {
   firstName: Scalars['String']['output'];
   histories: History;
   id: Scalars['String']['output'];
-  isAdmin: Scalars['Boolean']['output'];
+  isActive: Scalars['Boolean']['output'];
+  isFirstLogin: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
-  password: Scalars['String']['output'];
   phone?: Maybe<Scalars['String']['output']>;
+  role: UserRole;
   startDate: Scalars['DateTimeISO']['output'];
   updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
 };
@@ -801,6 +839,52 @@ export type DeleteTagMutationVariables = Exact<{
 }>;
 
 export type DeleteTagMutation = { __typename?: 'Mutation'; deleteTag: boolean };
+
+export type GetUsersQueryVariables = Exact<{
+  page: Scalars['Int']['input'];
+  limit: Scalars['Int']['input'];
+}>;
+
+export type GetUsersQuery = {
+  __typename?: 'Query';
+  totalUsers: number;
+  users: Array<{
+    __typename?: 'Users';
+    id: string;
+    lastName: string;
+    firstName: string;
+    email: string;
+    phone?: string | null;
+    role: UserRole;
+    isFirstLogin: boolean;
+    startDate: Date;
+    endDate?: Date | null;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
+    deletedAt?: Date | null;
+    isActive: boolean;
+  }>;
+};
+
+export type UpdateUserMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+  input: UpdateUserInput;
+}>;
+
+export type UpdateUserMutation = {
+  __typename?: 'Mutation';
+  updateUser: {
+    __typename?: 'Users';
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone?: string | null;
+    startDate: Date;
+    endDate?: Date | null;
+    updatedAt?: Date | null;
+    createdAt?: Date | null;
+  };
+};
 
 export const GetBrandsDocument = gql`
   query getBrands($limit: Int!, $page: Int!, $search: String) {
@@ -2344,4 +2428,147 @@ export type DeleteTagMutationResult = Apollo.MutationResult<DeleteTagMutation>;
 export type DeleteTagMutationOptions = Apollo.BaseMutationOptions<
   DeleteTagMutation,
   DeleteTagMutationVariables
+>;
+export const GetUsersDocument = gql`
+  query GetUsers($page: Int!, $limit: Int!) {
+    users(page: $page, limit: $limit) {
+      id
+      lastName
+      firstName
+      email
+      phone
+      role
+      isFirstLogin
+      startDate
+      endDate
+      createdAt
+      updatedAt
+      deletedAt
+      isActive
+    }
+    totalUsers
+  }
+`;
+
+/**
+ * __useGetUsersQuery__
+ *
+ * To run a query within a React component, call `useGetUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useGetUsersQuery(
+  baseOptions: Apollo.QueryHookOptions<GetUsersQuery, GetUsersQueryVariables> &
+    ({ variables: GetUsersQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetUsersQuery, GetUsersQueryVariables>(
+    GetUsersDocument,
+    options
+  );
+}
+export function useGetUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetUsersQuery,
+    GetUsersQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetUsersQuery, GetUsersQueryVariables>(
+    GetUsersDocument,
+    options
+  );
+}
+export function useGetUsersSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetUsersQuery, GetUsersQueryVariables>
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetUsersQuery, GetUsersQueryVariables>(
+    GetUsersDocument,
+    options
+  );
+}
+export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
+export type GetUsersLazyQueryHookResult = ReturnType<
+  typeof useGetUsersLazyQuery
+>;
+export type GetUsersSuspenseQueryHookResult = ReturnType<
+  typeof useGetUsersSuspenseQuery
+>;
+export type GetUsersQueryResult = Apollo.QueryResult<
+  GetUsersQuery,
+  GetUsersQueryVariables
+>;
+export const UpdateUserDocument = gql`
+  mutation UpdateUser($id: String!, $input: UpdateUserInput!) {
+    updateUser(id: $id, input: $input) {
+      id
+      firstName
+      lastName
+      phone
+      startDate
+      endDate
+      updatedAt
+      createdAt
+    }
+  }
+`;
+export type UpdateUserMutationFn = Apollo.MutationFunction<
+  UpdateUserMutation,
+  UpdateUserMutationVariables
+>;
+
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateUserMutation,
+    UpdateUserMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(
+    UpdateUserDocument,
+    options
+  );
+}
+export type UpdateUserMutationHookResult = ReturnType<
+  typeof useUpdateUserMutation
+>;
+export type UpdateUserMutationResult =
+  Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<
+  UpdateUserMutation,
+  UpdateUserMutationVariables
 >;

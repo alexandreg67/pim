@@ -8,6 +8,7 @@ import {
   Mutation,
   InputType,
   Ctx,
+  Authorized,
 } from 'type-graphql';
 import { Products } from '../entities/Products';
 import { FindOptionsWhere, ILike, In } from 'typeorm';
@@ -63,6 +64,7 @@ class UpdateProductInput {
 export default class ProductsResolver {
   constructor(private historyService: HistoryService) {}
   @Query(() => PaginatedProductsResponse)
+  @Authorized(['admin', 'collaborator'])
   async products(
     @Arg('page', () => Int, { defaultValue: 1 }) page: number,
     @Arg('limit', () => Int, { defaultValue: 10 }) limit: number,
@@ -107,6 +109,7 @@ export default class ProductsResolver {
 
   // Query pour les suggestions de recherche (autocomplétion)
   @Query(() => [Products])
+  @Authorized(['admin', 'collaborator'])
   async searchProductsSuggestions(
     @Arg('query') query: string,
     @Arg('limit', () => Int, { defaultValue: 5 }) limit: number
@@ -130,6 +133,7 @@ export default class ProductsResolver {
   }
 
   @Query(() => Products, { nullable: true })
+  @Authorized(['admin', 'collaborator'])
   async product(@Arg('id', () => String) id: string): Promise<Products | null> {
     try {
       const product = await Products.findOne({
@@ -157,6 +161,7 @@ export default class ProductsResolver {
   }
 
   @Mutation(() => Products)
+  @Authorized(['admin', 'collaborator'])
   async updateProduct(
     @Arg('id') id: string,
     @Arg('input') input: UpdateProductInput,
