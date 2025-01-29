@@ -13,19 +13,15 @@ const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
 
   return (
-    <div
+    <Box
       role="tabpanel"
       hidden={value !== index}
       id={`admin-tabpanel-${index}`}
       aria-labelledby={`admin-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </Box>
   );
 };
 
@@ -37,19 +33,39 @@ const AdminPage = () => {
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
-        <Typography variant="h4">Administration</Typography>
+    <Box sx={{ height: '100%' }}>
+      <Box
+        sx={{
+          mb: 3,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Typography variant="h4" sx={{ fontWeight: 500 }}>
+          Administration
+        </Typography>
       </Box>
-      <Paper sx={{ mb: 2 }}>
-        <Tabs
-          value={currentTab}
-          onChange={handleTabChange}
-          aria-label="admin tabs"
-        >
-          <Tab label="Liste des utilisateurs" />
-          <Tab label="Créer un utilisateur" />
-        </Tabs>
+
+      <Paper sx={{ mb: 3 }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={currentTab}
+            onChange={handleTabChange}
+            aria-label="admin tabs"
+          >
+            <Tab
+              label="Liste des utilisateurs"
+              id="admin-tab-0"
+              aria-controls="admin-tabpanel-0"
+            />
+            <Tab
+              label="Créer un utilisateur"
+              id="admin-tab-1"
+              aria-controls="admin-tabpanel-1"
+            />
+          </Tabs>
+        </Box>
       </Paper>
 
       <TabPanel value={currentTab} index={0}>

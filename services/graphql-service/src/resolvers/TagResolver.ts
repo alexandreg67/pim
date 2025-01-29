@@ -6,6 +6,7 @@ import {
   InputType,
   Field,
   Mutation,
+  Authorized,
 } from 'type-graphql';
 import { Tags } from '../entities/Tags';
 import { Service } from 'typedi';
@@ -32,6 +33,7 @@ class UpdateTagInput {
 @Resolver(Tags)
 export class TagResolver {
   @Query(() => [Tags])
+  @Authorized(['admin', 'collaborator'])
   async tags(): Promise<Tags[]> {
     return await Tags.find({
       relations: ['products'],
@@ -39,6 +41,7 @@ export class TagResolver {
   }
 
   @Query(() => Tags, { nullable: true })
+  @Authorized(['admin', 'collaborator'])
   async tag(@Arg('id', () => ID) id: string): Promise<Tags | null> {
     return await Tags.findOne({
       where: { id },
@@ -47,6 +50,7 @@ export class TagResolver {
   }
 
   @Query(() => [Tags])
+  @Authorized(['admin', 'collaborator'])
   async productTags(
     @Arg('productId', () => ID) productId: string
   ): Promise<Tags[]> {
@@ -59,6 +63,7 @@ export class TagResolver {
   }
 
   @Mutation(() => Tags)
+  @Authorized(['admin', 'collaborator'])
   async createTag(@Arg('input') newTag: CreateTagInput): Promise<Tags> {
     try {
       // Vérifier si un tag avec ce nom existe déjà
@@ -80,6 +85,7 @@ export class TagResolver {
   }
 
   @Mutation(() => Tags)
+  @Authorized(['admin', 'collaborator'])
   async updateTag(
     @Arg('id', () => String) id: string,
     @Arg('input') input: UpdateTagInput
@@ -101,6 +107,7 @@ export class TagResolver {
   }
 
   @Mutation(() => Boolean)
+  @Authorized(['admin', 'collaborator'])
   async deleteTag(@Arg('id', () => String) id: string): Promise<boolean> {
     try {
       const tag = await Tags.findOne({

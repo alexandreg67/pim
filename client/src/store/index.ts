@@ -10,6 +10,9 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: false, // Pour gérer les dates et autres objets non-sérialisables
     }),
+  devTools: {
+    shouldHotReload: false,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

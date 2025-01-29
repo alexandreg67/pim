@@ -24,6 +24,7 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
       - DB_DATABASE=pim_db
+      - AUTH_SERVICE_URL=http://auth:4001/auth
     depends_on:
       postgres:
         condition: service_healthy
@@ -86,6 +87,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      mail:
+        condition: service_started
     networks:
       - pim_network
 

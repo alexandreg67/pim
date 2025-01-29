@@ -5,6 +5,7 @@ import { MailService } from './mail.service';
 import { generateTemporaryPassword } from '../utils/password.util';
 import { AppError } from '../utils/error.util';
 import { authService } from './auth.service';
+import { AppDataSource } from '../config/database';
 
 export class UserService {
   async createUser(userData: {
@@ -85,28 +86,49 @@ export class UserService {
   }
 
   async resetPassword(email: string): Promise<void> {
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      // Pour des raisons de sécurité, on ne révèle pas si l'utilisateur existe
-      return;
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const user = await queryRunner.manager.findOne(User, {
+        where: { email },
+      });
+
+      if (!user) {
+        await queryRunner.rollbackTransaction();
+        return; // Silencieux pour la sécurité
+      }
+
+      const temporaryPassword = generateTemporaryPassword();
+      const hashedPassword = await authService.hashPassword(temporaryPassword);
+
+      user.password = hashedPassword;
+      user.isFirstLogin = true;
+      await queryRunner.manager.save(user);
+
+      try {
+        await MailService.sendMail({
+          to: email,
+          template: 'TEMP_PASSWORD',
+          data: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            temporaryPassword,
+          },
+        });
+
+        await queryRunner.commitTransaction();
+      } catch {
+        await queryRunner.rollbackTransaction();
+        throw new AppError('Failed to send reset password email', 500);
+      }
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    const temporaryPassword = generateTemporaryPassword();
-    const hashedPassword = await authService.hashPassword(temporaryPassword);
-
-    user.password = hashedPassword;
-    user.isFirstLogin = true;
-    await user.save();
-
-    await MailService.sendMail({
-      to: email,
-      template: 'TEMP_PASSWORD',
-      data: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        temporaryPassword,
-      },
-    });
   }
 
   async login(

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Card,
   CardContent,
-  CardHeader,
   TextField,
   Button,
   FormControl,
@@ -10,19 +9,12 @@ import {
   Select,
   MenuItem,
   Box,
+  Typography,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { fr } from 'date-fns/locale';
 import { useNotification } from '../../hooks/useNotification';
-
-const translations = {
-  messages: {
-    success:
-      "L'utilisateur {name} a été créé avec succès. Un email avec le mot de passe temporaire a été envoyé à {email}",
-    error: "Erreur lors de la création de l'utilisateur",
-  },
-};
 
 const UserCreationForm = () => {
   const { success, error } = useNotification();
@@ -58,12 +50,9 @@ const UserCreationForm = () => {
       }
 
       success(
-        translations.messages.success
-          .replace('{name}', `${data.user.firstName} ${data.user.lastName}`)
-          .replace('{email}', data.user.email)
+        `L'utilisateur ${data.user.firstName} ${data.user.lastName} a été créé avec succès. Un email avec le mot de passe temporaire a été envoyé à ${data.user.email}`
       );
 
-      // Réinitialiser le formulaire
       setFormData({
         email: '',
         firstName: '',
@@ -73,35 +62,37 @@ const UserCreationForm = () => {
         role: 'collaborator',
       });
     } catch (err) {
-      error(err instanceof Error ? err.message : translations.messages.error);
+      error(
+        err instanceof Error
+          ? err.message
+          : "Erreur lors de la création de l'utilisateur"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const isDateValid = (
-    startDate: Date | null,
-    endDate: Date | null
-  ): boolean => {
-    if (!startDate || !endDate) return true;
-    return startDate < endDate;
-  };
-
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={fr}>
       <Card>
-        <CardHeader
-          title="Créer un nouvel utilisateur"
-          subheader="Remplissez les informations pour créer un nouveau compte utilisateur"
-        />
         <CardContent>
-          <form onSubmit={handleSubmit}>
+          <Box component="form" onSubmit={handleSubmit} noValidate>
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" color="primary" gutterBottom>
+                Informations de l&apos;utilisateur
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Remplissez les informations pour créer un nouveau compte
+                utilisateur
+              </Typography>
+            </Box>
+
             <Box
               sx={{
                 display: 'grid',
                 gap: 3,
                 gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                mb: 3,
+                mb: 4,
               }}
             >
               <TextField
@@ -180,13 +171,6 @@ const UserCreationForm = () => {
                 slotProps={{
                   textField: {
                     fullWidth: true,
-                    error: !isDateValid(formData.startDate, formData.endDate),
-                    helperText: !isDateValid(
-                      formData.startDate,
-                      formData.endDate
-                    )
-                      ? 'La date de fin doit être après la date de début'
-                      : '',
                   },
                 }}
               />
@@ -202,7 +186,7 @@ const UserCreationForm = () => {
                 {loading ? 'Création en cours...' : "Créer l'utilisateur"}
               </Button>
             </Box>
-          </form>
+          </Box>
         </CardContent>
       </Card>
     </LocalizationProvider>

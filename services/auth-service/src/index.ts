@@ -9,6 +9,9 @@ dotenv.config();
 async function startServer() {
   const app = express();
 
+  // Faire confiance au proxy Nginx
+  app.set('trust proxy', 1);
+
   // Middlewares
   app.use(cookieParser());
   app.use(express.json());

@@ -1,4 +1,12 @@
-import { Resolver, Query, Arg, Int, FieldResolver, Root } from 'type-graphql';
+import {
+  Resolver,
+  Query,
+  Arg,
+  Int,
+  FieldResolver,
+  Root,
+  Authorized,
+} from 'type-graphql';
 import { Brands } from '../entities/Brands';
 import { Contacts } from '../entities/Contacts';
 import { Products } from '../entities/Products';
@@ -8,6 +16,7 @@ import { Service } from 'typedi';
 @Resolver(Brands)
 export class BrandResolver {
   @Query(() => [Brands])
+  @Authorized(['admin', 'collaborator'])
   async brands(
     @Arg('page', () => Int) page: number,
     @Arg('limit', () => Int) limit: number,
@@ -34,6 +43,7 @@ export class BrandResolver {
   }
 
   @Query(() => Brands, { nullable: true })
+  @Authorized(['admin', 'collaborator'])
   async brand(@Arg('id', () => String) id: string): Promise<Brands | null> {
     return await Brands.findOne({ where: { id } });
   }
@@ -86,6 +96,7 @@ export class BrandResolver {
   }
 
   @Query(() => [String])
+  @Authorized(['admin', 'collaborator'])
   async brandCountries(
     @Arg('brandId', () => String) brandId: string
   ): Promise<string[]> {
@@ -105,6 +116,7 @@ export class BrandResolver {
   }
 
   @Query(() => Int)
+  @Authorized(['admin', 'collaborator'])
   async totalBrands(
     @Arg('search', () => String, { nullable: true }) search?: string
   ): Promise<number> {
@@ -123,6 +135,7 @@ export class BrandResolver {
   }
 
   @Query(() => [Brands])
+  @Authorized(['admin', 'collaborator'])
   async brandsForFilter(): Promise<Brands[]> {
     return await Brands.createQueryBuilder('brand')
       .select(['brand.id', 'brand.name'])

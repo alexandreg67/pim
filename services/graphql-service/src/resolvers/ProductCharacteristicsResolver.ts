@@ -1,4 +1,4 @@
-import { Arg, Ctx, Mutation, Resolver } from 'type-graphql';
+import { Arg, Authorized, Ctx, Mutation, Resolver } from 'type-graphql';
 import { ProductCharacteristics } from '../entities/ProductCharacteristics';
 import { Products } from '../entities/Products';
 import { Context } from '../types/Context';
@@ -8,6 +8,7 @@ import { Service } from 'typedi';
 @Resolver(ProductCharacteristics)
 export class ProductCharacteristicsResolver {
   @Mutation(() => Products)
+  @Authorized(['admin', 'collaborator'])
   async addProductCharacteristic(
     @Arg('productId') productId: string,
     @Arg('characteristicId') characteristicId: string,
@@ -62,6 +63,7 @@ export class ProductCharacteristicsResolver {
   }
 
   @Mutation(() => Products)
+  @Authorized(['admin', 'collaborator'])
   async updateProductCharacteristicValue(
     @Arg('productId') productId: string,
     @Arg('characteristicId') characteristicId: string,
@@ -102,6 +104,7 @@ export class ProductCharacteristicsResolver {
   }
 
   @Mutation(() => Products)
+  @Authorized(['admin', 'collaborator'])
   async removeProductCharacteristic(
     @Arg('productId') productId: string,
     @Arg('characteristicId') characteristicId: string,
