@@ -181,6 +181,7 @@ export type Mutation = {
   createCategory: Categories;
   createTag: Tags;
   deleteCategory: Scalars['Boolean']['output'];
+  deleteProduct: Scalars['Boolean']['output'];
   deleteTag: Scalars['Boolean']['output'];
   removeProductCharacteristic: Products;
   resetUserPassword: Scalars['Boolean']['output'];
@@ -206,6 +207,10 @@ export type MutationCreateTagArgs = {
 };
 
 export type MutationDeleteCategoryArgs = {
+  id: Scalars['String']['input'];
+};
+
+export type MutationDeleteProductArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -304,6 +309,7 @@ export type Query = {
   characteristicDefinition?: Maybe<CharacteristicDefinitions>;
   characteristicDefinitions: Array<CharacteristicDefinitions>;
   dashboardStats: DashboardStats;
+  getHistory: Array<History>;
   product?: Maybe<Products>;
   productTags: Array<Tags>;
   products: PaginatedProductsResponse;
@@ -707,6 +713,25 @@ export type DashboardStatsQuery = {
   };
 };
 
+export type GetHistoryQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetHistoryQuery = {
+  __typename?: 'Query';
+  getHistory: Array<{
+    __typename?: 'History';
+    id: string;
+    createdAt?: Date | null;
+    action: {
+      __typename?: 'Actions';
+      name: string;
+      description?: string | null;
+      type: ActionType;
+    };
+    user: { __typename?: 'Users'; firstName: string; lastName: string };
+    product: { __typename?: 'Products'; name: string; reference: string };
+  }>;
+};
+
 export type GetProductsQueryVariables = Exact<{
   status?: InputMaybe<Scalars['String']['input']>;
   query?: InputMaybe<Scalars['String']['input']>;
@@ -801,6 +826,15 @@ export type UpdateProductMutation = {
     categories: Array<{ __typename?: 'Categories'; id: string; name: string }>;
     tags: Array<{ __typename?: 'Tags'; id: string; name: string }>;
   };
+};
+
+export type DeleteProductMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+export type DeleteProductMutation = {
+  __typename?: 'Mutation';
+  deleteProduct: boolean;
 };
 
 export type TagsQueryVariables = Exact<{ [key: string]: never }>;
@@ -1933,6 +1967,92 @@ export type DashboardStatsQueryResult = Apollo.QueryResult<
   DashboardStatsQuery,
   DashboardStatsQueryVariables
 >;
+export const GetHistoryDocument = gql`
+  query GetHistory {
+    getHistory {
+      id
+      createdAt
+      action {
+        name
+        description
+        type
+      }
+      user {
+        firstName
+        lastName
+      }
+      product {
+        name
+        reference
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetHistoryQuery__
+ *
+ * To run a query within a React component, call `useGetHistoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetHistoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetHistoryQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetHistoryQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetHistoryQuery,
+    GetHistoryQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetHistoryQuery, GetHistoryQueryVariables>(
+    GetHistoryDocument,
+    options
+  );
+}
+export function useGetHistoryLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetHistoryQuery,
+    GetHistoryQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetHistoryQuery, GetHistoryQueryVariables>(
+    GetHistoryDocument,
+    options
+  );
+}
+export function useGetHistorySuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<GetHistoryQuery, GetHistoryQueryVariables>
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<GetHistoryQuery, GetHistoryQueryVariables>(
+    GetHistoryDocument,
+    options
+  );
+}
+export type GetHistoryQueryHookResult = ReturnType<typeof useGetHistoryQuery>;
+export type GetHistoryLazyQueryHookResult = ReturnType<
+  typeof useGetHistoryLazyQuery
+>;
+export type GetHistorySuspenseQueryHookResult = ReturnType<
+  typeof useGetHistorySuspenseQuery
+>;
+export type GetHistoryQueryResult = Apollo.QueryResult<
+  GetHistoryQuery,
+  GetHistoryQueryVariables
+>;
 export const GetProductsDocument = gql`
   query GetProducts(
     $status: String
@@ -2220,6 +2340,54 @@ export type UpdateProductMutationResult =
 export type UpdateProductMutationOptions = Apollo.BaseMutationOptions<
   UpdateProductMutation,
   UpdateProductMutationVariables
+>;
+export const DeleteProductDocument = gql`
+  mutation DeleteProduct($id: String!) {
+    deleteProduct(id: $id)
+  }
+`;
+export type DeleteProductMutationFn = Apollo.MutationFunction<
+  DeleteProductMutation,
+  DeleteProductMutationVariables
+>;
+
+/**
+ * __useDeleteProductMutation__
+ *
+ * To run a mutation, you first call `useDeleteProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteProductMutation, { data, loading, error }] = useDeleteProductMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteProductMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteProductMutation,
+    DeleteProductMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DeleteProductMutation,
+    DeleteProductMutationVariables
+  >(DeleteProductDocument, options);
+}
+export type DeleteProductMutationHookResult = ReturnType<
+  typeof useDeleteProductMutation
+>;
+export type DeleteProductMutationResult =
+  Apollo.MutationResult<DeleteProductMutation>;
+export type DeleteProductMutationOptions = Apollo.BaseMutationOptions<
+  DeleteProductMutation,
+  DeleteProductMutationVariables
 >;
 export const TagsDocument = gql`
   query Tags {
