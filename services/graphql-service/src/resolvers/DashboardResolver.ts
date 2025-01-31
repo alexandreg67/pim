@@ -28,6 +28,7 @@ export class DashboardResolver {
 
     const recentHistory = await History.find({
       relations: ['action', 'user', 'product'],
+      withDeleted: true,
       order: { createdAt: 'DESC' },
       take: 5,
     });

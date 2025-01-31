@@ -14,6 +14,7 @@ import Container from 'typedi';
 import { ProductCharacteristicsResolver } from './resolvers/ProductCharacteristicsResolver';
 import { CharacteristicDefinitionResolver } from './resolvers/CharacteristicDefinitionResolver';
 import { authChecker } from './middleware/authMiddleware';
+import { HistoryResolver } from './resolvers/HistoryResolver';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -32,6 +33,7 @@ async function bootstrap() {
       UserResolver,
       ProductCharacteristicsResolver,
       CharacteristicDefinitionResolver,
+      HistoryResolver,
     ],
     authChecker,
     container: Container,

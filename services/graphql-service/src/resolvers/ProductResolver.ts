@@ -222,4 +222,54 @@ export default class ProductsResolver {
       throw new Error(`Failed to update product: ${error}`);
     }
   }
+
+  @Mutation(() => Boolean)
+  @Authorized(['admin', 'collaborator'])
+  async deleteProduct(
+    @Arg('id') id: string,
+    @Ctx() { user }: Context
+  ): Promise<boolean> {
+    if (!user) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const product = await Products.findOne({
+        where: { id },
+        relations: ['brand'],
+      });
+
+      if (!product) {
+        throw new Error(`Product with ID ${id} not found`);
+      }
+
+      const deleteAction = await Actions.findOne({
+        where: { name: 'DELETE_PRODUCT' },
+      });
+
+      if (!deleteAction) {
+        throw new Error('Delete action not found');
+      }
+
+      // Stocker les infos avant suppression
+      const productMetadata = {
+        name: product.name,
+        reference: product.reference,
+      };
+
+      await this.historyService.createHistory({
+        user,
+        action: deleteAction,
+        productId: product.id,
+        metadata: productMetadata,
+      });
+
+      await product.softRemove();
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      throw new Error(`Failed to delete product: ${error}`);
+    }
+  }
 }

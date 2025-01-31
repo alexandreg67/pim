@@ -1,6 +1,7 @@
 import {
   BaseEntity,
   Column,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinColumn,
@@ -91,7 +92,10 @@ export class Products extends BaseEntity {
   updatedAt: Date | null;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  @Column('timestamp with time zone', { name: 'deleted_at', nullable: true })
+  @DeleteDateColumn({
+    name: 'deleted_at',
+    nullable: true,
+  })
   deletedAt: Date | null;
 
   @Field(() => [History])

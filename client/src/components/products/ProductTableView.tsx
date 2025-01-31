@@ -1,21 +1,16 @@
 import React, { useState, useCallback } from 'react';
-import {
-  Box,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  DialogContentText,
-} from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { useGetProductsQuery } from '../../generated/graphql-types';
+import {
+  useGetProductsQuery,
+  useDeleteProductMutation,
+} from '../../generated/graphql-types';
 import { ProductStatus } from '../../types/enum/product';
 import { getStatusLabel } from '../../utils/product.utils';
 import { useNavigate } from 'react-router-dom';
+import { useDialog } from '../../hooks/useDialog';
+import { useNotification } from '../../hooks/useNotification';
 
 interface ProductTableViewProps {
   searchQuery?: string;
@@ -27,15 +22,13 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
   status,
 }) => {
   const navigate = useNavigate();
+  const { confirmDelete } = useDialog();
+  const { success, error: showError } = useNotification();
   const [currentPage, setCurrentPage] = useState(1);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [productToDelete, setProductToDelete] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
   const itemsPerPage = 12;
 
-  const { data, loading, error, fetchMore } = useGetProductsQuery({
+  // Queries et Mutations
+  const { data, loading, error, refetch } = useGetProductsQuery({
     variables: {
       page: 1,
       limit: itemsPerPage,
@@ -45,51 +38,52 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
     notifyOnNetworkStatusChange: true,
   });
 
+  const [deleteProduct, { loading: deleteLoading }] = useDeleteProductMutation({
+    onCompleted: () => {
+      success('Produit supprimé avec succès');
+      refetch();
+    },
+    onError: (error) => {
+      showError(`Erreur lors de la suppression : ${error.message}`);
+    },
+  });
+
+  // Gestion de la pagination
   const handlePaginationModelChange = useCallback(
     async (newModel: GridPaginationModel) => {
       const newPage = newModel.page + 1;
       setCurrentPage(newPage);
 
       try {
-        await fetchMore({
-          variables: {
-            page: newPage,
-            limit: itemsPerPage,
-            query: searchQuery,
-            status: status,
-          },
-          updateQuery: (prev, { fetchMoreResult }) => {
-            if (!fetchMoreResult) return prev;
-            return fetchMoreResult;
-          },
+        await refetch({
+          page: newPage,
+          limit: itemsPerPage,
+          query: searchQuery,
+          status: status,
         });
       } catch (error) {
         console.error('Error fetching more products:', error);
       }
     },
-    [fetchMore, searchQuery, status, itemsPerPage]
+    [refetch, searchQuery, status, itemsPerPage]
   );
 
+  // Actions
   const handleEditClick = (id: string) => () => {
     navigate(`/products/${id}/edit`);
   };
 
-  const handleDeleteClick = (id: string, name: string) => () => {
-    setProductToDelete({ id, name });
-    setDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (productToDelete) {
-      try {
-        // TODO: Implémenter la mutation de suppression
-        console.info('Suppression du produit:', productToDelete.id);
-      } catch (error) {
-        console.error('Erreur lors de la suppression:', error);
+  const handleDeleteClick = async (id: string, name: string) => {
+    try {
+      const confirmed = await confirmDelete(`le produit "${name}"`);
+      if (confirmed) {
+        await deleteProduct({
+          variables: { id },
+        });
       }
+    } catch (error) {
+      console.error('Error during deletion:', error);
     }
-    setDeleteDialogOpen(false);
-    setProductToDelete(null);
   };
 
   const columns: GridColDef[] = [
@@ -162,8 +156,9 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
           <Tooltip title="Supprimer">
             <IconButton
               size="small"
-              onClick={handleDeleteClick(params.row.id, params.row.name)}
+              onClick={() => handleDeleteClick(params.row.id, params.row.name)}
               color="error"
+              disabled={deleteLoading}
             >
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -195,7 +190,7 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
         pageSizeOptions={[12]}
         paginationMode="server"
         rowCount={data?.products?.total || 0}
-        loading={loading}
+        loading={loading || deleteLoading}
         checkboxSelection
         disableRowSelectionOnClick
         density="compact"
@@ -214,32 +209,6 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
           pagination: { paginationModel: { pageSize: itemsPerPage, page: 0 } },
         }}
       />
-
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        aria-labelledby="delete-dialog-title"
-      >
-        <DialogTitle id="delete-dialog-title">
-          Confirmer la suppression
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Êtes-vous sûr de vouloir supprimer le produit &quot;
-            {productToDelete?.name}&quot; ? Cette action est irréversible.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Annuler</Button>
-          <Button
-            onClick={handleConfirmDelete}
-            color="error"
-            variant="contained"
-          >
-            Supprimer
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };
