@@ -1,16 +1,29 @@
-import React, { useState, useCallback } from 'react';
-import { Box, IconButton, Tooltip } from '@mui/material';
-import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
+import React, { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+  IconButton,
+  Tooltip,
+  Pagination,
+  CircularProgress,
+  Typography,
+} from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import {
   useGetProductsQuery,
   useDeleteProductMutation,
 } from '../../generated/graphql-types';
-import { ProductStatus } from '../../types/enum/product';
-import { getStatusLabel } from '../../utils/product.utils';
 import { useNavigate } from 'react-router-dom';
 import { useDialog } from '../../hooks/useDialog';
 import { useNotification } from '../../hooks/useNotification';
+import { ProductStatus } from '../../types/enum/product';
+import { getStatusLabel } from '../../utils/product.utils';
 
 interface ProductTableViewProps {
   searchQuery?: string;
@@ -27,14 +40,15 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  // Queries et Mutations
+  // Fetch des produits avec pagination
   const { data, loading, error, refetch } = useGetProductsQuery({
     variables: {
-      page: 1,
+      page: currentPage,
       limit: itemsPerPage,
       query: searchQuery,
       status: status,
     },
+    fetchPolicy: 'network-only', // Toujours récupérer les nouvelles données
     notifyOnNetworkStatusChange: true,
   });
 
@@ -48,167 +62,111 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
     },
   });
 
-  // Gestion de la pagination
-  const handlePaginationModelChange = useCallback(
-    async (newModel: GridPaginationModel) => {
-      const newPage = newModel.page + 1;
-      setCurrentPage(newPage);
-
-      try {
-        await refetch({
-          page: newPage,
-          limit: itemsPerPage,
-          query: searchQuery,
-          status: status,
-        });
-      } catch (error) {
-        console.error('Error fetching more products:', error);
-      }
-    },
-    [refetch, searchQuery, status, itemsPerPage]
-  );
-
-  // Actions
-  const handleEditClick = (id: string) => () => {
-    navigate(`/products/${id}/edit`);
+  // Changement de page
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    page: number
+  ) => {
+    setCurrentPage(page);
   };
 
+  // Suppression d'un produit
   const handleDeleteClick = async (id: string, name: string) => {
-    try {
-      const confirmed = await confirmDelete(`le produit "${name}"`);
-      if (confirmed) {
-        await deleteProduct({
-          variables: { id },
-        });
-      }
-    } catch (error) {
-      console.error('Error during deletion:', error);
+    const confirmed = await confirmDelete(`le produit "${name}"`);
+    if (confirmed) {
+      await deleteProduct({ variables: { id } });
     }
   };
 
-  const columns: GridColDef[] = [
-    {
-      field: 'reference',
-      headerName: 'Référence',
-      flex: 0.7,
-    },
-    {
-      field: 'name',
-      headerName: 'Nom',
-      flex: 1,
-    },
-    {
-      field: 'brand',
-      headerName: 'Marque',
-      flex: 0.8,
-      valueGetter: (params) => params.row.brand?.name || 'Aucune marque',
-    },
-    {
-      field: 'price',
-      headerName: 'Prix',
-      flex: 0.5,
-      type: 'number',
-      valueFormatter: (params) =>
-        new Intl.NumberFormat('fr-FR', {
-          style: 'currency',
-          currency: 'EUR',
-        }).format(parseFloat(params.value)),
-    },
-    {
-      field: 'status',
-      headerName: 'Statut',
-      flex: 0.6,
-      valueFormatter: (params) => getStatusLabel(params.value as ProductStatus),
-    },
-    {
-      field: 'categories',
-      headerName: 'Catégories',
-      flex: 1,
-      valueGetter: (params) =>
-        params.row.categories
-          ?.map((cat: { name: string }) => cat.name)
-          .join(', ') || '',
-    },
-    {
-      field: 'tags',
-      headerName: 'Tags',
-      flex: 1,
-      valueGetter: (params) =>
-        params.row.tags?.map((tag: { name: string }) => tag.name).join(', ') ||
-        '',
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      flex: 0.3,
-      sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Tooltip title="Éditer">
-            <IconButton
-              size="small"
-              onClick={handleEditClick(params.row.id)}
-              color="primary"
-            >
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Supprimer">
-            <IconButton
-              size="small"
-              onClick={() => handleDeleteClick(params.row.id, params.row.name)}
-              color="error"
-              disabled={deleteLoading}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      ),
-    },
-  ];
+  if (loading)
+    return (
+      <Box textAlign="center">
+        <CircularProgress />
+      </Box>
+    );
+  if (error)
+    return <Typography color="error">Erreur : {error.message}</Typography>;
 
-  if (error) return null;
+  const products = data?.products?.items || [];
+  const totalProducts = data?.products?.total || 0;
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        '& .MuiDataGrid-root': {
-          border: 'none',
-        },
-      }}
-    >
-      <DataGrid
-        rows={data?.products?.items || []}
-        columns={columns}
-        paginationModel={{
-          page: currentPage - 1,
-          pageSize: itemsPerPage,
-        }}
-        onPaginationModelChange={handlePaginationModelChange}
-        pageSizeOptions={[12]}
-        paginationMode="server"
-        rowCount={data?.products?.total || 0}
-        loading={loading || deleteLoading}
-        checkboxSelection
-        disableRowSelectionOnClick
-        density="compact"
-        getRowId={(row) => row.id}
-        keepNonExistentRowsSelected
-        autoHeight
-        sx={{
-          '& .MuiDataGrid-cell': {
-            borderColor: 'divider',
-          },
-          '& .MuiDataGrid-row:last-child td': {
-            borderBottom: 'none',
-          },
-        }}
-        initialState={{
-          pagination: { paginationModel: { pageSize: itemsPerPage, page: 0 } },
-        }}
-      />
+    <Box>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Référence</TableCell>
+              <TableCell>Nom</TableCell>
+              <TableCell>Marque</TableCell>
+              <TableCell>Prix</TableCell>
+              <TableCell>Statut</TableCell>
+              <TableCell>Catégories</TableCell>
+              <TableCell>Tags</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {products.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>{product.reference}</TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.brand?.name || 'Aucune marque'}</TableCell>
+                <TableCell>
+                  {new Intl.NumberFormat('fr-FR', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  }).format(parseFloat(product.price))}
+                </TableCell>
+                <TableCell>
+                  {getStatusLabel(product.status as ProductStatus)}
+                </TableCell>
+                <TableCell>
+                  {product.categories
+                    .map((category) => category.name)
+                    .join(', ')}
+                </TableCell>
+                <TableCell>
+                  {product.tags.map((tag) => tag.name).join(', ')}
+                </TableCell>
+                <TableCell>
+                  <Tooltip title="Éditer">
+                    <IconButton
+                      size="small"
+                      onClick={() => navigate(`/products/${product.id}/edit`)}
+                      color="primary"
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Supprimer">
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        handleDeleteClick(product.id, product.name)
+                      }
+                      color="error"
+                      disabled={deleteLoading}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Pagination */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 3 }}>
+        <Pagination
+          count={Math.ceil(totalProducts / itemsPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+        />
+      </Box>
     </Box>
   );
 };
