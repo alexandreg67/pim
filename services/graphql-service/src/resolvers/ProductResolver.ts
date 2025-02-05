@@ -18,6 +18,8 @@ import { Context } from '../types/Context';
 import { HistoryService } from '../services/HistoryService';
 import { Service } from 'typedi';
 import { Actions } from '../entities/Actions';
+import { Brands } from '../entities/Brands';
+import { Contacts } from '../entities/Contacts';
 
 @ObjectType()
 class PaginatedProductsResponse {
@@ -52,6 +54,42 @@ class UpdateProductInput {
   label?: string;
 
   // Relations
+  @Field(() => [String], { nullable: true })
+  categoryIds?: string[];
+
+  @Field(() => [String], { nullable: true })
+  tagIds?: string[];
+}
+
+@InputType()
+class CreateProductInput {
+  @Field()
+  name: string;
+
+  @Field()
+  reference: string;
+
+  @Field()
+  price: string;
+
+  @Field()
+  brandId: string;
+
+  @Field()
+  contactId: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field({ nullable: true })
+  shortDescription?: string;
+
+  @Field(() => String, { defaultValue: 'draft' })
+  status: string;
+
+  @Field({ nullable: true })
+  label?: string;
+
   @Field(() => [String], { nullable: true })
   categoryIds?: string[];
 
@@ -270,6 +308,64 @@ export default class ProductsResolver {
     } catch (error) {
       console.error('Error deleting product:', error);
       throw new Error(`Failed to delete product: ${error}`);
+    }
+  }
+
+  @Mutation(() => Products)
+  @Authorized(['admin', 'collaborator'])
+  async createProduct(
+    @Arg('input') input: CreateProductInput,
+    @Ctx() { user }: Context
+  ): Promise<Products> {
+    if (!user) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      const product = new Products();
+
+      // Assign simple fields
+      Object.assign(product, {
+        ...input,
+        status: input.status || 'draft',
+      });
+
+      // Set relations
+      if (input.brandId) {
+        product.brand = await Brands.findOneByOrFail({ id: input.brandId });
+      }
+
+      if (input.contactId) {
+        product.contact = await Contacts.findOneByOrFail({
+          id: input.contactId,
+        });
+      }
+
+      if (input.categoryIds?.length) {
+        product.categories = await Categories.findBy({
+          id: In(input.categoryIds),
+        });
+      }
+
+      if (input.tagIds?.length) {
+        product.tags = await Tags.findBy({ id: In(input.tagIds) });
+      }
+
+      const savedProduct = await product.save();
+
+      // Create history entry
+      const createAction = await Actions.findOneByOrFail({
+        name: 'CREATE_PRODUCT',
+      });
+      await this.historyService.createHistory({
+        user,
+        action: createAction,
+        productId: savedProduct.id,
+      });
+
+      return savedProduct;
+    } catch (error) {
+      throw new Error(`Failed to create product: ${error}`);
     }
   }
 }
