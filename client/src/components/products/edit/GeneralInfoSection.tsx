@@ -7,11 +7,18 @@ import {
   InputLabel,
   Typography,
   Chip,
+  Autocomplete,
 } from '@mui/material';
 import { ProductStatus } from '../../../types/enum/product';
 import { getStatusLabel } from '../../../utils/product.utils';
 import { statusConfig } from '../../../config/status.config';
 import { useNotification } from '../../../hooks/useNotification';
+import { useGetBrandsForFilterQuery } from '../../../generated/graphql-types';
+
+type Brand = {
+  id: string;
+  name: string;
+};
 
 type GeneralInfo = {
   name: string;
@@ -21,21 +28,22 @@ type GeneralInfo = {
   price: string;
   status: ProductStatus;
   label?: string;
-  brand: {
-    name: string;
-  };
+  brand: Brand;
 };
 
 type GeneralInfoSectionProps = {
   productInfo: GeneralInfo;
   onChange: (infos: Partial<GeneralInfo>) => void;
+  mode?: 'create' | 'edit';
 };
 
 const GeneralInfoSection = ({
   productInfo,
   onChange,
+  mode,
 }: GeneralInfoSectionProps) => {
   const { success, error: showError } = useNotification();
+  const { data: brandsData } = useGetBrandsForFilterQuery();
 
   const ALLOWED_STATUS_TRANSITIONS: Record<ProductStatus, ProductStatus[]> = {
     [ProductStatus.DRAFT]: [
@@ -113,8 +121,10 @@ const GeneralInfoSection = ({
         <TextField
           fullWidth
           value={productInfo.reference}
-          disabled
+          onChange={(e) => handleChange('reference', e.target.value)}
+          disabled={mode === 'edit'}
           size="small"
+          required
         />
       </Grid>
 
@@ -122,11 +132,22 @@ const GeneralInfoSection = ({
         <Typography variant="subtitle1" sx={{ mb: 1 }}>
           Marque
         </Typography>
-        <TextField
+        <Autocomplete
           fullWidth
-          value={productInfo.brand.name}
-          disabled
-          size="small"
+          disabled={mode === 'edit'}
+          options={[
+            { id: '', name: '' },
+            ...(brandsData?.brandsForFilter || []),
+          ]}
+          getOptionLabel={(option) => option.name}
+          value={productInfo.brand}
+          onChange={(_, newValue) =>
+            onChange({ brand: newValue || { id: '', name: '' } })
+          }
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          renderInput={(params) => (
+            <TextField {...params} size="small" required />
+          )}
         />
       </Grid>
 

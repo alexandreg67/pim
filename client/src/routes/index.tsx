@@ -12,6 +12,7 @@ import AdminPage from '../pages/admin/AdminPage';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import LoginPage from '../pages/LoginPage';
 import ProfilePage from '../pages/ProfilePage';
+import CreateProductPage from '../pages/CreateProductPage';
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <ProductsPage />,
+          },
+          {
+            path: 'create',
+            element: <CreateProductPage />,
           },
           {
             path: ':id',
