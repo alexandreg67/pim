@@ -27,6 +27,11 @@ import { ProductStatus } from '../types/enum/product';
 import { CharacteristicType } from '../types/Characteristic';
 import CharacteristicsSection from '../components/products/edit/CharacteristicsSection';
 
+type Brand = {
+  id: string;
+  name: string;
+};
+
 type GeneralInfo = {
   reference: string;
   name: string;
@@ -35,9 +40,7 @@ type GeneralInfo = {
   price: string;
   status: ProductStatus;
   label?: string;
-  brand: {
-    name: string;
-  };
+  brand: Brand;
 };
 
 type TabPanelProps = {
@@ -82,9 +85,7 @@ const EditProductPage = () => {
     description: '',
     price: '',
     status: ProductStatus.DRAFT,
-    brand: {
-      name: '',
-    },
+    brand: { id: '', name: '' },
   });
 
   const {
@@ -116,6 +117,7 @@ const EditProductPage = () => {
         (productData?.product?.status as ProductStatus) || ProductStatus.DRAFT,
       brand: {
         name: productData?.product?.brand?.name || '',
+        id: '',
       },
     });
   }, [productData]);
@@ -212,6 +214,7 @@ const EditProductPage = () => {
               onChange={(infos: Partial<GeneralInfo>) =>
                 setProductInfo((prevInfo) => ({ ...prevInfo, ...infos }))
               }
+              mode="edit"
             />
           </Grid>
         </TabPanel>

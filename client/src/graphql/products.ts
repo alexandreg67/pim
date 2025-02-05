@@ -107,3 +107,36 @@ export const DELETE_PRODUCT = gql`
     deleteProduct(id: $id)
   }
 `;
+
+export const CREATE_PRODUCT = gql`
+  mutation CreateProduct($input: CreateProductInput!) {
+    createProduct(input: $input) {
+      id
+      name
+      reference
+      shortDescription
+      description
+      price
+      status
+      label
+      brand {
+        id
+        name
+      }
+      contact {
+        id
+        email
+        phone
+        country
+      }
+      categories {
+        id
+        name
+      }
+      tags {
+        id
+        name
+      }
+    }
+  }
+`;

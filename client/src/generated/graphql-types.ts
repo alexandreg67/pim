@@ -116,6 +116,20 @@ export type CreateCategoryInput = {
   name: Scalars['String']['input'];
 };
 
+export type CreateProductInput = {
+  brandId: Scalars['String']['input'];
+  categoryIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  contactId: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  label?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  price: Scalars['String']['input'];
+  reference: Scalars['String']['input'];
+  shortDescription?: InputMaybe<Scalars['String']['input']>;
+  status?: Scalars['String']['input'];
+  tagIds?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 export type CreateTagInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
@@ -179,6 +193,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addProductCharacteristic: Products;
   createCategory: Categories;
+  createProduct: Products;
   createTag: Tags;
   deleteCategory: Scalars['Boolean']['output'];
   deleteProduct: Scalars['Boolean']['output'];
@@ -200,6 +215,10 @@ export type MutationAddProductCharacteristicArgs = {
 
 export type MutationCreateCategoryArgs = {
   input: CreateCategoryInput;
+};
+
+export type MutationCreateProductArgs = {
+  input: CreateProductInput;
 };
 
 export type MutationCreateTagArgs = {
@@ -835,6 +854,35 @@ export type DeleteProductMutationVariables = Exact<{
 export type DeleteProductMutation = {
   __typename?: 'Mutation';
   deleteProduct: boolean;
+};
+
+export type CreateProductMutationVariables = Exact<{
+  input: CreateProductInput;
+}>;
+
+export type CreateProductMutation = {
+  __typename?: 'Mutation';
+  createProduct: {
+    __typename?: 'Products';
+    id: string;
+    name: string;
+    reference: string;
+    shortDescription?: string | null;
+    description?: string | null;
+    price: string;
+    status: string;
+    label?: string | null;
+    brand: { __typename?: 'Brands'; id: string; name: string };
+    contact: {
+      __typename?: 'Contacts';
+      id: string;
+      email?: string | null;
+      phone?: string | null;
+      country?: string | null;
+    };
+    categories: Array<{ __typename?: 'Categories'; id: string; name: string }>;
+    tags: Array<{ __typename?: 'Tags'; id: string; name: string }>;
+  };
 };
 
 export type TagsQueryVariables = Exact<{ [key: string]: never }>;
@@ -2388,6 +2436,81 @@ export type DeleteProductMutationResult =
 export type DeleteProductMutationOptions = Apollo.BaseMutationOptions<
   DeleteProductMutation,
   DeleteProductMutationVariables
+>;
+export const CreateProductDocument = gql`
+  mutation CreateProduct($input: CreateProductInput!) {
+    createProduct(input: $input) {
+      id
+      name
+      reference
+      shortDescription
+      description
+      price
+      status
+      label
+      brand {
+        id
+        name
+      }
+      contact {
+        id
+        email
+        phone
+        country
+      }
+      categories {
+        id
+        name
+      }
+      tags {
+        id
+        name
+      }
+    }
+  }
+`;
+export type CreateProductMutationFn = Apollo.MutationFunction<
+  CreateProductMutation,
+  CreateProductMutationVariables
+>;
+
+/**
+ * __useCreateProductMutation__
+ *
+ * To run a mutation, you first call `useCreateProductMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateProductMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createProductMutation, { data, loading, error }] = useCreateProductMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateProductMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateProductMutation,
+    CreateProductMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateProductMutation,
+    CreateProductMutationVariables
+  >(CreateProductDocument, options);
+}
+export type CreateProductMutationHookResult = ReturnType<
+  typeof useCreateProductMutation
+>;
+export type CreateProductMutationResult =
+  Apollo.MutationResult<CreateProductMutation>;
+export type CreateProductMutationOptions = Apollo.BaseMutationOptions<
+  CreateProductMutation,
+  CreateProductMutationVariables
 >;
 export const TagsDocument = gql`
   query Tags {

@@ -7,9 +7,10 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Tooltip,
+  Fab,
 } from '@mui/material';
-import { ViewList, GridView } from '@mui/icons-material';
-import { useLocation } from 'react-router-dom';
+import { ViewList, GridView, Add } from '@mui/icons-material';
+import { Link, useLocation } from 'react-router-dom';
 import { FilterContainer } from '../components/products/filters/FilterContainer';
 import { FilterState } from '../components/products/filters/types';
 
@@ -28,6 +29,14 @@ const ProductsPage: React.FC = () => {
 
   return (
     <Box sx={{ padding: 3 }}>
+      <Fab
+        color="primary"
+        sx={{ position: 'fixed', bottom: 32, right: 32 }}
+        component={Link}
+        to="/products/create"
+      >
+        <Add />
+      </Fab>
       <Box
         sx={{
           display: 'flex',
