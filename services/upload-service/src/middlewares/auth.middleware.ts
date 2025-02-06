@@ -26,11 +26,12 @@ export const authMiddleware = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
+    res.status(401).json({ message: 'No token provided' });
+    return;
   }
 
   try {
@@ -49,6 +50,7 @@ export const authMiddleware = async (
       'Auth verification failed:',
       axiosError.response?.data || axiosError.message
     );
-    return res.status(401).json({ message: 'Invalid token' });
+    res.status(401).json({ message: 'Invalid token' });
+    return;
   }
 };
