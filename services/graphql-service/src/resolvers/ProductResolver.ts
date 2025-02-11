@@ -20,6 +20,7 @@ import { Service } from 'typedi';
 import { Actions } from '../entities/Actions';
 import { Brands } from '../entities/Brands';
 import { Contacts } from '../entities/Contacts';
+import { Images } from '../entities/Images';
 
 @ObjectType()
 class PaginatedProductsResponse {
@@ -95,6 +96,21 @@ class CreateProductInput {
 
   @Field(() => [String], { nullable: true })
   tagIds?: string[];
+}
+
+@InputType()
+class AddProductImageInput {
+  @Field()
+  productId: string;
+
+  @Field()
+  url: string;
+
+  @Field({ nullable: true })
+  altText?: string;
+
+  @Field({ defaultValue: false })
+  isPrimary: boolean;
 }
 
 @Service()
@@ -366,6 +382,62 @@ export default class ProductsResolver {
       return savedProduct;
     } catch (error) {
       throw new Error(`Failed to create product: ${error}`);
+    }
+  }
+
+  @Mutation(() => Products)
+  @Authorized(['admin', 'collaborator'])
+  async addProductImage(
+    @Arg('input') input: AddProductImageInput,
+    @Ctx() { user }: Context
+  ): Promise<Products> {
+    if (!user) {
+      throw new Error('Authentication required');
+    }
+
+    try {
+      // Vérifier si le produit existe
+      const product = await Products.findOne({
+        where: { id: input.productId },
+        relations: ['images'],
+      });
+
+      if (!product) {
+        throw new Error('Product not found');
+      }
+
+      // Si c'est une image principale, mettre à jour les autres images
+      if (input.isPrimary) {
+        await Images.createQueryBuilder()
+          .update()
+          .set({ isPrimary: false })
+          .where(
+            'id IN (SELECT image_id FROM product_images WHERE product_id = :productId)',
+            { productId: product.id }
+          )
+          .execute();
+      }
+
+      // Créer une nouvelle image
+      const image = new Images();
+      image.url = input.url;
+      image.altText = input.altText || '';
+      image.isPrimary = input.isPrimary;
+
+      // Sauvegarder l'image
+      await image.save();
+
+      // Associer l'image au produit
+      if (!product.images) {
+        product.images = [];
+      }
+      product.images.push(image);
+      await product.save();
+
+      return product;
+    } catch (error) {
+      console.error('Error adding image:', error);
+      throw new Error(`Failed to add image to product: ${error}`);
     }
   }
 }
