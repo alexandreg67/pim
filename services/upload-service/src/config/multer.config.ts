@@ -1,5 +1,4 @@
 import multer from 'multer';
-import path from 'path';
 import { Request } from 'express';
 
 const imageStorage = multer.diskStorage({
@@ -8,8 +7,9 @@ const imageStorage = multer.diskStorage({
     cb(null, `/storage/assets/${uploadType}`);
   },
   filename: (req: Request, file: Express.Multer.File, cb) => {
+    const originalName = file.originalname.replace(/\s+/g, '-').toLowerCase();
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${uniqueSuffix}${path.extname(file.originalname)}`);
+    cb(null, `${uniqueSuffix}-${originalName}`);
   },
 });
 

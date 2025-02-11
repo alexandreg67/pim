@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 import { uploadController } from '../controllers/upload.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { upload } from '../config/multer.config';
@@ -9,7 +9,7 @@ router.post(
   '/:type?',
   authMiddleware,
   upload.single('file'),
-  uploadController.uploadImage
+  uploadController.uploadImage as RequestHandler
 );
 
 router.delete('/:type/:filename', authMiddleware, uploadController.deleteImage);

@@ -4,11 +4,6 @@ import path from 'path';
 import fs from 'fs/promises';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
-interface UploadResponse {
-  url: string;
-  filename: string;
-}
-
 class UploadController {
   async uploadImage(req: AuthRequest, res: Response) {
     try {
@@ -18,29 +13,37 @@ class UploadController {
 
       const file = req.file;
       const uploadType = req.params.type || 'images';
-      const outputPath = `/storage/assets/${uploadType}`;
 
-      // Redimensionner et optimiser l'image
-      await sharp(file.path)
+      // Utiliser le même chemin que multer
+      const inputPath = file.path; // Déjà dans /storage/assets/images
+      const outputPath = inputPath.replace(path.extname(inputPath), '.jpg');
+
+      // Traitement de l'image
+      await sharp(inputPath)
         .resize(800, 800, {
           fit: 'inside',
           withoutEnlargement: true,
         })
         .jpeg({ quality: 80 })
-        .toFile(path.join(outputPath, `optimized-${file.filename}`));
+        .toFile(outputPath + '.tmp');
 
-      // Supprimer le fichier original
-      await fs.unlink(file.path);
+      // Remplacer le fichier original par la version optimisée
+      await fs.unlink(inputPath);
+      await fs.rename(outputPath + '.tmp', outputPath);
 
-      const response: UploadResponse = {
-        url: `/${uploadType}/optimized-${file.filename}`,
-        filename: `optimized-${file.filename}`,
+      const filename = path.basename(outputPath);
+      const response = {
+        url: `/assets/${uploadType}/${filename}`,
+        filename: filename,
       };
 
       res.status(201).json(response);
     } catch (error) {
       console.error('Upload error:', error);
-      res.status(500).json({ message: 'Error processing upload' });
+      res.status(500).json({
+        message: 'Error processing upload',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
   }
 

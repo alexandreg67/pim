@@ -126,6 +126,28 @@ const EditProductPage = () => {
     setCurrentTab(newValue);
   };
 
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!event.target.files?.length) return;
+
+    const formData = new FormData();
+    formData.append('file', event.target.files[0]);
+
+    try {
+      const response = await fetch('http://localhost:8000/upload/images', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+      success('Image uploadée avec succès');
+    } catch {
+      showError("Erreur lors de l'upload");
+    }
+  };
+
   const handleSave = async () => {
     if (!productInfo.name) {
       return showError('Le nom du produit est requis');
@@ -251,7 +273,12 @@ const EditProductPage = () => {
                 color="primary"
               >
                 Ajouter des images
-                <input type="file" multiple hidden accept="image/*" />
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                />
               </Button>
             </Box>
 
