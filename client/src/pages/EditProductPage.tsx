@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { Save, ArrowBack, Delete, CloudUpload } from '@mui/icons-material';
 import {
+  useAddProductImageMutation,
   useGetProductQuery,
   useUpdateProductMutation,
 } from '../generated/graphql-types';
@@ -97,6 +98,8 @@ const EditProductPage = () => {
   });
   const [updateProduct] = useUpdateProductMutation();
 
+  const [addProductImage] = useAddProductImageMutation();
+
   useEffect(() => {
     if (productData?.product?.categories) {
       setProductCategories(productData.product.categories);
@@ -131,10 +134,11 @@ const EditProductPage = () => {
   ) => {
     if (!event.target.files?.length) return;
 
-    const formData = new FormData();
-    formData.append('file', event.target.files[0]);
-
     try {
+      // 1. Upload de l'image
+      const formData = new FormData();
+      formData.append('file', event.target.files[0]);
+
       const response = await fetch('http://localhost:8000/upload/images', {
         method: 'POST',
         credentials: 'include',
@@ -142,9 +146,27 @@ const EditProductPage = () => {
       });
 
       if (!response.ok) throw new Error('Upload failed');
-      success('Image uploadée avec succès');
-    } catch {
-      showError("Erreur lors de l'upload");
+
+      // Destructurer uniquement ce dont on a besoin
+      const { url } = await response.json();
+
+      // 2. Association de l'image au produit via GraphQL
+      await addProductImage({
+        variables: {
+          input: {
+            productId: id as string,
+            url: url,
+            altText: event.target.files[0].name,
+            isPrimary: !productData?.product?.images?.length,
+          },
+        },
+      });
+
+      success('Image ajoutée avec succès');
+      refetch();
+    } catch (error) {
+      showError("Erreur lors de l'ajout de l'image");
+      console.error(error);
     }
   };
 
@@ -282,33 +304,44 @@ const EditProductPage = () => {
               </Button>
             </Box>
 
+            {/* Grille des images */}
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={4}>
-                <Card>
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image="/api/placeholder/400/200"
-                    alt="Image preview"
-                    sx={{ height: 200, objectFit: 'cover' }}
-                  />
-                  <Box
-                    sx={{
-                      p: 2,
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Typography variant="caption" color="text.secondary">
-                      Image principale
-                    </Typography>
-                    <IconButton size="small" color="error">
-                      <Delete />
-                    </IconButton>
-                  </Box>
-                </Card>
-              </Grid>
+              {productData?.product?.images.map((image) => {
+                const imageUrl = image.url.startsWith('/assets')
+                  ? `http://localhost:8000${image.url}`
+                  : `http://localhost:8000/images/${image.url}`;
+
+                return (
+                  <Grid item xs={12} sm={6} md={4} key={image.id}>
+                    <Card>
+                      <CardMedia
+                        component="img"
+                        height="200"
+                        image={imageUrl}
+                        alt={image.altText || 'Product image'}
+                        sx={{ height: 200, objectFit: 'cover' }}
+                      />
+                      <Box
+                        sx={{
+                          p: 2,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          {image.isPrimary
+                            ? 'Image principale'
+                            : 'Image secondaire'}
+                        </Typography>
+                        <IconButton size="small" color="error">
+                          <Delete />
+                        </IconButton>
+                      </Box>
+                    </Card>
+                  </Grid>
+                );
+              })}
             </Grid>
           </Stack>
         </TabPanel>
