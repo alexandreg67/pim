@@ -12,7 +12,6 @@ class UploadController {
       }
 
       const file = req.file;
-      const uploadType = req.params.type || 'images';
 
       // Utiliser le même chemin que multer
       const inputPath = file.path; // Déjà dans /storage/assets/images
@@ -33,7 +32,7 @@ class UploadController {
 
       const filename = path.basename(outputPath);
       const response = {
-        url: `/assets/${uploadType}/${filename}`,
+        url: `${filename}`,
         filename: filename,
       };
 
