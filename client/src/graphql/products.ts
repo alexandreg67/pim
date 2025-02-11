@@ -84,7 +84,6 @@ export const GET_PRODUCT = gql`
 
 export const UPDATE_PRODUCT = gql`
   mutation UpdateProduct($id: String!, $input: UpdateProductInput!) {
-    # Noter le changement de UpdateProductInput à ProductUpdateInput
     updateProduct(id: $id, input: $input) {
       id
       name
@@ -136,6 +135,20 @@ export const CREATE_PRODUCT = gql`
       tags {
         id
         name
+      }
+    }
+  }
+`;
+
+export const ADD_PRODUCT_IMAGE = gql`
+  mutation AddProductImage($input: AddProductImageInput!) {
+    addProductImage(input: $input) {
+      id
+      images {
+        id
+        url
+        altText
+        isPrimary
       }
     }
   }

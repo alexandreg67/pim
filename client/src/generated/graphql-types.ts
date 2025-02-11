@@ -56,6 +56,13 @@ export type Actions = {
   type: ActionType;
 };
 
+export type AddProductImageInput = {
+  altText?: InputMaybe<Scalars['String']['input']>;
+  isPrimary?: Scalars['Boolean']['input'];
+  productId: Scalars['String']['input'];
+  url: Scalars['String']['input'];
+};
+
 export type Brands = {
   __typename?: 'Brands';
   contacts: Array<Contacts>;
@@ -192,6 +199,7 @@ export type Images = {
 export type Mutation = {
   __typename?: 'Mutation';
   addProductCharacteristic: Products;
+  addProductImage: Products;
   createCategory: Categories;
   createProduct: Products;
   createTag: Tags;
@@ -211,6 +219,10 @@ export type MutationAddProductCharacteristicArgs = {
   characteristicId: Scalars['String']['input'];
   productId: Scalars['String']['input'];
   value: Scalars['String']['input'];
+};
+
+export type MutationAddProductImageArgs = {
+  input: AddProductImageInput;
 };
 
 export type MutationCreateCategoryArgs = {
@@ -882,6 +894,25 @@ export type CreateProductMutation = {
     };
     categories: Array<{ __typename?: 'Categories'; id: string; name: string }>;
     tags: Array<{ __typename?: 'Tags'; id: string; name: string }>;
+  };
+};
+
+export type AddProductImageMutationVariables = Exact<{
+  input: AddProductImageInput;
+}>;
+
+export type AddProductImageMutation = {
+  __typename?: 'Mutation';
+  addProductImage: {
+    __typename?: 'Products';
+    id: string;
+    images: Array<{
+      __typename?: 'Images';
+      id: string;
+      url: string;
+      altText?: string | null;
+      isPrimary: boolean;
+    }>;
   };
 };
 
@@ -2511,6 +2542,62 @@ export type CreateProductMutationResult =
 export type CreateProductMutationOptions = Apollo.BaseMutationOptions<
   CreateProductMutation,
   CreateProductMutationVariables
+>;
+export const AddProductImageDocument = gql`
+  mutation AddProductImage($input: AddProductImageInput!) {
+    addProductImage(input: $input) {
+      id
+      images {
+        id
+        url
+        altText
+        isPrimary
+      }
+    }
+  }
+`;
+export type AddProductImageMutationFn = Apollo.MutationFunction<
+  AddProductImageMutation,
+  AddProductImageMutationVariables
+>;
+
+/**
+ * __useAddProductImageMutation__
+ *
+ * To run a mutation, you first call `useAddProductImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddProductImageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addProductImageMutation, { data, loading, error }] = useAddProductImageMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddProductImageMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AddProductImageMutation,
+    AddProductImageMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    AddProductImageMutation,
+    AddProductImageMutationVariables
+  >(AddProductImageDocument, options);
+}
+export type AddProductImageMutationHookResult = ReturnType<
+  typeof useAddProductImageMutation
+>;
+export type AddProductImageMutationResult =
+  Apollo.MutationResult<AddProductImageMutation>;
+export type AddProductImageMutationOptions = Apollo.BaseMutationOptions<
+  AddProductImageMutation,
+  AddProductImageMutationVariables
 >;
 export const TagsDocument = gql`
   query Tags {
