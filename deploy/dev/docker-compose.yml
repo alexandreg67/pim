@@ -106,6 +106,22 @@ services:
     networks:
       - pim_network
 
+  upload:
+    build:
+      context: ../../services/upload-service
+      dockerfile: Dockerfile
+    container_name: pim_upload
+    volumes:
+      - ../../services/upload-service/src:/app/src
+      - ../../services/upload-service/dist:/app/dist
+      - ../../storage/assets:/storage/assets
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - AUTH_SERVICE_URL=http://auth:4001/auth
+    networks:
+      - pim_network
+
   nginx:
     image: nginx:latest
     container_name: pim_nginx
