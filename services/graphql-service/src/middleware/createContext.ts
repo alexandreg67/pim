@@ -25,6 +25,11 @@ export async function createContext({ req }: RequestContext): Promise<Context> {
       return {
         user,
         historyService: new HistoryService(),
+        req: {
+          headers: {
+            cookie: req.headers.cookie,
+          },
+        },
       };
     }
   } catch (error) {
@@ -34,5 +39,10 @@ export async function createContext({ req }: RequestContext): Promise<Context> {
   return {
     user: null,
     historyService: new HistoryService(),
+    req: {
+      headers: {
+        cookie: undefined,
+      },
+    },
   };
 }

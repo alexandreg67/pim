@@ -49,14 +49,26 @@ class UploadController {
   async deleteImage(req: AuthRequest, res: Response) {
     try {
       const { filename } = req.params;
-      const uploadType = req.params.type || 'images';
-      const filePath = `/storage/assets/${uploadType}/${filename}`;
 
-      await fs.unlink(filePath);
+      const filepath = path.join('/storage/assets/images', filename);
+
+      try {
+        await fs.access(filepath);
+      } catch {
+        console.error(`File not found: ${filepath}`);
+        res.status(404).json({ message: 'File not found' });
+        return;
+      }
+
+      // Supprimer le fichier
+      await fs.unlink(filepath);
+
       res.status(200).json({ message: 'File deleted successfully' });
+      return;
     } catch (error) {
-      console.error('Delete error:', error);
+      console.error('Error deleting file:', error);
       res.status(500).json({ message: 'Error deleting file' });
+      return;
     }
   }
 }

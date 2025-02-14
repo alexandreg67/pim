@@ -15,6 +15,7 @@ import { ProductCharacteristicsResolver } from './resolvers/ProductCharacteristi
 import { CharacteristicDefinitionResolver } from './resolvers/CharacteristicDefinitionResolver';
 import { authChecker } from './middleware/authMiddleware';
 import { HistoryResolver } from './resolvers/HistoryResolver';
+import { ImageResolver } from './resolvers/ImageResolver';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -34,6 +35,7 @@ async function bootstrap() {
       ProductCharacteristicsResolver,
       CharacteristicDefinitionResolver,
       HistoryResolver,
+      ImageResolver,
     ],
     authChecker,
     container: Container,
