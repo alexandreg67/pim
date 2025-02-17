@@ -17,6 +17,7 @@ import { Save, ArrowBack, Delete, CloudUpload } from '@mui/icons-material';
 import {
   useAddProductImageMutation,
   useGetProductQuery,
+  useRemoveProductImageMutation,
   useUpdateProductMutation,
 } from '../generated/graphql-types';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -49,6 +50,13 @@ type TabPanelProps = {
   index: number;
   value: number;
 };
+
+interface Image {
+  id: string;
+  url: string;
+  altText?: string;
+  isPrimary: boolean;
+}
 
 const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
@@ -97,8 +105,8 @@ const EditProductPage = () => {
     variables: { productId: id || '' },
   });
   const [updateProduct] = useUpdateProductMutation();
-
   const [addProductImage] = useAddProductImageMutation();
+  const [removeProductImage] = useRemoveProductImageMutation();
 
   useEffect(() => {
     if (productData?.product?.categories) {
@@ -167,6 +175,23 @@ const EditProductPage = () => {
     } catch (error) {
       showError("Erreur lors de l'ajout de l'image");
       console.error(error);
+    }
+  };
+
+  const handleDeleteImage = async (image: Image) => {
+    try {
+      await removeProductImage({
+        variables: {
+          productId: id as string,
+          imageId: image.id,
+        },
+      });
+
+      success('Image supprimée avec succès');
+      refetch();
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error);
+      showError("Erreur lors de la suppression de l'image");
     }
   };
 
@@ -334,7 +359,11 @@ const EditProductPage = () => {
                             ? 'Image principale'
                             : 'Image secondaire'}
                         </Typography>
-                        <IconButton size="small" color="error">
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleDeleteImage(image)}
+                        >
                           <Delete />
                         </IconButton>
                       </Box>
