@@ -54,7 +54,7 @@ type TabPanelProps = {
 interface Image {
   id: string;
   url: string;
-  altText?: string;
+  altText?: string | null;
   isPrimary: boolean;
 }
 
