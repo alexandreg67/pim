@@ -1,18 +1,18 @@
 // services/auth-service/src/__tests__/services/user.service.test.ts
-import { UserService } from '../../services/user.service';
-import { User } from '../../entities/User';
-import { MailService } from '../../services/mail.service';
-import { authService } from '../../services/auth.service';
-import { AppDataSource } from '../../config/database';
-import { AppError } from '../../utils/error.util';
+import { UserService } from '../../../services/user.service';
+import { User } from '../../../entities/User';
+import { MailService } from '../../../services/mail.service';
+import { authService } from '../../../services/auth.service';
+import { AppDataSource } from '../../../config/database';
+import { AppError } from '../../../utils/error.util';
 import { EntityManager } from 'typeorm';
 import { QueryRunner } from 'typeorm';
 
 // Mocks
-jest.mock('../../entities/User');
-jest.mock('../../services/mail.service');
-jest.mock('../../services/auth.service');
-jest.mock('../../config/database');
+jest.mock('../../../entities/User');
+jest.mock('../../../services/mail.service');
+jest.mock('../../../services/auth.service');
+jest.mock('../../../config/database');
 
 describe('UserService', () => {
   let userService: UserService;

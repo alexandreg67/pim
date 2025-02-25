@@ -1,12 +1,12 @@
 // services/auth-service/src/__tests__/middlewares/auth.middleware.test.ts
-import { authMiddleware } from '../../middlewares/auth.middleware';
-import { User } from '../../entities/User';
+import { authMiddleware } from '../../../middlewares/auth.middleware';
+import { User } from '../../../entities/User';
 import jwt from 'jsonwebtoken';
-import { AUTH_ERRORS } from '../../constants/error-messages';
+import { AUTH_ERRORS } from '../../../constants/error-messages';
 
 // Mocks
 jest.mock('jsonwebtoken');
-jest.mock('../../entities/User');
+jest.mock('../../../entities/User');
 
 describe('authMiddleware', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
