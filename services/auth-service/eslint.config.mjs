@@ -36,4 +36,18 @@ export default [
       ],
     },
   },
+  {
+    files: ['**/jest.setup.js', '**/*.test.ts', '**/__tests__/**/*.ts'],
+    languageOptions: {
+      globals: {
+        process: true,
+        jest: true,
+        describe: true,
+        it: true,
+        expect: true,
+        beforeEach: true,
+        afterEach: true,
+      },
+    },
+  },
 ];

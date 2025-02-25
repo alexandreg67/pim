@@ -23,3 +23,5 @@ npm-debug.log*
 # System
 .DS_Store
 EOL
+
+coverage/
