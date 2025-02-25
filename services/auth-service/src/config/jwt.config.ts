@@ -8,11 +8,11 @@ if (!process.env.JWT_REFRESH_TOKEN_SECRET) {
 
 export const jwtConfig = {
   accessToken: {
-    secret: process.env.JWT_ACCESS_TOKEN_SECRET || 'your-secret-key',
+    secret: process.env.JWT_ACCESS_TOKEN_SECRET,
     expiresIn: '1h',
   },
   refreshToken: {
-    secret: process.env.JWT_REFRESH_TOKEN_SECRET || 'your-refresh-secret-key',
+    secret: process.env.JWT_REFRESH_TOKEN_SECRET,
     expiresIn: '7d',
   },
   cookieOptions: {
@@ -21,4 +21,4 @@ export const jwtConfig = {
     sameSite: 'strict' as const,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
   },
-};
+} as const;

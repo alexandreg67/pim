@@ -2,18 +2,19 @@
   "compilerOptions": {
     "target": "ES2018",
     "module": "CommonJS",
-    "lib": ["ES2018"],
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "sourceMap": true
+    "emitDecoratorMetadata": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node", "jest"]
   },
-  "include": ["src/**/*", "src/types/*.d.ts"],
+  "include": ["src/**/*", "__tests__/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
