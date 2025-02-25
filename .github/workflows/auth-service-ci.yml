@@ -1,0 +1,134 @@
+name: Auth Service CI
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'services/auth-service/**'
+      - '.github/workflows/auth-service-ci.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'services/auth-service/**'
+      - '.github/workflows/auth-service-ci.yml'
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: services/auth-service/package-lock.json
+
+      - name: Install dependencies
+        working-directory: services/auth-service
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: services/auth-service
+        run: npm run lint
+
+      - name: Run unit tests
+        working-directory: services/auth-service
+        run: npm run test:unit
+        env:
+          JWT_ACCESS_TOKEN_SECRET: test_access_secret_key
+          JWT_REFRESH_TOKEN_SECRET: test_refresh_secret_key
+          NODE_ENV: test
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: services/auth-service/package-lock.json
+
+      - name: Install dependencies
+        working-directory: services/auth-service
+        run: npm ci
+
+      - name: Run integration tests
+        working-directory: services/auth-service
+        run: npm run test:integration
+        env:
+          JWT_ACCESS_TOKEN_SECRET: test_access_secret_key
+          JWT_REFRESH_TOKEN_SECRET: test_refresh_secret_key
+          NODE_ENV: test
+
+  e2e-tests:
+    name: E2E Tests
+    # Exécute uniquement sur main/dev, pas sur les PRs de feature branches
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: services/auth-service/package-lock.json
+
+      - name: Install dependencies
+        working-directory: services/auth-service
+        run: npm ci
+
+      - name: Run E2E tests
+        working-directory: services/auth-service
+        run: npm run test:e2e
+        env:
+          JWT_ACCESS_TOKEN_SECRET: test_access_secret_key
+          JWT_REFRESH_TOKEN_SECRET: test_refresh_secret_key
+          NODE_ENV: test
+
+  coverage:
+    name: Generate Coverage Report
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: services/auth-service/package-lock.json
+
+      - name: Install dependencies
+        working-directory: services/auth-service
+        run: npm ci
+
+      - name: Generate coverage report
+        working-directory: services/auth-service
+        run: npm run test:ci
+        env:
+          JWT_ACCESS_TOKEN_SECRET: test_access_secret_key
+          JWT_REFRESH_TOKEN_SECRET: test_refresh_secret_key
+          NODE_ENV: test
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: services/auth-service/coverage
