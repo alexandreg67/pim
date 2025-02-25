@@ -1,11 +1,11 @@
-import { AuthService } from '../../services/auth.service';
-import { User } from '../../entities/User';
+import { AuthService } from '../../../services/auth.service';
+import { User } from '../../../entities/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { AppError } from '../../utils/error.util';
+import { AppError } from '../../../utils/error.util';
 
 // Mock des dépendances
-jest.mock('../../entities/User');
+jest.mock('../../../entities/User');
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 

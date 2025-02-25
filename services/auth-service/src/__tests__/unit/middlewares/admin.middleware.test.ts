@@ -1,5 +1,5 @@
-import { AUTH_ERRORS } from '../../constants/error-messages';
-import { adminMiddleware } from '../../middlewares/admin.middleware';
+import { AUTH_ERRORS } from '../../../constants/error-messages';
+import { adminMiddleware } from '../../../middlewares/admin.middleware';
 
 describe('adminMiddleware', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

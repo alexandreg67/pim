@@ -1,13 +1,12 @@
-// services/auth-service/src/__tests__/controllers/auth.controller.test.ts
-import { authController } from '../../controllers/auth.controller';
-import { userService } from '../../services/user.service';
-import { authService } from '../../services/auth.service';
-import { AppError } from '../../utils/error.util';
+import { authController } from '../../../controllers/auth.controller';
+import { userService } from '../../../services/user.service';
+import { authService } from '../../../services/auth.service';
+import { AppError } from '../../../utils/error.util';
 
 // Mocks
-jest.mock('../../services/user.service');
-jest.mock('../../services/auth.service');
-jest.mock('../../services/mail.service');
+jest.mock('../../../services/user.service');
+jest.mock('../../../services/auth.service');
+jest.mock('../../../services/mail.service');
 
 describe('AuthController', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

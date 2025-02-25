@@ -4,6 +4,10 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:unit": "jest \"src/__tests__/unit/.*\\.test\\.ts\"",
+    "test:integration": "jest \"src/__tests__/integration/.*\\.test\\.ts\"",
+    "test:e2e": "jest \"src/__tests__/e2e/.*\\.test\\.ts\"",
+    "test:ci": "jest --coverage",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
@@ -39,6 +43,7 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
