@@ -25,8 +25,14 @@ services:
       - DB_PASSWORD=postgres
       - DB_DATABASE=pim_db
       - AUTH_SERVICE_URL=http://auth:4001/auth
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - REDIS_DEFAULT_TTL=3600
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - pim_network
@@ -138,9 +144,28 @@ services:
     networks:
       - pim_network
 
+  redis:
+    image: redis:alpine
+    container_name: pim_redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+      - ../../storage/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - pim_network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 volumes:
   postgres_data:
     name: pim_postgres_data
+  redis_data:
+    name: pim_redis_data
 
 networks:
   pim_network:

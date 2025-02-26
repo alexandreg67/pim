@@ -11,4 +11,5 @@ export interface Context {
   historyService: HistoryService;
   ipAddress?: string;
   userAgent?: string;
+  setCacheHit?: () => void;
 }

@@ -21,6 +21,7 @@ import { Actions } from '../entities/Actions';
 import { Brands } from '../entities/Brands';
 import { Contacts } from '../entities/Contacts';
 import { Images } from '../entities/Images';
+import RedisCache from '../config/redis';
 
 @ObjectType()
 class PaginatedProductsResponse {
@@ -126,6 +127,15 @@ export default class ProductsResolver {
     @Arg('status', () => String, { nullable: true }) status?: string
   ): Promise<PaginatedProductsResponse> {
     try {
+      // Clé composite basée sur tous les paramètres
+      const cacheKey = `products:list:page:${page}:limit:${limit}:query:${query || 'null'}:status:${status || 'null'}`;
+
+      // Vérifier le cache
+      const cachedResponse =
+        await RedisCache.get<PaginatedProductsResponse>(cacheKey);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
       const offset = (page - 1) * limit;
 
       const where: FindOptionsWhere<Products> = {};
@@ -150,11 +160,17 @@ export default class ProductsResolver {
         },
       });
 
-      return {
+      const response = {
         items,
         total,
         hasMore: total > offset + items.length,
       };
+
+      // Mettre en cache pour 5 minutes (300 secondes)
+      // Durée plus courte car les listes changent plus souvent
+      await RedisCache.set(cacheKey, response, 300);
+
+      return response;
     } catch (error) {
       console.error('Error fetching products:', error);
       throw new Error('Unable to fetch products');
@@ -190,6 +206,18 @@ export default class ProductsResolver {
   @Authorized(['admin', 'collaborator'])
   async product(@Arg('id', () => String) id: string): Promise<Products | null> {
     try {
+      // Clé de cache unique pour ce produit
+      const cacheKey = `product:${id}`;
+
+      // Vérifier si les données sont en cache
+      const cachedProduct = await RedisCache.get<Products>(cacheKey);
+      if (cachedProduct) {
+        console.info(`Cache hit for product:${id}`);
+        return cachedProduct;
+      }
+
+      // Si non en cache, charger depuis la base de données
+      console.info(`Cache miss for product:${id}, fetching from database`);
       const product = await Products.findOne({
         where: { id },
         relations: [
@@ -270,6 +298,12 @@ export default class ProductsResolver {
         action: updateAction,
         productId: product.id,
       });
+
+      // 1. Invalider le cache du produit spécifique
+      await RedisCache.delete(`product:${id}`);
+
+      // 2. Invalider les listes qui pourraient contenir ce produit
+      await RedisCache.invalidatePattern('products:list:*');
 
       return updatedProduct;
     } catch (error) {

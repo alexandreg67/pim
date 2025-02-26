@@ -16,6 +16,7 @@ import { CharacteristicDefinitionResolver } from './resolvers/CharacteristicDefi
 import { authChecker } from './middleware/authMiddleware';
 import { HistoryResolver } from './resolvers/HistoryResolver';
 import { ImageResolver } from './resolvers/ImageResolver';
+import { cacheMetricsMiddleware } from './middleware/cacheMetrics';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -40,6 +41,7 @@ async function bootstrap() {
     authChecker,
     container: Container,
     validate: false,
+    globalMiddlewares: [cacheMetricsMiddleware],
   });
 
   // Création du serveur Apollo
