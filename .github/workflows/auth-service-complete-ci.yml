@@ -2,15 +2,15 @@ name: Auth Service CI
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, pre-deploy, dev]
     paths:
       - 'services/auth-service/**'
-      - '.github/workflows/auth-service-ci.yml'
+      - '.github/workflows/auth-service-complete-ci.yml'
   pull_request:
-    branches: [main, dev]
+    branches: [main, pre-deploy, dev]
     paths:
       - 'services/auth-service/**'
-      - '.github/workflows/auth-service-ci.yml'
+      - '.github/workflows/auth-service-complete-ci.yml'
 
 jobs:
   unit-tests:
@@ -72,10 +72,12 @@ jobs:
 
   e2e-tests:
     name: E2E Tests
-    # Exécute uniquement sur main/dev, pas sur les PRs de feature branches
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
     runs-on: ubuntu-latest
     needs: integration-tests
+    # Les tests E2E s'exécutent uniquement:
+    # 1. Pour les PRs vers pre-deploy ou main
+    # 2. Pour les push sur dev, pre-deploy ou main
+    if: (github.event_name == 'pull_request' && (github.base_ref == 'pre-deploy' || github.base_ref == 'main')) || (github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/pre-deploy' || github.ref == 'refs/heads/main'))
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -101,8 +103,11 @@ jobs:
 
   coverage:
     name: Generate Coverage Report
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    # Le rapport de couverture se génère uniquement:
+    # 1. Pour les PRs vers main
+    # 2. Pour les push sur pre-deploy ou main
+    if: (github.event_name == 'pull_request' && github.base_ref == 'main') || (github.event_name == 'push' && (github.ref == 'refs/heads/pre-deploy' || github.ref == 'refs/heads/main'))
     needs: [unit-tests, integration-tests]
     steps:
       - name: Checkout code
