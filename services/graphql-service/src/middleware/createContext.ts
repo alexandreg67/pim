@@ -30,6 +30,7 @@ export async function createContext({ req }: RequestContext): Promise<Context> {
             cookie: req.headers.cookie,
           },
         },
+        setCacheHit: () => {},
       };
     }
   } catch (error) {
@@ -44,5 +45,6 @@ export async function createContext({ req }: RequestContext): Promise<Context> {
         cookie: undefined,
       },
     },
+    setCacheHit: () => {},
   };
 }

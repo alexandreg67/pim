@@ -5,12 +5,18 @@ on:
     branches: [main, pre-deploy, dev]
     paths:
       - 'services/auth-service/**'
-      - '.github/workflows/auth-service-complete-ci.yml'
+      - 'services/graphql-service/**'
+      - 'storage/redis/**'
+      - 'deploy/dev/docker-compose.yml'
+      - '.github/workflows/**'
   pull_request:
     branches: [main, pre-deploy, dev]
     paths:
       - 'services/auth-service/**'
-      - '.github/workflows/auth-service-complete-ci.yml'
+      - 'services/graphql-service/**'
+      - 'storage/redis/**'
+      - 'deploy/dev/docker-compose.yml'
+      - '.github/workflows/**'
 
 jobs:
   unit-tests:
