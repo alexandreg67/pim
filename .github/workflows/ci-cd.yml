@@ -1,0 +1,78 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ['main', 'pre-deploy', 'feature/continuous-deployment']
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Client (Frontend)
+      - name: Build and push client
+        uses: docker/build-push-action@v4
+        with:
+          context: ./client
+          file: ./client/dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pim-client:latest,${{ secrets.DOCKER_HUB_USERNAME }}/pim-client:${{ github.sha }}
+
+      # API (GraphQL)
+      - name: Build and push API
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/graphql-service
+          file: ./services/graphql-service/dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pim-api:latest,${{ secrets.DOCKER_HUB_USERNAME }}/pim-api:${{ github.sha }}
+
+      # Auth Service
+      - name: Build and push Auth Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/auth-service
+          file: ./services/auth-service/dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pim-auth:latest,${{ secrets.DOCKER_HUB_USERNAME }}/pim-auth:${{ github.sha }}
+
+      # Mail Service
+      - name: Build and push Mail Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/mail-service
+          file: ./services/mail-service/dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pim-mail:latest,${{ secrets.DOCKER_HUB_USERNAME }}/pim-mail:${{ github.sha }}
+
+      # Upload Service
+      - name: Build and push Upload Service
+        uses: docker/build-push-action@v4
+        with:
+          context: ./services/upload-service
+          file: ./services/upload-service/dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pim-upload:latest,${{ secrets.DOCKER_HUB_USERNAME }}/pim-upload:${{ github.sha }}
+
+      # Trigger deployment webhook
+      - name: Trigger Deployment
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.DEPLOYMENT_WEBHOOK_URL }} \
+          -H "Content-Type: application/json" \
+          -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
