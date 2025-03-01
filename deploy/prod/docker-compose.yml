@@ -98,4 +98,5 @@ volumes:
   redis_data:
 networks:
   pim_network:
+    name: pim_network
     driver: bridge
