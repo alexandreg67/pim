@@ -20,7 +20,7 @@ import { checkAuth } from './store/slices/authSlice';
 import { useAppDispatch } from './store/hooks';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:8000/api',
+  uri: import.meta.env.VITE_API_URL || '/api',
   cache: new InMemoryCache(),
   credentials: 'include',
   headers: {

@@ -16,10 +16,12 @@ interface AuthState {
   error: string | null;
 }
 
+const API_BASE = import.meta.env.VITE_AUTH_URL || '/auth';
+
 export const login = createAsyncThunk(
   'auth/login',
   async (credentials: { email: string; password: string }) => {
-    const response = await fetch('http://localhost:8000/auth/login', {
+    const response = await fetch(`${API_BASE}/login`, {
       method: 'POST',
       credentials: 'include', // Important pour les cookies
       headers: { 'Content-Type': 'application/json' },
@@ -35,7 +37,7 @@ export const login = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-  const response = await fetch('http://localhost:8000/auth/logout', {
+  const response = await fetch(`${API_BASE}/logout`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -46,7 +48,7 @@ export const logout = createAsyncThunk('auth/logout', async () => {
 });
 
 export const checkAuth = createAsyncThunk('auth/check', async () => {
-  const response = await fetch('http://localhost:8000/auth/me', {
+  const response = await fetch(`${API_BASE}/me`, {
     credentials: 'include',
   });
 
