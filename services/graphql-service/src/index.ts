@@ -52,7 +52,9 @@ async function bootstrap() {
   // Démarrage du serveur standalone
   const { url } = await startStandaloneServer(server, {
     context: createContext,
-    listen: { port: 4000 },
+    listen: {
+      port: 4000,
+    },
   });
 
   console.info(`🚀 Server ready at ${url}`);
