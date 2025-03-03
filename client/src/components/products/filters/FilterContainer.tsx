@@ -17,10 +17,11 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  // Adapter le type de `brandId` pour être une seule valeur `string | ''`
   const [filters, setFilters] = useState<FilterState>({
     searchQuery: searchParams.get('query') || undefined,
     status: '',
-    brandIds: [],
+    brandId: '',
     ...initialFilters,
   });
 
@@ -44,9 +45,9 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
   };
 
   const handleResetSearch = () => {
-    searchParams.delete('query'); // Supprime le paramètre "query" de l'URL
+    searchParams.delete('query');
     navigate({
-      pathname: '/products', // Navigue vers /products sans paramètres
+      pathname: '/products',
       search: searchParams.toString(),
     });
   };
@@ -60,8 +61,8 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
             onChange={(status) => handleFilterChange({ status })}
           />
           <BrandFilter
-            selectedBrands={filters.brandIds}
-            onChange={(brandIds) => handleFilterChange({ brandIds })}
+            value={filters.brandId}
+            onChange={(brandId) => handleFilterChange({ brandId })}
           />
         </Box>
 

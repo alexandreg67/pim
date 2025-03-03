@@ -6,8 +6,15 @@ export const GET_PRODUCTS = gql`
     $query: String
     $limit: Int!
     $page: Int!
+    $brandId: String
   ) {
-    products(page: $page, limit: $limit, status: $status, query: $query) {
+    products(
+      page: $page
+      limit: $limit
+      status: $status
+      query: $query
+      brandId: $brandId
+    ) {
       items {
         id
         name
@@ -24,6 +31,7 @@ export const GET_PRODUCTS = gql`
           name
         }
         brand {
+          id
           name
         }
       }

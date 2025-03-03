@@ -124,11 +124,12 @@ export default class ProductsResolver {
     @Arg('page', () => Int, { defaultValue: 1 }) page: number,
     @Arg('limit', () => Int, { defaultValue: 10 }) limit: number,
     @Arg('query', () => String, { nullable: true }) query?: string,
-    @Arg('status', () => String, { nullable: true }) status?: string
+    @Arg('status', () => String, { nullable: true }) status?: string,
+    @Arg('brandId', () => String, { nullable: true }) brandId?: string
   ): Promise<PaginatedProductsResponse> {
     try {
       // Clé composite basée sur tous les paramètres
-      const cacheKey = `products:list:page:${page}:limit:${limit}:query:${query || 'null'}:status:${status || 'null'}`;
+      const cacheKey = `products:list:page:${page}:limit:${limit}:query:${query || 'null'}:status:${status || 'null'}:brandId:${brandId || 'null'}`;
 
       // Vérifier le cache
       const cachedResponse =
@@ -146,6 +147,10 @@ export default class ProductsResolver {
 
       if (query) {
         where.name = ILike(`%${query}%`);
+      }
+
+      if (brandId) {
+        where.brand = { id: brandId };
       }
 
       const [items, total] = await Products.findAndCount({

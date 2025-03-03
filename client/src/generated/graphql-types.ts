@@ -386,6 +386,7 @@ export type QueryProductTagsArgs = {
 };
 
 export type QueryProductsArgs = {
+  brandId?: InputMaybe<Scalars['String']['input']>;
   limit?: Scalars['Int']['input'];
   page?: Scalars['Int']['input'];
   query?: InputMaybe<Scalars['String']['input']>;
@@ -784,6 +785,7 @@ export type GetProductsQueryVariables = Exact<{
   query?: InputMaybe<Scalars['String']['input']>;
   limit: Scalars['Int']['input'];
   page: Scalars['Int']['input'];
+  brandId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 export type GetProductsQuery = {
@@ -804,7 +806,7 @@ export type GetProductsQuery = {
       reference: string;
       categories: Array<{ __typename?: 'Categories'; name: string }>;
       tags: Array<{ __typename?: 'Tags'; name: string }>;
-      brand: { __typename?: 'Brands'; name: string };
+      brand: { __typename?: 'Brands'; id: string; name: string };
     }>;
   };
 };
@@ -2203,8 +2205,15 @@ export const GetProductsDocument = gql`
     $query: String
     $limit: Int!
     $page: Int!
+    $brandId: String
   ) {
-    products(page: $page, limit: $limit, status: $status, query: $query) {
+    products(
+      page: $page
+      limit: $limit
+      status: $status
+      query: $query
+      brandId: $brandId
+    ) {
       items {
         id
         name
@@ -2221,6 +2230,7 @@ export const GetProductsDocument = gql`
           name
         }
         brand {
+          id
           name
         }
       }
@@ -2246,6 +2256,7 @@ export const GetProductsDocument = gql`
  *      query: // value for 'query'
  *      limit: // value for 'limit'
  *      page: // value for 'page'
+ *      brandId: // value for 'brandId'
  *   },
  * });
  */

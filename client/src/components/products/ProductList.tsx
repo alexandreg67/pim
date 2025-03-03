@@ -9,9 +9,14 @@ import { getStatusLabel } from '../../utils/product.utils';
 interface ProductListProps {
   searchQuery?: string; // Recherche optionnelle
   status?: string; // Filtre optionnel
+  brandId?: string; // Filtre optionnel
 }
 
-const ProductList: React.FC<ProductListProps> = ({ searchQuery, status }) => {
+const ProductList: React.FC<ProductListProps> = ({
+  searchQuery,
+  status,
+  brandId,
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
@@ -21,12 +26,13 @@ const ProductList: React.FC<ProductListProps> = ({ searchQuery, status }) => {
       limit: itemsPerPage,
       query: searchQuery,
       status: status,
+      brandId: brandId,
     },
   });
 
   // Gestion de la pagination
   const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
+    _event: React.ChangeEvent<unknown>,
     page: number
   ) => {
     setCurrentPage(page);

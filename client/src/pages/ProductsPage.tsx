@@ -21,10 +21,12 @@ const ProductsPage: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('query') || '';
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedBrandId, setSelectedBrandId] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('cards');
 
   const handleFiltersChange = (filters: FilterState) => {
     setSelectedStatus(filters.status);
+    setSelectedBrandId(filters.brandId);
   };
 
   return (
@@ -50,7 +52,7 @@ const ProductsPage: React.FC = () => {
         <ToggleButtonGroup
           value={viewMode}
           exclusive
-          onChange={(event, newView) => newView && setViewMode(newView)}
+          onChange={(_event, newView) => newView && setViewMode(newView)}
           aria-label="view mode"
           size="small"
         >
@@ -72,7 +74,7 @@ const ProductsPage: React.FC = () => {
         initialFilters={{
           searchQuery: searchQuery || undefined,
           status: '',
-          brandIds: [],
+          brandId: '',
         }}
       />
 
@@ -80,11 +82,13 @@ const ProductsPage: React.FC = () => {
         <ProductList
           searchQuery={searchQuery || undefined}
           status={selectedStatus || undefined}
+          brandId={selectedBrandId || undefined}
         />
       ) : (
         <ProductTableView
           searchQuery={searchQuery || undefined}
           status={selectedStatus || undefined}
+          brandId={selectedBrandId || undefined}
         />
       )}
     </Box>
