@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: ['main', 'pre-deploy', 'feature/continuous-deployment']
+    branches: ['main']
     paths-ignore:
       - '**.md'
 
