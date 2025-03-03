@@ -73,6 +73,21 @@ jobs:
       - name: Trigger Deployment
         if: success()
         run: |
-          curl -X POST ${{ secrets.DEPLOYMENT_WEBHOOK_URL }} \
+          echo "Déclenchement du webhook vers ${{ secrets.DEPLOYMENT_WEBHOOK_URL }}"
+          RESPONSE=$(curl -X POST ${{ secrets.DEPLOYMENT_WEBHOOK_URL }} \
           -H "Content-Type: application/json" \
-          -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+          -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}' \
+          -w "\n%{http_code}")
+
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "HTTP Status: $HTTP_STATUS"
+          echo "Response body: $BODY"
+
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "::error::Le webhook a échoué avec le statut $HTTP_STATUS"
+            exit 1
+          else
+            echo "::notice::Webhook déclenché avec succès"
+          fi
