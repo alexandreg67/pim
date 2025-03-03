@@ -1,49 +1,49 @@
-// components/products/filters/BrandFilter.tsx
 import { FC } from 'react';
-
-import { Autocomplete, TextField } from '@mui/material';
+import { FormControl, Select, MenuItem, Box } from '@mui/material';
 import { useGetBrandsForFilterQuery } from '../../../generated/graphql-types';
 
 interface BrandFilterProps {
-  selectedBrands: string[];
-  onChange: (selectedBrands: string[]) => void;
+  value: string | '';
+  onChange: (value: string | '') => void;
 }
 
-export const BrandFilter: FC<BrandFilterProps> = ({
-  selectedBrands,
-  onChange,
-}) => {
+export const BrandFilter: FC<BrandFilterProps> = ({ value, onChange }) => {
   const { data } = useGetBrandsForFilterQuery();
-
-  const selectedBrandObjects = (data?.brandsForFilter || []).filter((brand) =>
-    selectedBrands.includes(brand.id)
-  );
+  const brands = data?.brandsForFilter || [];
 
   return (
-    <Autocomplete
-      multiple
-      value={selectedBrandObjects}
-      onChange={(_, newValue) => {
-        onChange(newValue.map((brand) => brand.id));
-      }}
-      options={data?.brandsForFilter || []}
-      getOptionLabel={(option) => option.name}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          // label="Marques"
-          size="small"
-          placeholder={'Sélectionner une ou plusieurs marques'}
-        />
-      )}
-      noOptionsText="Aucune marque trouvée"
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        boxShadow: 1,
-        minWidth: 340,
-        outline: 'none',
-      }}
-    />
+    <FormControl size="small" sx={{ minWidth: 200, borderRadius: '8px' }}>
+      <Select
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value as string);
+        }}
+        displayEmpty
+        renderValue={(selected) =>
+          selected ? (
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', minHeight: '40px' }}
+            >
+              {brands.find((brand) => brand.id === selected)?.name || 'Marque'}
+            </Box>
+          ) : (
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', minHeight: '40px' }}
+            >
+              <span style={{ color: 'gray', opacity: 0.5 }}>Marque</span>
+            </Box>
+          )
+        }
+      >
+        <MenuItem value="">
+          <em>Toutes</em>
+        </MenuItem>
+        {brands.map((brand) => (
+          <MenuItem key={brand.id} value={brand.id}>
+            {brand.name}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
   );
 };

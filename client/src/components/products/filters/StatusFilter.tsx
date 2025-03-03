@@ -15,9 +15,6 @@ export const StatusFilter: FC<StatusFilterProps> = ({ value, onChange }) => {
       sx={{
         minWidth: 200,
         borderRadius: '8px',
-        boxShadow: 1,
-        border: 'none',
-        outline: 'none',
       }}
     >
       <Select

@@ -28,11 +28,13 @@ import { getStatusLabel } from '../../utils/product.utils';
 interface ProductTableViewProps {
   searchQuery?: string;
   status?: string;
+  brandId?: string;
 }
 
 const ProductTableView: React.FC<ProductTableViewProps> = ({
   searchQuery,
   status,
+  brandId,
 }) => {
   const navigate = useNavigate();
   const { confirmDelete } = useDialog();
@@ -47,8 +49,8 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
       limit: itemsPerPage,
       query: searchQuery,
       status: status,
+      brandId: brandId || null,
     },
-    fetchPolicy: 'network-only', // Toujours récupérer les nouvelles données
     notifyOnNetworkStatusChange: true,
   });
 
@@ -64,7 +66,7 @@ const ProductTableView: React.FC<ProductTableViewProps> = ({
 
   // Changement de page
   const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
+    _event: React.ChangeEvent<unknown>,
     page: number
   ) => {
     setCurrentPage(page);
