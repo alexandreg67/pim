@@ -52,6 +52,8 @@ const MainLayout = () => {
           mt: '64px',
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
+          overflowY: 'auto',
+          height: 'calc(100vh - 64px)',
         }}
       >
         <Box
@@ -59,7 +61,7 @@ const MainLayout = () => {
             backgroundColor: 'background.paper',
             borderRadius: 1,
             p: 2,
-            minHeight: 'calc(100vh - 180px)',
+            height: 'auto',
           }}
         >
           <Outlet />
