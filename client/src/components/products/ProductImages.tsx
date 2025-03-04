@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Typography, Card, CardMedia, IconButton } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { getAssetUrl } from '../../utils/assets';
 
 interface Image {
   id: string;
@@ -44,7 +45,7 @@ const ProductImages: React.FC<{ images: Image[] }> = ({ images }) => {
       <Card>
         <CardMedia
           component="img"
-          image={`http://localhost:8000/images/${validImages[currentImageIndex].url}`}
+          image={getAssetUrl(validImages[currentImageIndex].url, 'images')}
           alt={validImages[currentImageIndex].altText || `Image du produit`}
           sx={{ height: 400, objectFit: 'contain' }}
         />
@@ -96,7 +97,7 @@ const ProductImages: React.FC<{ images: Image[] }> = ({ images }) => {
               onClick={() => setCurrentImageIndex(index)}
             >
               <img
-                src={`http://localhost:8000/images/${img.url}`}
+                src={getAssetUrl(img.url, 'images')}
                 alt={img.altText || `Miniature ${index + 1}`}
                 style={{ height: 50, objectFit: 'contain' }}
               />

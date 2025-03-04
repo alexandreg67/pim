@@ -33,7 +33,8 @@ const UserCreationForm = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/auth/register', {
+      const authUrl = import.meta.env.VITE_AUTH_URL || '/auth';
+      const response = await fetch(`${authUrl}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

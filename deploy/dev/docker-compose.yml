@@ -10,6 +10,7 @@ services:
     environment:
       - VITE_API_URL=/api
       - VITE_AUTH_URL=/auth
+      - VITE_ASSETS_URL=
     networks:
       - pim_network
 
@@ -121,7 +122,8 @@ services:
     volumes:
       - ../../services/upload-service/src:/app/src
       - ../../services/upload-service/dist:/app/dist
-      - ../../storage/assets:/storage/assets
+      - ../../storage/assets/images:/storage/assets/images
+      - ../../storage/assets/logos:/storage/assets/logos
     environment:
       - NODE_ENV=development
       - PORT=3003
@@ -138,10 +140,12 @@ services:
       - ../../nginx.conf:/etc/nginx/nginx.conf:ro # Monte le fichier nginx.conf
       - ../../storage/assets/images:/storage/assets/images # Monte les assets
       - ../../storage/assets/logos:/storage/assets/logos # Monte les assets
-
     depends_on:
       - client
       - api
+      - auth
+      - mail
+      - upload
     networks:
       - pim_network
 
