@@ -1,52 +1,64 @@
 import { Request, Response } from 'express';
-import nodemailer from 'nodemailer';
+import { createTransporter } from '../config/mail';
 import { getEmailTemplate } from '../templates';
+import nodemailer from 'nodemailer';
 
 export class MailController {
-  private async createTestAccount() {
-    const testAccount = await nodemailer.createTestAccount();
-    return nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
-      },
-    });
-  }
-
   async sendMail(req: Request, res: Response) {
     try {
-      const { template, to, data } = req.body;
+      const { to, template, data } = req.body;
 
-      // Créer un compte de test Ethereal
-      const transporter = await this.createTestAccount();
+      console.info('📧 Mail request received:', { to, template });
 
-      // Obtenir le template HTML
-      const html = getEmailTemplate(template, data);
+      // Vérifier les données requises
+      if (!to || !template) {
+        return res.status(400).json({
+          error: 'Missing required parameters: to, template',
+        });
+      }
 
-      // Envoyer l'email
-      const info = await transporter.sendMail({
-        from: '"PIM Admin" <admin@pim.com>',
+      const transporter = await createTransporter();
+
+      // Configurer les options d'email
+      const mailOptions = {
+        from: {
+          name: 'PIM Platform',
+          address: process.env.SMTP_FROM || 'no-reply@pim.com',
+        },
         to,
         subject: this.getSubjectForTemplate(template),
-        html,
-      });
+        html: getEmailTemplate(template, data),
+      };
 
-      // Obtenir l'URL de prévisualisation Ethereal
-      const previewUrl = nodemailer.getTestMessageUrl(info);
+      // Envoyer l'email
+      const info = await transporter.sendMail(mailOptions);
+
+      console.info('📨 Email sent:', {
+        messageId: info.messageId,
+        response: info.response,
+        accepted: info.accepted || [],
+        rejected: info.rejected || [],
+        pending: info.pending || [],
+        envelope: info.envelope,
+      });
 
       return res.json({
         success: true,
         messageId: info.messageId,
-        previewUrl,
+        ...(process.env.NODE_ENV === 'development' && {
+          preview: nodemailer.getTestMessageUrl(info),
+        }),
       });
-    } catch (error) {
-      console.error('Mail sending error:', error);
+    } catch (error: any) {
+      console.error('❌ Mail sending error:', error);
+
+      if (error.response) {
+        console.error('📩 SMTP Response:', error.response);
+      }
+
       return res.status(500).json({
         error: 'Failed to send email',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error.message || 'Unknown error',
       });
     }
   }
@@ -55,7 +67,24 @@ export class MailController {
     const subjects: Record<string, string> = {
       TEMP_PASSWORD: 'Votre compte PIM a été créé',
       PASSWORD_CHANGED: 'Confirmation de changement de mot de passe',
+      DEFAULT: 'Message de PIM Platform',
     };
-    return subjects[template] || 'Message from PIM';
+    return subjects[template.toUpperCase()] || subjects.DEFAULT;
+  }
+
+  async healthCheck(req: Request, res: Response) {
+    try {
+      const transporter = await createTransporter();
+      await transporter.verify();
+      res.json({ status: 'healthy', smtp: true });
+    } catch (error) {
+      res.status(500).json({
+        status: 'unhealthy',
+        smtp: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
   }
 }
+
+export const mailController = new MailController();

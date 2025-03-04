@@ -7,7 +7,7 @@ export function getEmailTemplate(
   switch (template) {
     case 'TEMP_PASSWORD':
       return `
-        <h1>Bienvenue sur PIM</h1>
+        <h1>Bienvenue sur PIM Platform</h1>
         <p>Votre compte a été créé avec succès.</p>
         <p>Votre mot de passe temporaire est: <strong>${data.temporaryPassword}</strong></p>
         <p>Veuillez le changer lors de votre première connexion.</p>
