@@ -68,6 +68,7 @@ const LoginPage = () => {
                   setFormData({ ...formData, email: e.target.value })
                 }
                 required
+                autoComplete="email"
               />
             </Box>
 
@@ -81,6 +82,7 @@ const LoginPage = () => {
                   setFormData({ ...formData, password: e.target.value })
                 }
                 required
+                autoComplete="current-password"
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
