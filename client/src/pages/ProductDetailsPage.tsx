@@ -29,6 +29,7 @@ const ProductDetailsPage: React.FC = () => {
     return <Typography color="error">Erreur : {error.message}</Typography>;
 
   const product = data?.product;
+
   if (!product) return <Typography>Produit non trouvé</Typography>;
 
   const {

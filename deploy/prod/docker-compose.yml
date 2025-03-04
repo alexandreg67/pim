@@ -2,15 +2,19 @@ version: '3.8'
 services:
   client:
     image: alexandreg67/pim-client:latest
+    container_name: pim_client
+    restart: always
     environment:
       - NODE_ENV=production
       - VITE_API_URL=/api
       - VITE_AUTH_URL=/auth
-    restart: always
+      - VITE_ASSETS_URL=
     networks:
       - pim_network
+
   api:
     image: alexandreg67/pim-api:latest
+    container_name: pim_api
     restart: always
     environment:
       - NODE_ENV=production
@@ -20,14 +24,20 @@ services:
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_DATABASE=${POSTGRES_DB}
       - AUTH_SERVICE_URL=http://auth:4001/auth
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - REDIS_DEFAULT_TTL=3600
       - PORT=4000
     depends_on:
       - postgres
       - redis
     networks:
       - pim_network
+
   auth:
     image: alexandreg67/pim-auth:latest
+    container_name: pim_auth
     restart: always
     environment:
       - NODE_ENV=production
@@ -38,32 +48,39 @@ services:
       - DB_DATABASE=${POSTGRES_DB}
       - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
       - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}
-      - AUTH_SERVICE_PORT=4001
+      - PORT=4001
     depends_on:
       - postgres
     networks:
       - pim_network
+
   mail:
     image: alexandreg67/pim-mail:latest
+    container_name: pim_mail
     restart: always
     environment:
       - NODE_ENV=production
       - PORT=3002
     networks:
       - pim_network
+
   upload:
     image: alexandreg67/pim-upload:latest
+    container_name: pim_upload
     restart: always
     environment:
       - NODE_ENV=production
       - PORT=3003
       - AUTH_SERVICE_URL=http://auth:4001/auth
     volumes:
-      - /opt/pim/storage/uploads:/storage/assets
+      - /opt/pim/storage/uploads/images:/storage/assets/images
+      - /opt/pim/storage/uploads/logos:/storage/assets/logos
     networks:
       - pim_network
+
   postgres:
     image: postgres:15-alpine
+    container_name: pim_postgres
     restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -74,15 +91,31 @@ services:
       - ./storage/postgres/init:/docker-entrypoint-initdb.d
     networks:
       - pim_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:alpine
+    container_name: pim_redis
     restart: always
     volumes:
       - redis_data:/data
+      - ./storage/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
     networks:
       - pim_network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   nginx:
     image: nginx:latest
+    container_name: pim_nginx
     restart: always
     ports:
       - '8080:80'
@@ -98,9 +131,13 @@ services:
       - upload
     networks:
       - pim_network
+
 volumes:
   postgres_data:
+    name: pim_postgres_data
   redis_data:
+    name: pim_redis_data
+
 networks:
   pim_network:
     name: pim_network
