@@ -1,6 +1,6 @@
 import {
   Dashboard as DashboardIcon,
-  Category as CategoryIcon,
+  // Category as CategoryIcon,
   Inventory as InventoryIcon,
   Business as BusinessIcon,
   AdminPanelSettings,
@@ -16,7 +16,7 @@ export const menuItemsAdmin = [
       { text: 'Créer un produit', path: '/products/create' },
       { text: 'Catégories', path: '/categories' },
       { text: 'Tags', path: '/tags' },
-      { text: 'Caractéristiques', path: '/characteristics' },
+      // { text: 'Caractéristiques', path: '/characteristics' },
     ],
   },
   {
@@ -24,10 +24,10 @@ export const menuItemsAdmin = [
     icon: <BusinessIcon />,
     children: [
       { text: 'Liste des marques', path: '/brands' },
-      { text: 'Contacts', path: '/brands/contacts' },
+      // { text: 'Contacts', path: '/brands/contacts' },
     ],
   },
-  { text: 'Historique', icon: <CategoryIcon />, path: '/history' },
+  // { text: 'Historique', icon: <CategoryIcon />, path: '/history' },
   { text: 'Administration', icon: <AdminPanelSettings />, path: '/admin' },
 ];
 

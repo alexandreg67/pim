@@ -27,6 +27,7 @@ import {
   useGetBrandCountriesQuery,
   useGetBrandQuery,
 } from '../generated/graphql-types';
+import { getAssetUrl } from '../utils/assets';
 
 const BrandDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -128,7 +129,7 @@ const BrandDetailsPage: React.FC = () => {
             <img
               src={
                 brand?.logo
-                  ? `http://localhost:8000/logos/${brand.logo}`
+                  ? getAssetUrl(brand.logo, 'logos')
                   : '/api/placeholder/200/200'
               }
               alt={brand?.name}

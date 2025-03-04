@@ -7,6 +7,7 @@ import {
   Chip,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { getAssetUrl } from '../../utils/assets';
 
 interface BrandCardProps {
   id: string;
@@ -43,9 +44,7 @@ const BrandCard: React.FC<BrandCardProps> = ({
       <CardMedia
         component="img"
         height="120"
-        image={
-          `http://localhost:8000/logos/${logo}` || '/api/placeholder/180/120'
-        }
+        image={logo ? getAssetUrl(logo, 'logos') : '/api/placeholder/180/120'}
         alt={`${name} logo`}
         sx={{ objectFit: 'contain', p: 2, bgcolor: 'grey.50' }}
       />

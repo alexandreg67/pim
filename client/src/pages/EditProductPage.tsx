@@ -28,6 +28,7 @@ import GeneralInfoSection from '../components/products/edit/GeneralInfoSection';
 import { ProductStatus } from '../types/enum/product';
 import { CharacteristicType } from '../types/Characteristic';
 import CharacteristicsSection from '../components/products/edit/CharacteristicsSection';
+import { getAssetUrl } from '../utils/assets';
 
 type Brand = {
   id: string;
@@ -133,7 +134,7 @@ const EditProductPage = () => {
     });
   }, [productData]);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
 
@@ -147,7 +148,8 @@ const EditProductPage = () => {
       const formData = new FormData();
       formData.append('file', event.target.files[0]);
 
-      const response = await fetch('http://localhost:8000/upload/images', {
+      // Utiliser une URL relative
+      const response = await fetch('/upload/images', {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -332,9 +334,7 @@ const EditProductPage = () => {
             {/* Grille des images */}
             <Grid container spacing={2}>
               {productData?.product?.images.map((image) => {
-                const imageUrl = image.url.startsWith('/assets')
-                  ? `http://localhost:8000${image.url}`
-                  : `http://localhost:8000/images/${image.url}`;
+                const imageUrl = getAssetUrl(image.url, 'images');
 
                 return (
                   <Grid item xs={12} sm={6} md={4} key={image.id}>
