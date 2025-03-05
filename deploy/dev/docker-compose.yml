@@ -108,6 +108,8 @@ services:
     volumes:
       - ../../services/mail-service/src:/app/src
       - ../../services/mail-service/dist:/app/dist
+    env_file:
+      - ../../services/mail-service/.env
     environment:
       - NODE_ENV=development
       - PORT=3002
