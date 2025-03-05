@@ -1,7 +1,6 @@
 // auth-service/src/services/mail.service.ts
 import axios from 'axios';
 import { MailOptions, MailResponse } from '../types/mail.types';
-import { AppError } from '../utils/error.util';
 
 export class MailService {
   private static mailServiceUrl: string = 'http://mail:3002/mail';
@@ -14,27 +13,26 @@ export class MailService {
       );
 
       if (!response.data.success) {
-        throw new AppError('Mail service returned unsuccessful response', 500);
-      }
-
-      // Log en dev pour faciliter les tests
-      if (process.env.NODE_ENV === 'development') {
-        console.info('Email preview URL:', response.data.previewUrl);
+        console.error(
+          `Mail service returned unsuccessful response for ${options.template}`
+        );
+        // En production, on log l'erreur mais on ne bloque pas le processus
+        return {
+          success: false,
+          messageId: '',
+          errorMessage: 'Mail service returned unsuccessful response',
+        };
       }
 
       return response.data;
     } catch (error) {
       console.error(`Failed to send ${options.template} email:`, error);
 
-      if (process.env.NODE_ENV === 'production') {
-        throw new AppError('Failed to send email', 500);
-      }
-
-      // En dev, on retourne un faux succès pour ne pas bloquer le flow
+      // En production, on log l'erreur mais on ne bloque pas le processus
       return {
-        success: true,
-        messageId: 'dev-mode',
-        previewUrl: 'https://ethereal.email',
+        success: false,
+        messageId: '',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }

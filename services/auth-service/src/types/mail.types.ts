@@ -7,5 +7,5 @@ export interface MailOptions {
 export interface MailResponse {
   success: boolean;
   messageId: string;
-  previewUrl: string;
+  errorMessage?: string;
 }
