@@ -97,7 +97,7 @@ export class UserService {
 
       if (!user) {
         await queryRunner.rollbackTransaction();
-        return; // Silencieux pour la sécurité
+        return; // Silencieux par sécurité
       }
 
       const temporaryPassword = generateTemporaryPassword();
@@ -107,22 +107,22 @@ export class UserService {
       user.isFirstLogin = true;
       await queryRunner.manager.save(user);
 
-      try {
-        await MailService.sendMail({
-          to: email,
-          template: 'TEMP_PASSWORD',
-          data: {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            temporaryPassword,
-          },
-        });
+      const mailResult = await MailService.sendMail({
+        to: email,
+        template: 'TEMP_PASSWORD',
+        data: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          temporaryPassword,
+        },
+      });
 
-        await queryRunner.commitTransaction();
-      } catch {
-        await queryRunner.rollbackTransaction();
-        throw new AppError('Failed to send reset password email', 500);
+      if (!mailResult.success) {
+        console.warn(`Failed to send password reset email to ${email}`);
+        // Vous pouvez potentiellement ajouter une logique de notification alternative
       }
+
+      await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
