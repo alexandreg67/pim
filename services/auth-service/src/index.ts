@@ -31,7 +31,7 @@ async function startServer() {
     await AppDataSource.initialize();
     console.info('📦 Database connection successful');
 
-    const PORT = process.env.PORT || 4001;
+    const PORT = process.env.AUTH_SERVICE_PORT || 4001;
     app.listen(PORT, () => {
       console.info(`🚀 Auth service running on port ${PORT}`);
     });
