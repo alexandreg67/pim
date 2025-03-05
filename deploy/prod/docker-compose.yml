@@ -39,16 +39,8 @@ services:
     image: alexandreg67/pim-auth:latest
     container_name: pim_auth
     restart: always
-    environment:
-      - NODE_ENV=production
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USERNAME=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_DATABASE=${POSTGRES_DB}
-      - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
-      - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}
-      - PORT=4001
+    env_file:
+      - .env.prod
     depends_on:
       - postgres
     networks:
@@ -58,9 +50,8 @@ services:
     image: alexandreg67/pim-mail:latest
     container_name: pim_mail
     restart: always
-    environment:
-      - NODE_ENV=production
-      - PORT=3002
+    env_file:
+      - .env.prod
     networks:
       - pim_network
 
