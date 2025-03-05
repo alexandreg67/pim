@@ -40,7 +40,7 @@ services:
     container_name: pim_auth
     restart: always
     env_file:
-      - .env.prod
+      - .env
     depends_on:
       - postgres
     networks:
@@ -51,7 +51,7 @@ services:
     container_name: pim_mail
     restart: always
     env_file:
-      - .env.prod
+      - .env
     networks:
       - pim_network
 
