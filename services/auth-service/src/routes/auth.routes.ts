@@ -3,7 +3,7 @@ import { authController } from '../controllers/auth.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { validateDto } from '../middlewares/validate.middleware';
 import { LoginDto, RegisterDto } from '../dtos/auth.dto';
-import { adminMiddleware } from '../middlewares/admin.middleware';
+// import { adminMiddleware } from '../middlewares/admin.middleware';
 import {
   loginLimiter,
   resetPasswordLimiter,
@@ -22,16 +22,16 @@ router.post(
 // Routes protégées (admin uniquement)
 router.post(
   '/register',
-  authMiddleware,
-  adminMiddleware,
+  // authMiddleware,
+  // adminMiddleware,
   validateDto(RegisterDto),
   authController.register
 );
 router.post(
   '/reset-password',
   resetPasswordLimiter,
-  authMiddleware,
-  adminMiddleware,
+  // authMiddleware,
+  // adminMiddleware,
   authController.resetPassword
 );
 

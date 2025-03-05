@@ -33,14 +33,14 @@ export class MailController {
       // Envoyer l'email
       const info = await transporter.sendMail(mailOptions);
 
-      console.info('📨 Email sent:', {
-        messageId: info.messageId,
-        response: info.response,
-        accepted: info.accepted || [],
-        rejected: info.rejected || [],
-        pending: info.pending || [],
-        envelope: info.envelope,
-      });
+      // console.info('📨 Email sent:', {
+      //   messageId: info.messageId,
+      //   response: info.response,
+      //   accepted: info.accepted || [],
+      //   rejected: info.rejected || [],
+      //   pending: info.pending || [],
+      //   envelope: info.envelope,
+      // });
 
       return res.json({
         success: true,
