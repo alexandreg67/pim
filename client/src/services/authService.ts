@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
+const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_URL;
 
 export const authService = {
   resetPassword: async (email: string) => {
