@@ -19,7 +19,7 @@ interface NotificationContextType {
 }
 
 const DEFAULT_SUCCESS_DURATION = 3000; // 3 secondes
-const DEFAULT_ERROR_DURATION = undefined; // Pas de fermeture automatique
+const DEFAULT_ERROR_DURATION = 5000; // Pas de fermeture automatique
 
 export const NotificationContext = createContext<
   NotificationContextType | undefined
