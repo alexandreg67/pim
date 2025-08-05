@@ -47,6 +47,7 @@ async function bootstrap() {
   // Création du serveur Apollo
   const server = new ApolloServer({
     schema,
+    plugins: [],
   });
 
   // Démarrage du serveur standalone
@@ -55,6 +56,7 @@ async function bootstrap() {
     listen: {
       port: 4000,
     },
+    // body size limit configurable
   });
 
   console.info(`🚀 Server ready at ${url}`);
