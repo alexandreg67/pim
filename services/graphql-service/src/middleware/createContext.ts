@@ -11,9 +11,18 @@ interface RequestContext {
   };
 }
 
+import { createLoaders } from './dataLoaders';
+
 export async function createContext({ req }: RequestContext): Promise<Context> {
   const userService = new UserService();
   const token = req.headers.cookie?.match(/token=([^;]+)/)?.[1];
+
+  const base = {
+    historyService: new HistoryService(),
+    req: { headers: { cookie: req.headers.cookie } },
+    loaders: createLoaders(),
+    setCacheHit: () => {},
+  } as const;
 
   try {
     const response = await axios.get('http://auth:4001/auth/verify', {
@@ -22,29 +31,11 @@ export async function createContext({ req }: RequestContext): Promise<Context> {
 
     if (response.data.userId) {
       const user = await userService.getCurrentUser(response.data.userId);
-      return {
-        user,
-        historyService: new HistoryService(),
-        req: {
-          headers: {
-            cookie: req.headers.cookie,
-          },
-        },
-        setCacheHit: () => {},
-      };
+      return { ...base, user } as Context;
     }
   } catch (error) {
     console.error('Auth verification failed:', error);
   }
 
-  return {
-    user: null,
-    historyService: new HistoryService(),
-    req: {
-      headers: {
-        cookie: undefined,
-      },
-    },
-    setCacheHit: () => {},
-  };
+  return { ...base, user: null } as Context;
 }
