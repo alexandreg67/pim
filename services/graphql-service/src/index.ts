@@ -45,7 +45,7 @@ async function bootstrap() {
     ],
     authChecker,
     container: Container,
-    validate: false,
+    validate: true,
     globalMiddlewares: [cacheMetricsMiddleware],
   });
 
