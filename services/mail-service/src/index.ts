@@ -1,8 +1,10 @@
 import express from 'express';
 import { mailRoutes } from './routes/mail.routes';
+import { rateLimit } from './middlewares/rateLimit.middleware';
 
 const app = express();
 app.use(express.json());
+app.use(rateLimit);
 
 app.use('/mail', mailRoutes);
 
