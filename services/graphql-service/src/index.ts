@@ -21,6 +21,7 @@ import {
   createComplexityPlugin,
   getBodySizeLimit,
 } from './middleware/graphqlLimits';
+import { rateLimitPlugin } from './middleware/rateLimit';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -51,7 +52,7 @@ async function bootstrap() {
   // Création du serveur Apollo
   const server = new ApolloServer({
     schema,
-    plugins: [createComplexityPlugin()],
+    plugins: [rateLimitPlugin(), createComplexityPlugin()],
   });
 
   // Démarrage du serveur standalone
