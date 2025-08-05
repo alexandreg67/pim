@@ -41,4 +41,8 @@ Workflow Rules
 
 Changelog
 
-- [TBD]
+- CI: added service workflows (client, graphql, upload, mail)
+- GraphQL: complexity + body limit + rate limiting plugins wired; DataLoaders per-request
+- GraphQL: enabled class-validator; Product DTOs and tests added
+- Nginx: security headers (HSTS, CSP, Referrer-Policy, Permissions-Policy)
+- Upload: magic number verification, stricter filename sanitization
