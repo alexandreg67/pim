@@ -7,9 +7,9 @@ const imageStorage = multer.diskStorage({
     cb(null, `/storage/assets/${uploadType}`);
   },
   filename: (req: Request, file: Express.Multer.File, cb) => {
-    const originalName = file.originalname.replace(/\s+/g, '-').toLowerCase();
+    const base = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase();
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${uniqueSuffix}-${originalName}`);
+    cb(null, `${uniqueSuffix}-${base}`);
   },
 });
 
