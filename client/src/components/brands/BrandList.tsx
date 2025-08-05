@@ -27,7 +27,7 @@ const BrandList: React.FC = () => {
   });
 
   const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
+    _event: React.ChangeEvent<unknown>,
     page: number
   ) => {
     setCurrentPage(page);
