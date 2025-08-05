@@ -54,7 +54,7 @@ export default function UserMenu() {
           <ListItemIcon>
             <Person fontSize="small" />
           </ListItemIcon>
-          Profile
+          Profil
         </MenuItem>
         {/* <MenuItem onClick={() => navigate('/settings')}>
           <ListItemIcon>
