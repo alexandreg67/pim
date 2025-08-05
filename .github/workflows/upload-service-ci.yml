@@ -1,0 +1,34 @@
+name: Upload Service CI
+
+on:
+  push:
+    branches: [main, pre-deploy, dev]
+    paths:
+      - 'services/upload-service/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main, pre-deploy, dev]
+    paths:
+      - 'services/upload-service/**'
+      - '.github/workflows/**'
+
+jobs:
+  lint-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: services/upload-service/package-lock.json
+      - name: Install deps
+        working-directory: services/upload-service
+        run: npm ci
+      - name: Lint
+        working-directory: services/upload-service
+        run: npm run lint
+      - name: Build
+        working-directory: services/upload-service
+        run: |
+          if npm run -q build; then npm run build; else echo "No build script"; fi

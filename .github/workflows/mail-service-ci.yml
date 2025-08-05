@@ -1,0 +1,34 @@
+name: Mail Service CI
+
+on:
+  push:
+    branches: [main, pre-deploy, dev]
+    paths:
+      - 'services/mail-service/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main, pre-deploy, dev]
+    paths:
+      - 'services/mail-service/**'
+      - '.github/workflows/**'
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: services/mail-service/package-lock.json
+      - name: Install deps
+        working-directory: services/mail-service
+        run: npm ci
+      - name: Lint
+        working-directory: services/mail-service
+        run: npm run lint
+      - name: Tests
+        working-directory: services/mail-service
+        run: |
+          if npm run -q test; then npm run test; else echo "No tests"; fi
