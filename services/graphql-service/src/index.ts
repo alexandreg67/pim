@@ -17,6 +17,10 @@ import { authChecker } from './middleware/authMiddleware';
 import { HistoryResolver } from './resolvers/HistoryResolver';
 import { ImageResolver } from './resolvers/ImageResolver';
 import { cacheMetricsMiddleware } from './middleware/cacheMetrics';
+import {
+  createComplexityPlugin,
+  getBodySizeLimit,
+} from './middleware/graphqlLimits';
 
 async function bootstrap() {
   // Initialisation de la base de données
@@ -47,7 +51,7 @@ async function bootstrap() {
   // Création du serveur Apollo
   const server = new ApolloServer({
     schema,
-    plugins: [],
+    plugins: [createComplexityPlugin()],
   });
 
   // Démarrage du serveur standalone
@@ -56,7 +60,9 @@ async function bootstrap() {
     listen: {
       port: 4000,
     },
-    // body size limit configurable
+    bodyParser: {
+      sizeLimit: getBodySizeLimit(),
+    },
   });
 
   console.info(`🚀 Server ready at ${url}`);
