@@ -6,7 +6,8 @@ const max = Number(process.env.RATE_LIMIT_MAX ?? 100);
 
 const buckets = new Map<string, { count: number; resetAt: number }>();
 
-const keyFor = (req: AuthRequest) => req.ip || req.headers['x-real-ip'] || 'anon';
+const keyFor = (req: AuthRequest) =>
+  req.ip || req.headers['x-real-ip'] || 'anon';
 
 export function rateLimit(req: AuthRequest, res: Response, next: NextFunction) {
   const key = String(keyFor(req));
@@ -18,6 +19,9 @@ export function rateLimit(req: AuthRequest, res: Response, next: NextFunction) {
   }
   entry.count += 1;
   buckets.set(key, entry);
-  if (entry.count > max) return res.status(429).json({ message: 'Too many requests' });
+  if (entry.count > max) {
+    res.status(429).json({ message: 'Too many requests' });
+    return;
+  }
   next();
 }

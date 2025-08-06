@@ -17,6 +17,9 @@ export function rateLimit(req: Request, res: Response, next: NextFunction) {
   }
   entry.count += 1;
   buckets.set(key, entry);
-  if (entry.count > max) return res.status(429).json({ message: 'Too many requests' });
+  if (entry.count > max) {
+    res.status(429).json({ message: 'Too many requests' });
+    return;
+  }
   next();
 }

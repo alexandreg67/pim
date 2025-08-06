@@ -7,7 +7,9 @@ const imageStorage = multer.diskStorage({
     cb(null, `/storage/assets/${uploadType}`);
   },
   filename: (req: Request, file: Express.Multer.File, cb) => {
-    const base = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase();
+    const base = file.originalname
+      .replace(/[^a-zA-Z0-9._-]/g, '-')
+      .toLowerCase();
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     cb(null, `${uniqueSuffix}-${base}`);
   },
@@ -32,7 +34,7 @@ const fileFilter = (
 export const upload = multer({
   storage: imageStorage,
   limits: {
-    fileSize: (Number(process.env.MAX_FILE_SIZE_MB || 5)) * 1024 * 1024,
+    fileSize: Number(process.env.MAX_FILE_SIZE_MB || 5) * 1024 * 1024,
   },
   fileFilter,
 });
