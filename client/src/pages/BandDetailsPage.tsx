@@ -62,7 +62,7 @@ const BrandDetailsPage: React.FC = () => {
   if (error)
     return <Typography color="error">Error: {error.message}</Typography>;
 
-  const handlePageChange = (event: unknown, newPage: number) => {
+  const handlePageChange = (_event: unknown, newPage: number) => {
     setPage(newPage);
     refetch();
   };

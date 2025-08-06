@@ -49,16 +49,19 @@ export class MailController {
           preview: nodemailer.getTestMessageUrl(info),
         }),
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ Mail sending error:', error);
 
-      if (error.response) {
-        console.error('📩 SMTP Response:', error.response);
+      if (error instanceof Error && 'response' in error) {
+        console.error(
+          '📩 SMTP Response:',
+          (error as Error & { response: unknown }).response
+        );
       }
 
       return res.status(500).json({
         error: 'Failed to send email',
-        details: error.message || 'Unknown error',
+        details: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }

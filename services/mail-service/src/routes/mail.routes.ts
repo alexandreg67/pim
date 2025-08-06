@@ -27,12 +27,10 @@ router.get('/smtp-health', async (req, res) => {
     await transporter.verify();
     res.json({ status: 'SMTP connection successful' });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        status: 'SMTP connection failed',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
+    res.status(500).json({
+      status: 'SMTP connection failed',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 });
 

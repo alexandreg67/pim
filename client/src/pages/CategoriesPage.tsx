@@ -212,9 +212,9 @@ const CategoriesPage = () => {
             count={categories.length}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={(event, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(event) =>
-              setRowsPerPage(parseInt(event.target.value, 10))
+            onPageChange={(_event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(_event) =>
+              setRowsPerPage(parseInt(_event.target.value, 10))
             }
             labelRowsPerPage="Lignes par page"
           />

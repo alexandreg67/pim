@@ -2,7 +2,7 @@ export type EmailTemplate = 'TEMP_PASSWORD' | 'PASSWORD_CHANGED';
 
 export function getEmailTemplate(
   template: EmailTemplate,
-  data: Record<string, any>
+  data: Record<string, unknown>
 ): string {
   switch (template) {
     case 'TEMP_PASSWORD':

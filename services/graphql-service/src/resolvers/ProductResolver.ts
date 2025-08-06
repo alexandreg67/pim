@@ -6,7 +6,6 @@ import {
   ObjectType,
   Field,
   Mutation,
-  InputType,
   Ctx,
   Authorized,
 } from 'type-graphql';
@@ -22,6 +21,11 @@ import { Brands } from '../entities/Brands';
 import { Contacts } from '../entities/Contacts';
 import { Images } from '../entities/Images';
 import RedisCache from '../config/redis';
+import {
+  AddProductImageDTO,
+  CreateProductDTO,
+  UpdateProductDTO,
+} from '../types/ProductInputs';
 
 @ObjectType()
 class PaginatedProductsResponse {
@@ -33,85 +37,6 @@ class PaginatedProductsResponse {
 
   @Field()
   hasMore: boolean;
-}
-
-@InputType()
-class UpdateProductInput {
-  @Field({ nullable: true })
-  name?: string;
-
-  @Field({ nullable: true })
-  description?: string;
-
-  @Field({ nullable: true })
-  shortDescription?: string;
-
-  @Field({ nullable: true })
-  price?: string;
-
-  @Field({ nullable: true })
-  status?: string;
-
-  @Field({ nullable: true })
-  label?: string;
-
-  // Relations
-  @Field(() => [String], { nullable: true })
-  categoryIds?: string[];
-
-  @Field(() => [String], { nullable: true })
-  tagIds?: string[];
-}
-
-@InputType()
-class CreateProductInput {
-  @Field()
-  name: string;
-
-  @Field()
-  reference: string;
-
-  @Field()
-  price: string;
-
-  @Field()
-  brandId: string;
-
-  @Field()
-  contactId: string;
-
-  @Field({ nullable: true })
-  description?: string;
-
-  @Field({ nullable: true })
-  shortDescription?: string;
-
-  @Field(() => String, { defaultValue: 'draft' })
-  status: string;
-
-  @Field({ nullable: true })
-  label?: string;
-
-  @Field(() => [String], { nullable: true })
-  categoryIds?: string[];
-
-  @Field(() => [String], { nullable: true })
-  tagIds?: string[];
-}
-
-@InputType()
-class AddProductImageInput {
-  @Field()
-  productId: string;
-
-  @Field()
-  url: string;
-
-  @Field({ nullable: true })
-  altText?: string;
-
-  @Field({ defaultValue: false })
-  isPrimary: boolean;
 }
 
 @Service()
@@ -251,7 +176,7 @@ export default class ProductsResolver {
   @Authorized(['admin', 'collaborator'])
   async updateProduct(
     @Arg('id') id: string,
-    @Arg('input') input: UpdateProductInput,
+    @Arg('input') input: UpdateProductDTO,
     @Ctx() { user }: Context
   ): Promise<Products> {
     if (!user) {
@@ -369,7 +294,7 @@ export default class ProductsResolver {
   @Mutation(() => Products)
   @Authorized(['admin', 'collaborator'])
   async createProduct(
-    @Arg('input') input: CreateProductInput,
+    @Arg('input') input: CreateProductDTO,
     @Ctx() { user }: Context
   ): Promise<Products> {
     if (!user) {
@@ -427,7 +352,7 @@ export default class ProductsResolver {
   @Mutation(() => Products)
   @Authorized(['admin', 'collaborator'])
   async addProductImage(
-    @Arg('input') input: AddProductImageInput,
+    @Arg('input') input: AddProductImageDTO,
     @Ctx() { user }: Context
   ): Promise<Products> {
     if (!user) {

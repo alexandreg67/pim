@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { uploadRoutes } from './routes/upload.routes';
+import { rateLimit } from './middlewares/rateLimit.middleware';
 
 dotenv.config();
 
@@ -8,6 +9,7 @@ const app = express();
 const port = process.env.PORT || 3003;
 
 app.use(express.json());
+app.use(rateLimit);
 
 // Health check
 app.get('/health', (_, res) => {

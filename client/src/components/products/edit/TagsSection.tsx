@@ -47,7 +47,7 @@ const TagsSection = ({ productTags, onChange }: TagsSectionProps) => {
         loading={loading}
         getOptionLabel={(option: Tag) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
-        onChange={(event, newValue) => {
+        onChange={(_event, newValue) => {
           onChange(newValue);
         }}
         renderInput={(params) => (
